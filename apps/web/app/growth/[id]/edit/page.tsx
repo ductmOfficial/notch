@@ -38,7 +38,8 @@ export default async function EditMeasurementPage({ params, searchParams }: Prop
           childId={child.id}
           id={measurement.id}
           label="Xoá lần đo này"
-          confirm="Không hoàn tác được."
+          title={`Xoá lần đo ${formatDate(measurement.measuredOn)}?`}
+          confirm="Cân nặng, chiều dài và vòng đầu của lần đo này sẽ bị xoá. Không hoàn tác được."
         />
       }
     >

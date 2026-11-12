@@ -7,7 +7,17 @@ import { useActionState } from "react";
 
 import { saveAppointmentAction } from "../../app/actions";
 import { fieldValue, type FormState } from "../../lib/form-values";
-import { DateInput, Field, FormMessage, Select, SubmitButton, TextInput } from "./fields";
+import { BUTTON } from "../button-styles";
+import {
+  DateField,
+  FormMessage,
+  NumberField,
+  SelectField,
+  SubmitButton,
+  TextField,
+} from "./fields";
+
+const PRODUCTS = CATALOG.products.map((p) => ({ id: p.code, name: p.name }));
 
 export function AppointmentForm({
   childId,
@@ -20,61 +30,51 @@ export function AppointmentForm({
   const v = (name: string, fallback = "") => fieldValue(state, name, fallback);
 
   return (
-    <form action={action} className="space-y-4" noValidate>
+    <form action={action} className="space-y-6" noValidate>
       <input type="hidden" name="childId" value={childId} />
       {appointment && <input type="hidden" name="id" value={appointment.id} />}
       <FormMessage message={state.message} />
 
-      <div className="grid gap-4 sm:grid-cols-[2fr_1fr]">
-        <Field label="Vaccine" error={state.errors?.productCode}>
-          {(p) => (
-            <Select
-              // React 19 resets forms after an action, but a <select> only applies
-              // defaultValue when mounted: remount it so the choice survives errors.
-              key={v("productCode", appointment?.productCode ?? "")}
-              {...p}
-              name="productCode"
-              defaultValue={v("productCode", appointment?.productCode ?? "")}
-              required
-            >
-              <option value="">Chọn vaccine…</option>
-              {CATALOG.products.map((product) => (
-                <option key={product.code} value={product.code}>
-                  {product.name}
-                </option>
-              ))}
-            </Select>
-          )}
-        </Field>
-        <Field label="Mũi số" error={state.errors?.doseNo}>
-          {(p) => (
-            <TextInput
-              {...p}
-              name="doseNo"
-              inputMode="numeric"
-              defaultValue={v("doseNo", String(appointment?.doseNo ?? 1))}
-              required
-            />
-          )}
-        </Field>
+      <div className="grid gap-6 sm:grid-cols-[2fr_1fr]">
+        <SelectField
+          // React 19 resets forms after an action; remount so the choice survives errors.
+          key={v("productCode", appointment?.productCode ?? "")}
+          label="Vaccine"
+          name="productCode"
+          items={PRODUCTS}
+          defaultValue={v("productCode", appointment?.productCode ?? "")}
+          placeholder="Chọn vaccine…"
+          error={state.errors?.productCode}
+          isRequired
+        />
+        <NumberField
+          label="Mũi số"
+          name="doseNo"
+          defaultValue={v("doseNo", String(appointment?.doseNo ?? 1))}
+          error={state.errors?.doseNo}
+          required
+        />
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Ngày hẹn" hint="Để trống nếu chưa có ngày" error={state.errors?.dueOn}>
-          {(p) => (
-            <DateInput {...p} name="dueOn" defaultValue={v("dueOn", appointment?.dueOn ?? "")} />
-          )}
-        </Field>
-        <Field label="Ghi chú" hint="Ví dụ: sau 1 tuổi">
-          {(p) => (
-            <TextInput {...p} name="note" defaultValue={v("note", appointment?.note ?? "")} />
-          )}
-        </Field>
+      <div className="grid gap-6 sm:grid-cols-2">
+        <DateField
+          label="Ngày hẹn"
+          hint="Để trống nếu chưa có ngày"
+          name="dueOn"
+          defaultValue={v("dueOn", appointment?.dueOn ?? "")}
+          error={state.errors?.dueOn}
+        />
+        <TextField
+          label="Ghi chú"
+          hint="Ví dụ: sau 1 tuổi"
+          name="note"
+          defaultValue={v("note", appointment?.note ?? "")}
+        />
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex flex-row-reverse flex-wrap items-center justify-start gap-2">
         <SubmitButton>{appointment ? "Lưu lịch hẹn" : "Thêm lịch hẹn"}</SubmitButton>
-        <Link href="/vaccines" className="text-sm text-[var(--muted)] hover:text-[var(--text)]">
+        <Link href="/vaccines" className={BUTTON.text}>
           Huỷ
         </Link>
       </div>

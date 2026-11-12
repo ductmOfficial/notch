@@ -8,3 +8,6 @@ engineStrict: true
 # only verifies its binary, which pnpm already installs as a platform package.
 allowBuilds:
   esbuild: false
+
+minimumReleaseAgeExclude:
+  - "@ductmofficial/sen-ui@0.5.0"

@@ -4,7 +4,9 @@ import Link from "next/link";
 
 import { deleteDoseAction } from "../actions";
 import { AppointmentBadge } from "../../components/AppointmentBadge";
+import { BUTTON } from "../../components/button-styles";
 import { DeleteForm } from "../../components/form/DeleteForm";
+import { Icon } from "../../components/icons";
 import { Card, NoChild, NoDatabase } from "../../components/ui";
 import { getCurrentChild } from "../../lib/child";
 import { getDb } from "../../lib/db";
@@ -37,69 +39,70 @@ export default async function VaccinesPage({ searchParams }: Props) {
   const doseIds = new Map(doses.map((d) => [key(d.productCode, d.doseNo), d.id]));
 
   return (
-    <div className="space-y-6">
-      <header className="flex flex-wrap items-end justify-between gap-3">
+    <div className="space-y-6 pt-2">
+      <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Tiêm chủng của {child.name}</h1>
-          <p className="text-sm text-[var(--muted)]">
+          <h1 className="headline-medium">Tiêm chủng của {child.name}</h1>
+          <p className="body-medium mt-1 text-on-surface-variant">
             {formatAge(child.birthDate, today)} · {doses.length} mũi đã tiêm · {view.covered.length}
             /{view.covered.length + view.uncovered.length} bệnh đã có mũi
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link
-            href="/vaccines/record"
-            className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-medium text-[var(--surface)] hover:opacity-90"
-          >
-            Ghi nhận mũi tiêm
-          </Link>
-          <Link
-            href="/vaccines/appointments/new"
-            className="rounded-lg border border-[var(--border)] px-4 py-2 text-sm font-medium hover:bg-[var(--grid)]"
-          >
-            Thêm lịch hẹn
-          </Link>
-          <a
-            href="/calendar.ics"
-            download
-            className="rounded-lg border border-[var(--border)] px-4 py-2 text-sm font-medium hover:bg-[var(--grid)]"
-          >
+          <a href="/calendar.ics" download className={BUTTON.outlined}>
+            <Icon name="download" size={18} />
             Tải lịch (.ics)
           </a>
+          <Link href="/vaccines/appointments/new" className={BUTTON.tonal}>
+            <Icon name="event" size={18} />
+            Thêm lịch hẹn
+          </Link>
+          <Link href="/vaccines/record" className={BUTTON.filled}>
+            <Icon name="add" size={18} />
+            Ghi nhận mũi tiêm
+          </Link>
         </div>
       </header>
 
-      <Card>
-        <h2 className="mb-3 font-medium">Lịch hẹn</h2>
+      <Card className="p-0">
+        <h2 id="appointments-title" className="title-medium px-4 pt-4 pb-2">
+          Lịch hẹn
+        </h2>
         {view.open.length === 0 && view.undated.length === 0 ? (
-          <p className="text-sm text-[var(--muted)]">Không có lịch hẹn nào đang chờ.</p>
+          <p className="body-medium px-4 pb-4 text-on-surface-variant">
+            Không có lịch hẹn nào đang chờ.
+          </p>
         ) : (
-          <ul className="divide-y divide-[var(--border)]">
+          <ul aria-labelledby="appointments-title" className="divide-y divide-outline-variant pb-2">
             {[...view.open, ...view.undated].map((a) => (
               <li
                 key={`${a.productCode}-${String(a.doseNo)}`}
-                className="flex flex-wrap items-center gap-x-4 gap-y-1 py-2.5"
+                className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3"
               >
-                <span className="min-w-40 font-medium">
-                  {productName(a.productCode)}{" "}
-                  <span className="font-normal text-[var(--muted)]">· mũi {a.doseNo}</span>
+                <span className="min-w-44">
+                  <span className="body-large block">
+                    {productName(a.productCode)}
+                    <span className="text-on-surface-variant"> · mũi {a.doseNo}</span>
+                  </span>
+                  <span className="body-medium tabular-nums text-on-surface-variant">
+                    {a.dueOn ? formatDate(a.dueOn) : (a.note ?? "Chưa có ngày")}
+                  </span>
                 </span>
-                <span className="text-sm tabular-nums text-[var(--muted)]">
-                  {a.dueOn ? formatDate(a.dueOn) : (a.note ?? "Chưa có ngày")}
-                </span>
-                <span className="ml-auto flex flex-wrap items-center gap-3 text-sm">
-                  <AppointmentBadge state={a} />
-                  <Link
-                    href={`/vaccines/record?product=${a.productCode}&dose=${String(a.doseNo)}`}
-                    className="text-[var(--accent)] hover:underline"
-                  >
-                    Đã tiêm
-                  </Link>
+                <AppointmentBadge state={a} />
+                <span className="ml-auto flex flex-wrap items-center gap-1">
                   <Link
                     href={`/vaccines/appointments/${appointmentIds.get(key(a.productCode, a.doseNo)) ?? ""}/edit`}
-                    className="text-[var(--muted)] hover:text-[var(--text)]"
+                    className={BUTTON.text}
                   >
+                    <Icon name="edit" size={18} />
                     Sửa
+                  </Link>
+                  <Link
+                    href={`/vaccines/record?product=${a.productCode}&dose=${String(a.doseNo)}`}
+                    className={BUTTON.tonal}
+                  >
+                    <Icon name="check" size={18} />
+                    Đã tiêm
                   </Link>
                 </span>
               </li>
@@ -108,32 +111,34 @@ export default async function VaccinesPage({ searchParams }: Props) {
         )}
       </Card>
 
-      <Card>
-        <h2 className="mb-1 font-medium">Theo bệnh</h2>
-        <p className="mb-3 text-xs text-[var(--muted)]">
-          Một mũi vaccine phối hợp được tính cho mọi bệnh nó phòng (ví dụ Infanrix Hexa phòng 6
-          bệnh).
-        </p>
-        <ul className="divide-y divide-[var(--border)] border-y border-[var(--border)]">
+      <Card className="p-0">
+        <div className="px-4 pt-4 pb-2">
+          <h2 className="title-medium">Theo bệnh</h2>
+          <p className="body-small mt-1 text-on-surface-variant">
+            Một mũi vaccine phối hợp được tính cho mọi bệnh nó phòng (ví dụ Infanrix Hexa phòng 6
+            bệnh).
+          </p>
+        </div>
+        <ul className="divide-y divide-outline-variant">
           {view.covered.map((row) => (
-            <li key={row.code} className="grid gap-x-4 gap-y-1.5 py-2.5 sm:grid-cols-[13rem_1fr]">
+            <li key={row.code} className="grid gap-x-4 gap-y-2 px-4 py-3 sm:grid-cols-[13rem_1fr]">
               <p className="flex items-baseline justify-between gap-3 sm:block">
-                <span className="font-medium">{row.name}</span>{" "}
-                <span className="text-sm whitespace-nowrap text-[var(--muted)]">
+                <span className="body-large">{row.name}</span>{" "}
+                <span className="body-medium block whitespace-nowrap text-on-surface-variant">
                   {row.doses.length} mũi
                 </span>
               </p>
               <ul
-                className="flex flex-wrap content-start items-start gap-1.5"
+                className="flex flex-wrap content-start items-start gap-2"
                 aria-label={`Các mũi phòng ${row.name}`}
               >
                 {row.doses.map((d) => (
                   <li
                     key={`${d.productCode}-${String(d.doseNo)}`}
-                    className="rounded-md bg-[var(--grid)] px-2 py-0.5 text-xs whitespace-nowrap"
+                    className="label-large inline-flex h-8 items-center rounded-m3-sm bg-success-container px-3 whitespace-nowrap text-on-success-container"
                   >
-                    {d.productName} {d.doseNo} ·{" "}
-                    <span className="tabular-nums">{formatDate(d.givenOn)}</span>
+                    {d.productName} {d.doseNo}
+                    <span className="tabular-nums opacity-80">&nbsp;· {formatDate(d.givenOn)}</span>
                   </li>
                 ))}
               </ul>
@@ -141,48 +146,53 @@ export default async function VaccinesPage({ searchParams }: Props) {
           ))}
         </ul>
         {view.uncovered.length > 0 && (
-          <details className="mt-3 text-sm">
-            <summary className="cursor-pointer text-[var(--muted)]">
+          <details className="body-medium border-t border-outline-variant px-4 py-3">
+            <summary className="cursor-pointer text-on-surface-variant">
               Chưa có mũi nào ({view.uncovered.length} bệnh)
             </summary>
-            <p className="mt-2 text-[var(--muted)]">
+            <p className="mt-2 text-on-surface-variant">
               {view.uncovered.map((r) => r.name).join(" · ")}
             </p>
           </details>
         )}
       </Card>
 
-      <Card>
-        <h2 className="mb-3 font-medium">Lịch sử tiêm ({view.history.length})</h2>
-        <ol className="divide-y divide-[var(--border)]">
+      <Card className="p-0">
+        <h2 id="history-title" className="title-medium px-4 pt-4 pb-2">
+          Lịch sử tiêm ({view.history.length})
+        </h2>
+        <ol aria-labelledby="history-title" className="divide-y divide-outline-variant pb-2">
           {view.history.map((h) => (
             <li
               key={`${h.productCode}-${String(h.doseNo)}`}
-              className="grid gap-x-4 py-2.5 sm:grid-cols-[7rem_1fr]"
+              className="grid items-center gap-x-4 gap-y-1 px-4 py-3 sm:grid-cols-[7rem_1fr_auto]"
             >
-              <span className="text-sm tabular-nums text-[var(--muted)]">
+              <span className="body-medium tabular-nums text-on-surface-variant">
                 {formatDate(h.givenOn)}
               </span>
               <span>
-                <span className="font-medium">{h.productName}</span>{" "}
-                <span className="text-[var(--muted)]">· mũi {h.doseNo}</span>
-                <span className="block text-xs text-[var(--muted)]">{h.diseases.join(", ")}</span>
-                <span className="mt-1 block">
-                  <DeleteForm
-                    action={deleteDoseAction}
-                    childId={child.id}
-                    id={doseIds.get(key(h.productCode, h.doseNo)) ?? ""}
-                    label="Xoá"
-                    confirm={`Xoá ${h.productName} mũi ${String(h.doseNo)}? Không hoàn tác được.`}
-                  />
+                <span className="body-large">{h.productName}</span>
+                <span className="text-on-surface-variant"> · mũi {h.doseNo}</span>
+                <span className="body-small block text-on-surface-variant">
+                  {h.diseases.join(", ")}
                 </span>
+              </span>
+              <span className="-ml-3 sm:ml-0">
+                <DeleteForm
+                  action={deleteDoseAction}
+                  childId={child.id}
+                  id={doseIds.get(key(h.productCode, h.doseNo)) ?? ""}
+                  label="Xoá"
+                  title={`Xoá ${h.productName} mũi ${String(h.doseNo)}?`}
+                  confirm={`Mũi tiêm ngày ${formatDate(h.givenOn)} sẽ bị xoá khỏi lịch sử. Không hoàn tác được.`}
+                />
               </span>
             </li>
           ))}
         </ol>
       </Card>
 
-      <p className="text-xs text-[var(--muted)]">
+      <p className="body-small text-on-surface-variant">
         Lịch hẹn theo sổ tiêm của phòng tiêm. Hỏi bác sĩ hoặc phòng tiêm trước khi thay đổi lịch.
       </p>
     </div>

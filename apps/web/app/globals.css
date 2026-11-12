@@ -1,48 +1,190 @@
+/* Sen UI sits above Tailwind's base styles and below its utilities, so a utility class on a
+   Sen UI component still wins. Declared first: the first statement fixes the layer order. */
+@layer theme, base, sen, components, utilities;
+
 @import "tailwindcss";
+@import "@ductmofficial/sen-ui/styles.css";
+@import "@fontsource-variable/roboto-flex";
+@import "./theme.css";
 
-@theme {
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-}
-
+/* ── Material Design 3 on Sen UI ─────────────────────────────────────────
+   theme.css holds the generated M3 color roles (--md-sys-color-*). The Sen UI
+   tokens below point at those roles, so Sen UI components follow the scheme
+   in light and dark. Unlayered, so they override the defaults in `sen`. */
 :root {
-  --bg: #f7f6f2;
-  --surface: #ffffff;
-  --text: #1d1d1b;
-  --muted: #6b6a63;
-  --border: #e4e2da;
-  --accent: #2f6f5e;
-  --accent-soft: #e3efe9;
-  --point: #c2410c;
-  --curve-median: #2f6f5e;
-  --curve-2: #b7791f;
-  --curve-3: #b4b2a9;
-  --grid: #eceae3;
-  --danger: #b42318;
-  --danger-soft: #fdeceb;
-  color-scheme: light;
+  --sen-color-bg: var(--md-sys-color-surface);
+  --sen-color-surface: var(--md-sys-color-surface-container-highest);
+  --sen-color-surface-hover: var(--md-sys-color-surface-container-high);
+  --sen-color-fg: var(--md-sys-color-on-surface);
+  --sen-color-fg-muted: var(--md-sys-color-on-surface-variant);
+  --sen-color-border: var(--md-sys-color-outline);
+  --sen-color-border-subtle: var(--md-sys-color-outline-variant);
+  --sen-color-accent: var(--md-sys-color-primary);
+  --sen-color-accent-hover: color-mix(
+    in srgb,
+    var(--md-sys-color-primary) 88%,
+    var(--md-sys-color-on-primary)
+  );
+  --sen-color-accent-text: var(--md-sys-color-primary);
+  --sen-color-on-accent: var(--md-sys-color-on-primary);
+  --sen-color-danger: var(--md-sys-color-error);
+  --sen-focus-ring-color: var(--md-sys-color-secondary);
+  --sen-focus-ring-offset: 2px;
+
+  /* M3 shape scale: extra-small 4px (fields, menus), small 8px, medium 12px (cards),
+     extra-large 28px (dialogs), full (buttons). */
+  --sen-radius-sm: 2px;
+  --sen-radius-md: 4px;
+  --sen-radius-lg: 28px;
+  --sen-button-radius: 9999px;
+  --sen-control-height-md: 3.5rem;
+  --sen-font-family: "Roboto Flex Variable", system-ui, sans-serif;
+  --sen-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --sen-duration-fast: 150ms;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #161614;
-    --surface: #201f1c;
-    --text: #ecebe6;
-    --muted: #a3a199;
-    --border: #34322d;
-    --accent: #7fc4ad;
-    --accent-soft: #23332d;
-    --point: #fb923c;
-    --curve-median: #7fc4ad;
-    --curve-2: #e0b04a;
-    --curve-3: #5f5d56;
-    --grid: #2b2a26;
-    --danger: #f97066;
-    --danger-soft: #3a1f1d;
-    color-scheme: dark;
+@theme inline {
+  --font-sans: "Roboto Flex Variable", system-ui, sans-serif;
+
+  --color-primary: var(--md-sys-color-primary);
+  --color-on-primary: var(--md-sys-color-on-primary);
+  --color-primary-container: var(--md-sys-color-primary-container);
+  --color-on-primary-container: var(--md-sys-color-on-primary-container);
+  --color-secondary: var(--md-sys-color-secondary);
+  --color-secondary-container: var(--md-sys-color-secondary-container);
+  --color-on-secondary-container: var(--md-sys-color-on-secondary-container);
+  --color-tertiary: var(--md-sys-color-tertiary);
+  --color-tertiary-container: var(--md-sys-color-tertiary-container);
+  --color-on-tertiary-container: var(--md-sys-color-on-tertiary-container);
+  --color-error: var(--md-sys-color-error);
+  --color-error-container: var(--md-sys-color-error-container);
+  --color-on-error-container: var(--md-sys-color-on-error-container);
+  --color-warning-container: var(--md-sys-color-warning-container);
+  --color-on-warning-container: var(--md-sys-color-on-warning-container);
+  --color-success: var(--md-sys-color-success);
+  --color-success-container: var(--md-sys-color-success-container);
+  --color-on-success-container: var(--md-sys-color-on-success-container);
+  --color-surface: var(--md-sys-color-surface);
+  --color-on-surface: var(--md-sys-color-on-surface);
+  --color-on-surface-variant: var(--md-sys-color-on-surface-variant);
+  --color-surface-container-lowest: var(--md-sys-color-surface-container-lowest);
+  --color-surface-container-low: var(--md-sys-color-surface-container-low);
+  --color-surface-container: var(--md-sys-color-surface-container);
+  --color-surface-container-high: var(--md-sys-color-surface-container-high);
+  --color-surface-container-highest: var(--md-sys-color-surface-container-highest);
+  --color-outline: var(--md-sys-color-outline);
+  --color-outline-variant: var(--md-sys-color-outline-variant);
+  --color-inverse-surface: var(--md-sys-color-inverse-surface);
+  --color-inverse-on-surface: var(--md-sys-color-inverse-on-surface);
+
+  --radius-m3-xs: 4px;
+  --radius-m3-sm: 8px;
+  --radius-m3-md: 12px;
+  --radius-m3-lg: 16px;
+  --radius-m3-xl: 28px;
+}
+
+/* Colors of the growth chart, from the same roles. */
+:root {
+  --chart-point: var(--md-sys-color-primary);
+  --chart-median: var(--md-sys-color-tertiary);
+  --chart-sd2: var(--md-sys-color-warning);
+  --chart-sd3: var(--md-sys-color-outline-variant);
+  --chart-grid: var(--md-sys-color-surface-container-highest);
+}
+
+@layer base {
+  body {
+    background: var(--md-sys-color-surface);
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--font-sans);
+  }
+  :focus-visible {
+    outline: 2px solid var(--md-sys-color-secondary);
+    outline-offset: 2px;
   }
 }
 
-body {
-  background: var(--bg);
-  color: var(--text);
+/* ── M3 type scale ───────────────────────────────────────────────────── */
+@utility display-small {
+  font-size: 36px;
+  line-height: 44px;
+  font-weight: 400;
+}
+@utility headline-medium {
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 400;
+}
+@utility headline-small {
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 400;
+}
+@utility title-large {
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 400;
+}
+@utility title-medium {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+  letter-spacing: 0.15px;
+}
+@utility title-small {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  letter-spacing: 0.1px;
+}
+@utility body-large {
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0.5px;
+}
+@utility body-medium {
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+}
+@utility body-small {
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.4px;
+}
+@utility label-large {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  letter-spacing: 0.1px;
+}
+@utility label-medium {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* M3 state layer: a tint of the content color on hover (8%) and press or focus (10%). */
+@utility state-layer {
+  position: relative;
+  isolation: isolate;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: currentColor;
+    opacity: 0;
+    transition: opacity 150ms cubic-bezier(0.2, 0, 0, 1);
+  }
+  &:hover::before {
+    opacity: 0.08;
+  }
+  &:focus-visible::before,
+  &:active::before {
+    opacity: 0.1;
+  }
 }

@@ -1,2 +1,5 @@
 pnpm-lock.yaml
 packages/growth/src/data/
+# Generated files (apps/web/scripts)
+apps/web/app/theme.css
+apps/web/components/icons.tsx

@@ -2,7 +2,9 @@ import { type Child, listMeasurements, type Measurement } from "@notch/db";
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { BUTTON } from "../../components/button-styles";
 import { GrowthChart } from "../../components/GrowthChart";
+import { Icon } from "../../components/icons";
 import { NoChild, NoDatabase } from "../../components/ui";
 import { getCurrentChild } from "../../lib/child";
 import { getDb } from "../../lib/db";
@@ -47,11 +49,11 @@ export default async function GrowthPage({ searchParams }: Props) {
   const today = todayInVietnam();
 
   return (
-    <div className="space-y-6">
-      <header className="flex flex-wrap items-end justify-between gap-2">
+    <div className="space-y-6 pt-2">
+      <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Tăng trưởng của {child.name}</h1>
-          <p className="text-sm text-[var(--muted)]">
+          <h1 className="headline-medium">Tăng trưởng của {child.name}</h1>
+          <p className="body-medium mt-1 text-on-surface-variant">
             {child.sex === "female" ? "Bé gái" : "Bé trai"} · {formatAge(child.birthDate, today)} ·
             so với chuẩn WHO
           </p>
@@ -62,8 +64,9 @@ export default async function GrowthPage({ searchParams }: Props) {
           )}
           <Link
             href={`/growth/new${children.length > 1 ? `?child=${child.id}` : ""}`}
-            className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-medium text-[var(--surface)] hover:opacity-90"
+            className={BUTTON.filled}
           >
+            <Icon name="add" size={18} />
             Thêm lần đo
           </Link>
         </div>
@@ -71,21 +74,18 @@ export default async function GrowthPage({ searchParams }: Props) {
 
       <Summary sex={child.sex} birthDate={child.birthDate} measurements={measurements} />
 
-      <section
-        aria-labelledby="chart-title"
-        className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4"
-      >
+      <section aria-labelledby="chart-title" className="rounded-m3-md bg-surface-container-low p-4">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-          <h2 id="chart-title" className="font-medium">
+          <h2 id="chart-title" className="title-medium">
             {INDICATORS[indicator].label} theo tuổi
           </h2>
-          <nav aria-label="Chỉ số" className="flex flex-wrap gap-1">
+          <nav aria-label="Chỉ số" className="flex flex-wrap gap-2">
             {TABS.map((tab) => (
               <Link
                 key={tab}
                 href={`/growth?indicator=${tab}${children.length > 1 ? `&child=${child.id}` : ""}`}
                 aria-current={tab === indicator ? "page" : undefined}
-                className="rounded-full px-3 py-1 text-sm text-[var(--muted)] hover:text-[var(--text)] aria-[current=page]:bg-[var(--accent-soft)] aria-[current=page]:text-[var(--accent)]"
+                className="state-layer label-large inline-flex h-8 items-center rounded-m3-sm border border-outline-variant px-3 text-on-surface-variant aria-[current=page]:border-transparent aria-[current=page]:bg-secondary-container aria-[current=page]:text-on-secondary-container"
               >
                 {INDICATORS[tab].label}
               </Link>
@@ -93,7 +93,7 @@ export default async function GrowthPage({ searchParams }: Props) {
           </nav>
         </div>
         {chart.points.length === 0 ? (
-          <p className="py-12 text-center text-sm text-[var(--muted)]">
+          <p className="body-medium py-12 text-center text-on-surface-variant">
             Chưa có số đo {INDICATORS[indicator].label.toLowerCase()}.
           </p>
         ) : (
@@ -101,7 +101,14 @@ export default async function GrowthPage({ searchParams }: Props) {
           // container starts scrolled to the end, where the latest measurements
           // are, without client JavaScript. The inner box must be as wide as the chart
           // (w-max) so it overflows to the left; the content stays left-to-right.
-          <div dir="rtl" className="-mx-4 overflow-x-auto px-4">
+          <div
+            dir="rtl"
+            // Focusable so the chart can be scrolled with the keyboard when it overflows.
+            tabIndex={0}
+            role="region"
+            aria-labelledby="chart-title"
+            className="-mx-4 overflow-x-auto px-4"
+          >
             <div dir="ltr" className="w-max min-w-full">
               <GrowthChart chart={chart} titleId="chart-title" />
             </div>
@@ -112,7 +119,7 @@ export default async function GrowthPage({ searchParams }: Props) {
 
       <MeasurementTable sex={child.sex} birthDate={child.birthDate} measurements={measurements} />
 
-      <p className="text-xs text-[var(--muted)]">
+      <p className="body-small text-on-surface-variant">
         Số liệu đối chiếu với Chuẩn tăng trưởng trẻ em của WHO (0–5 tuổi). Đây không phải đánh giá y
         khoa; hãy hỏi bác sĩ khi có điều cần lưu ý.
       </p>
@@ -130,13 +137,13 @@ function ChildPicker({
   indicator: ChartIndicator;
 }) {
   return (
-    <nav aria-label="Chọn bé" className="flex gap-1">
+    <nav aria-label="Chọn bé" className="flex gap-2">
       {items.map((c) => (
         <Link
           key={c.id}
           href={`/growth?indicator=${indicator}&child=${c.id}`}
           aria-current={c.id === current ? "page" : undefined}
-          className="rounded-full border border-[var(--border)] px-3 py-1 text-sm aria-[current=page]:bg-[var(--accent-soft)]"
+          className="state-layer label-large inline-flex h-8 items-center rounded-m3-sm border border-outline-variant px-3 text-on-surface-variant aria-[current=page]:border-transparent aria-[current=page]:bg-secondary-container aria-[current=page]:text-on-secondary-container"
         >
           {c.name}
         </Link>
@@ -165,27 +172,26 @@ function Summary({
       {cards.map(({ indicator, latest }) => {
         const info = INDICATORS[indicator];
         return (
-          <div
-            key={indicator}
-            className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4"
-          >
-            <dt className="text-sm text-[var(--muted)]">{info.label}</dt>
+          <div key={indicator} className="rounded-m3-md bg-surface-container-highest p-4">
+            <dt className="title-small text-on-surface-variant">{info.label}</dt>
             <dd className="mt-1">
-              <span className="text-2xl font-semibold tabular-nums">
+              <span className="headline-medium tabular-nums">
                 {latest.estimated ? "≈" : ""}
                 {formatNumber(latest.value, info.digits)}
               </span>{" "}
-              <span className="text-sm text-[var(--muted)]">{info.unit}</span>
+              <span className="body-medium text-on-surface-variant">{info.unit}</span>
             </dd>
             {latest.z !== undefined && latest.percentile !== undefined && (
-              <dd className="mt-1 text-sm">
+              <dd className="body-medium mt-1">
                 Bách phân vị{" "}
                 <strong className="tabular-nums">{Math.round(latest.percentile)}</strong> · z{" "}
                 <span className="tabular-nums">{formatZ(latest.z)}</span>
-                <span className="block text-xs text-[var(--muted)]">{zBand(latest.z)}</span>
+                <span className="body-small block text-on-surface-variant">{zBand(latest.z)}</span>
               </dd>
             )}
-            <dd className="mt-1 text-xs text-[var(--muted)]">Đo ngày {formatDate(latest.date)}</dd>
+            <dd className="body-small mt-1 text-on-surface-variant">
+              Đo ngày {formatDate(latest.date)}
+            </dd>
           </div>
         );
       })}
@@ -195,20 +201,20 @@ function Summary({
 
 function Legend() {
   const items = [
-    { label: "Trung bình (TB)", style: { borderColor: "var(--curve-median)", borderTopWidth: 2 } },
-    { label: "±2 SD", style: { borderColor: "var(--curve-2)", borderTopWidth: 2 } },
+    { label: "Trung bình (TB)", style: { borderColor: "var(--chart-median)", borderTopWidth: 2 } },
+    { label: "±2 SD", style: { borderColor: "var(--chart-sd2)", borderTopWidth: 2 } },
     {
       label: "±3 SD",
       style: {
-        borderColor: "var(--curve-3)",
+        borderColor: "var(--chart-sd3)",
         borderTopWidth: 2,
         borderTopStyle: "dashed" as const,
       },
     },
-    { label: "Số đo của bé", style: { borderColor: "var(--point)", borderTopWidth: 3 } },
+    { label: "Số đo của bé", style: { borderColor: "var(--chart-point)", borderTopWidth: 3 } },
   ];
   return (
-    <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-xs text-[var(--muted)]">
+    <ul className="body-small mt-3 flex flex-wrap gap-x-5 gap-y-1 text-on-surface-variant">
       {items.map((item) => (
         <li key={item.label} className="flex items-center gap-2">
           <span aria-hidden="true" className="inline-block w-5" style={item.style} />
@@ -242,7 +248,9 @@ function MeasurementTable({
         {p.estimated ? "≈" : ""}
         {formatNumber(p.value, digits)}
         {p.percentile !== undefined && (
-          <span className="ml-2 text-xs text-[var(--muted)]">P{Math.round(p.percentile)}</span>
+          <span className="body-small ml-2 text-on-surface-variant">
+            P{Math.round(p.percentile)}
+          </span>
         )}
       </>
     ) : (
@@ -250,27 +258,24 @@ function MeasurementTable({
     );
 
   return (
-    <section
-      aria-labelledby="table-title"
-      className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4"
-    >
-      <h2 id="table-title" className="mb-3 font-medium">
+    <section aria-labelledby="table-title" className="rounded-m3-md bg-surface-container-low p-4">
+      <h2 id="table-title" className="title-medium mb-2">
         Các lần đo ({measurements.length})
       </h2>
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead className="text-left text-[var(--muted)]">
+        <table className="body-medium w-full">
+          <thead className="label-large text-left text-on-surface-variant">
             <tr>
-              <th scope="col" className="py-2 pr-4 font-normal">
+              <th scope="col" className="py-2 pr-4 font-medium">
                 Ngày
               </th>
-              <th scope="col" className="py-2 pr-4 font-normal">
+              <th scope="col" className="py-2 pr-4 font-medium">
                 Tuổi
               </th>
-              <th scope="col" className="py-2 pr-4 text-right font-normal">
+              <th scope="col" className="py-2 pr-4 text-right font-medium">
                 Cân nặng (kg)
               </th>
-              <th scope="col" className="py-2 pr-4 text-right font-normal">
+              <th scope="col" className="py-2 pr-4 text-right font-medium">
                 Chiều dài (cm)
               </th>
               <th scope="col" className="py-2">
@@ -280,23 +285,24 @@ function MeasurementTable({
           </thead>
           <tbody className="tabular-nums">
             {rows.map((m) => (
-              <tr key={m.id} className="border-t border-[var(--border)]">
-                <td className="py-2 pr-4 whitespace-nowrap">{formatDate(m.measuredOn)}</td>
-                <td className="py-2 pr-4 whitespace-nowrap text-[var(--muted)]">
+              <tr key={m.id} className="border-t border-outline-variant">
+                <td className="py-1 pr-4 whitespace-nowrap">{formatDate(m.measuredOn)}</td>
+                <td className="py-1 pr-4 whitespace-nowrap text-on-surface-variant">
                   {formatAge(birthDate, m.measuredOn)}
                 </td>
-                <td className="py-2 pr-4 text-right whitespace-nowrap">
+                <td className="py-1 pr-4 text-right whitespace-nowrap">
                   {cell(weight.get(m.measuredOn), 2)}
                 </td>
-                <td className="py-2 pr-4 text-right whitespace-nowrap">
+                <td className="py-1 pr-4 text-right whitespace-nowrap">
                   {cell(length.get(m.measuredOn), 1)}
                 </td>
-                <td className="py-2 text-right">
+                <td className="py-1 text-right">
                   <Link
                     href={`/growth/${m.id}/edit`}
-                    className="text-[var(--accent)] hover:underline"
+                    className={BUTTON.text}
                     aria-label={`Sửa lần đo ${formatDate(m.measuredOn)}`}
                   >
+                    <Icon name="edit" size={18} />
                     Sửa
                   </Link>
                 </td>
