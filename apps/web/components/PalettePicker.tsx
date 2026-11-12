@@ -4,11 +4,11 @@ import { type CSSProperties, useState, useTransition } from "react";
 
 import { setPaletteAction } from "../app/settings/actions";
 import { useI18n } from "../lib/i18n/client";
-import { FlowerMark, type Palette } from "./Flowers";
+import { MotifMark, type Palette } from "./Motifs";
 import { Segmented } from "./Segmented";
 
 /**
- * Each option shows its flower in its own seed colors (those of scripts/generate-theme.mjs),
+ * Each option shows its drawing in its own seed colors (those of scripts/generate-theme.mjs),
  * whatever the current palette.
  */
 const SEEDS: Record<Palette, CSSProperties> = {
@@ -22,16 +22,21 @@ const SEEDS: Record<Palette, CSSProperties> = {
     "--md-sys-color-tertiary": "#5b8a3a",
     "--md-sys-color-warning": "#f2b33d",
   } as CSSProperties,
+  cloud: {
+    "--md-sys-color-primary": "#3f86d4",
+    "--md-sys-color-tertiary": "#e8916a",
+    "--md-sys-color-warning": "#e8b23a",
+  } as CSSProperties,
 };
 
 const swatch = (palette: Palette) => (
   <span style={SEEDS[palette]} className="flex">
-    <FlowerMark palette={palette} size={20} />
+    <MotifMark palette={palette} size={20} />
   </span>
 );
 
 /**
- * Lotus or daylily colors and drawings. Both palettes are already in the page, so it
+ * Lotus, daylily or cloud colors and drawings. Every palette is already in the page, so it
  * switches at once; the cookie lets the server render the choice on the next visit.
  */
 export function PalettePicker({ initial }: { initial: Palette }) {
@@ -63,6 +68,11 @@ export function PalettePicker({ initial }: { initial: Palette }) {
           value: "daylily",
           label: t("settings.paletteDaylily"),
           icon: swatch("daylily"),
+        },
+        {
+          value: "cloud",
+          label: t("settings.paletteCloud"),
+          icon: swatch("cloud"),
         },
       ]}
     />

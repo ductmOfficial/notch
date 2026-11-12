@@ -16,7 +16,7 @@ export async function getTheme(): Promise<Theme> {
   return isTheme(value) ? value : "system";
 }
 
-export const PALETTES = ["lotus", "daylily"] as const;
+export const PALETTES = ["lotus", "daylily", "cloud"] as const;
 export type Palette = (typeof PALETTES)[number];
 
 export const PALETTE_COOKIE = "notch-palette";
@@ -24,7 +24,7 @@ export const PALETTE_COOKIE = "notch-palette";
 export const isPalette = (value: unknown): value is Palette =>
   typeof value === "string" && (PALETTES as readonly string[]).includes(value);
 
-/** The flower palette chosen in Settings; the lotus is the default. */
+/** The palette chosen in Settings; the lotus is the default. */
 export async function getPalette(): Promise<Palette> {
   const value = (await cookies()).get(PALETTE_COOKIE)?.value;
   return isPalette(value) ? value : "lotus";

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { BUTTON } from "../../components/button-styles";
-import { CardFlower, type CardFlowerProps } from "../../components/Flowers";
+import { CardMotif, type CardMotifProps } from "../../components/Motifs";
 import { GrowthChart } from "../../components/GrowthChart";
 import { Icon } from "../../components/icons";
 import { NoChild, NoDatabase } from "../../components/ui";
@@ -28,10 +28,10 @@ import {
   type MeasurementInput,
 } from "../../lib/growth-chart";
 
-const GROWTH_FLOWERS: Record<"weight" | "length" | "bmi", CardFlowerProps> = {
-  weight: { motif: "bloom", place: "bottomRight", tilt: -8 },
-  length: { motif: "bud", place: "right", tilt: 22 },
-  bmi: { motif: "petals", place: "topRight" },
+const GROWTH_MOTIFS: Record<"weight" | "length" | "bmi", CardMotifProps> = {
+  weight: { kind: "bloom", place: "bottomRight", tilt: -8 },
+  length: { kind: "bud", place: "right", tilt: 22 },
+  bmi: { kind: "petals", place: "topRight" },
 };
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -206,7 +206,7 @@ function Summary({
             key={indicator}
             className="relative isolate overflow-hidden rounded-m3-md bg-surface-container-highest p-4"
           >
-            <CardFlower {...GROWTH_FLOWERS[indicator]} />
+            <CardMotif {...GROWTH_MOTIFS[indicator]} />
             <dt className="title-small text-on-surface-variant">{t(info.labelKey)}</dt>
             <dd className="mt-1">
               <span className="headline-medium tabular-nums">

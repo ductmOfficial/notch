@@ -129,7 +129,7 @@ test("the theme chosen in settings applies at once and survives a reload", async
   await expect(html).not.toHaveAttribute("data-theme");
 });
 
-test("the daylily palette applies at once and survives a reload", async ({ page }) => {
+test("the palette applies at once and survives a reload", async ({ page }) => {
   await page.goto("/settings");
   const html = page.locator("html");
   await expect(html).not.toHaveAttribute("data-palette");
@@ -140,14 +140,22 @@ test("the daylily palette applies at once and survives a reload", async ({ page 
   await expect(html).toHaveAttribute("data-palette", "daylily");
   await expect(page.getByRole("radio", { name: "Huyên thảo" })).toBeChecked();
   // Only the daylily drawings show.
-  await expect(page.locator(".flower-lotus").filter({ visible: true })).toHaveCount(0);
-  await expect(page.locator(".flower-daylily").filter({ visible: true }).first()).toBeVisible();
+  await expect(page.locator(".motif-lotus").filter({ visible: true })).toHaveCount(0);
+  await expect(page.locator(".motif-daylily").filter({ visible: true }).first()).toBeVisible();
+
+  await page.locator("label").filter({ hasText: "Mây" }).click();
+  await expect(html).toHaveAttribute("data-palette", "cloud");
+  await expect(page.locator(".motif-cloud").filter({ visible: true }).first()).toBeVisible();
+  await expect(page.locator(".motif-daylily").filter({ visible: true })).toHaveCount(0);
 
   await page.locator("label").filter({ hasText: "Sen" }).click();
   await expect(html).not.toHaveAttribute("data-palette");
   await page.reload();
   await expect(html).not.toHaveAttribute("data-palette");
-  await expect(page.locator(".flower-daylily").filter({ visible: true })).toHaveCount(0);
+  await expect(page.locator(".motif-daylily, .motif-cloud").filter({ visible: true })).toHaveCount(
+    0,
+  );
+  await expect(page.locator(".motif-lotus").filter({ visible: true }).first()).toBeVisible();
 });
 
 test("the language follows the browser and can be changed in settings", async ({ browser }) => {

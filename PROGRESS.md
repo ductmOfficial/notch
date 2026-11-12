@@ -36,6 +36,7 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 | 15  | Lotus mark next to the name, on empty states, as the favicon         | `feat/lotus-mark`      | ✅     |
 | 16  | Lotus drawings on the summary cards                                  | `feat/card-lotus`      | ✅     |
 | 17  | Daylily (huyên thảo) palette and drawings, chosen in Settings        | `feat/daylily-palette` | ✅     |
+| 18  | Cloud (mây) palette and drawings                                     | `feat/cloud-palette`   | ✅     |
 
 Each step is a pull request with green checks (`Browser` from step 9), merged with rebase.
 
@@ -47,35 +48,36 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 
 ## Decisions
 
-| Decision                                                          | Reason                                                                                                                                             |
-| ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| WHO data by day of age                                            | `anthro` publishes LMS values for every day from 0 to 1826, so no interpolation between monthly rows is needed                                     |
-| Restricted extrapolation beyond ±3 SD for weight-based indicators | As WHO specifies; length/height and head circumference use the plain LMS formula                                                                   |
-| Vaccine data is not typed by hand                                 | The engine ships with fixture schedules; the real schedule comes from a generator once an official source is reachable                             |
-| Appointments over schedules                                       | Real records show the clinic books every next dose, so the app reminds from appointments; `planDoses` stays for suggestions                        |
-| Doses per product, shown per disease                              | One product can cover several diseases (Infanrix Hexa covers six)                                                                                  |
-| Approximate values flagged per value                              | A record can have an approximate weight and an exact length                                                                                        |
-| PGlite next to PostgreSQL                                         | The same Drizzle code runs on both; tests, E2E and Docker-free local runs use PGlite                                                               |
-| Seed is for the first load only                                   | It refuses to overwrite a child that already has records unless `--replace` is passed, so data entered in the app is kept                          |
-| A fictional demo child in the repository                          | E2E and demos need data; real records stay outside the repository                                                                                  |
-| Calendar titles stay generic ("Lịch tiêm cho bé")                 | Calendars sync to other services and show on lock screens                                                                                          |
-| Server-rendered SVG chart                                         | No chart library and no client JavaScript; the table repeats the data                                                                              |
-| Material Design 3                                                 | A widely known system with published guidance for color, type, shape and layout; familiar to phone users                                           |
-| Lotus palette generated with Material Color Utilities             | Colors come from four seed colors, light and dark, with contrast built in; a unit test checks AA for every pairing                                 |
-| Sen UI tokens mapped to M3 color roles                            | Sen UI components follow the scheme without forking them; the same token approach restyles the portfolio                                           |
-| Forms moved to Sen UI with the design system                      | One switch for every control; the first forms used native inputs behind one module so the swap touched only that module                            |
-| Deleting asks in an `alertdialog`                                 | A single tap never deletes; Cancel keeps focus where it was                                                                                        |
-| `@material/material-color-utilities` 0.3.x                        | 0.4.0 imports its own files without extensions, which Node's ESM loader rejects                                                                    |
-| E2E on a fresh PGlite database, flows on desktop only             | Tests are independent of any local data; flows change data, so they run once while accessibility runs on desktop and mobile                        |
-| Browser checks with the runner's Chrome                           | No browser download and no apt packages in CI; Playwright's Chromium stays the fallback                                                            |
-| Theme kept in a cookie and applied on the server                  | The page never flashes the wrong theme on load; "System" removes the cookie and follows the device                                                 |
-| Language from a cookie, then the browser; no locale in URLs       | The app is private and not indexed, so URLs stay short; Vietnamese is the fallback                                                                 |
-| Flat dictionaries, Vietnamese as the reference                    | TypeScript rejects unknown keys; a unit test keeps English on the same keys and placeholders                                                       |
-| Lotus drawn in SVG, not a photo                                   | It takes its colors from the scheme, so it follows light and dark, weighs a few hundred bytes and needs no image license                           |
-| The lotus mark stays off data cards and navigation                | Those icons tell what an item is (weight, vaccine, settings); the lotus is the brand, shown where nothing else needs saying                        |
-| Palettes switch with a `data-palette` attribute and CSS           | Both schemes are in `theme.css` and every drawing is rendered in both flowers, so the page repaints at once; the cookie only serves the next visit |
-| Daylily as a second palette, lotus stays the default              | In East Asian tradition the daylily stands for the mother; parents can pick the flower they prefer                                                 |
-| No Co-Authored-By trailer in commits                              | Maintainer's preference                                                                                                                            |
+| Decision                                                          | Reason                                                                                                                                              |
+| ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| WHO data by day of age                                            | `anthro` publishes LMS values for every day from 0 to 1826, so no interpolation between monthly rows is needed                                      |
+| Restricted extrapolation beyond ±3 SD for weight-based indicators | As WHO specifies; length/height and head circumference use the plain LMS formula                                                                    |
+| Vaccine data is not typed by hand                                 | The engine ships with fixture schedules; the real schedule comes from a generator once an official source is reachable                              |
+| Appointments over schedules                                       | Real records show the clinic books every next dose, so the app reminds from appointments; `planDoses` stays for suggestions                         |
+| Doses per product, shown per disease                              | One product can cover several diseases (Infanrix Hexa covers six)                                                                                   |
+| Approximate values flagged per value                              | A record can have an approximate weight and an exact length                                                                                         |
+| PGlite next to PostgreSQL                                         | The same Drizzle code runs on both; tests, E2E and Docker-free local runs use PGlite                                                                |
+| Seed is for the first load only                                   | It refuses to overwrite a child that already has records unless `--replace` is passed, so data entered in the app is kept                           |
+| A fictional demo child in the repository                          | E2E and demos need data; real records stay outside the repository                                                                                   |
+| Calendar titles stay generic ("Lịch tiêm cho bé")                 | Calendars sync to other services and show on lock screens                                                                                           |
+| Server-rendered SVG chart                                         | No chart library and no client JavaScript; the table repeats the data                                                                               |
+| Material Design 3                                                 | A widely known system with published guidance for color, type, shape and layout; familiar to phone users                                            |
+| Lotus palette generated with Material Color Utilities             | Colors come from four seed colors, light and dark, with contrast built in; a unit test checks AA for every pairing                                  |
+| Sen UI tokens mapped to M3 color roles                            | Sen UI components follow the scheme without forking them; the same token approach restyles the portfolio                                            |
+| Forms moved to Sen UI with the design system                      | One switch for every control; the first forms used native inputs behind one module so the swap touched only that module                             |
+| Deleting asks in an `alertdialog`                                 | A single tap never deletes; Cancel keeps focus where it was                                                                                         |
+| `@material/material-color-utilities` 0.3.x                        | 0.4.0 imports its own files without extensions, which Node's ESM loader rejects                                                                     |
+| E2E on a fresh PGlite database, flows on desktop only             | Tests are independent of any local data; flows change data, so they run once while accessibility runs on desktop and mobile                         |
+| Browser checks with the runner's Chrome                           | No browser download and no apt packages in CI; Playwright's Chromium stays the fallback                                                             |
+| Theme kept in a cookie and applied on the server                  | The page never flashes the wrong theme on load; "System" removes the cookie and follows the device                                                  |
+| Language from a cookie, then the browser; no locale in URLs       | The app is private and not indexed, so URLs stay short; Vietnamese is the fallback                                                                  |
+| Flat dictionaries, Vietnamese as the reference                    | TypeScript rejects unknown keys; a unit test keeps English on the same keys and placeholders                                                        |
+| Lotus drawn in SVG, not a photo                                   | It takes its colors from the scheme, so it follows light and dark, weighs a few hundred bytes and needs no image license                            |
+| The lotus mark stays off data cards and navigation                | Those icons tell what an item is (weight, vaccine, settings); the lotus is the brand, shown where nothing else needs saying                         |
+| Palettes switch with a `data-palette` attribute and CSS           | Every scheme is in `theme.css` and every drawing is rendered for every palette, so the page repaints at once; the cookie only serves the next visit |
+| Daylily as a second palette, lotus stays the default              | In East Asian tradition the daylily stands for the mother; parents can pick the flower they prefer                                                  |
+| Cloud palette with its own "done" green                           | Sky blue, sunset peach and sun yellow carry the theme; "done" stays green so its meaning does not change with the palette                           |
+| No Co-Authored-By trailer in commits                              | Maintainer's preference                                                                                                                             |
 
 ## Follow-ups
 
