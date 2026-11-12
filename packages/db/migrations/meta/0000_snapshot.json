@@ -1,0 +1,536 @@
+{
+  "id": "7296eae8-bdac-43c7-9a1a-eab0f5f8f917",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.appointment": {
+      "name": "appointment",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "child_id": {
+          "name": "child_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "product_code": {
+          "name": "product_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dose_no": {
+          "name": "dose_no",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "due_on": {
+          "name": "due_on",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "note": {
+          "name": "note",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "appointment_child_id_child_id_fk": {
+          "name": "appointment_child_id_child_id_fk",
+          "tableFrom": "appointment",
+          "tableTo": "child",
+          "columnsFrom": ["child_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "appointment_product_code_vaccine_product_code_fk": {
+          "name": "appointment_product_code_vaccine_product_code_fk",
+          "tableFrom": "appointment",
+          "tableTo": "vaccine_product",
+          "columnsFrom": ["product_code"],
+          "columnsTo": ["code"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "appointment_child_dose": {
+          "name": "appointment_child_dose",
+          "nullsNotDistinct": false,
+          "columns": ["child_id", "product_code", "dose_no"]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "appointment_dose_positive": {
+          "name": "appointment_dose_positive",
+          "value": "\"appointment\".\"dose_no\" > 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.child": {
+      "name": "child",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "family_id": {
+          "name": "family_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sex": {
+          "name": "sex",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "birth_date": {
+          "name": "birth_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "birth_time": {
+          "name": "birth_time",
+          "type": "time",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "child_family_id_family_id_fk": {
+          "name": "child_family_id_family_id_fk",
+          "tableFrom": "child",
+          "tableTo": "family",
+          "columnsFrom": ["family_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "child_sex_check": {
+          "name": "child_sex_check",
+          "value": "\"child\".\"sex\" in ('male', 'female')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.disease": {
+      "name": "disease",
+      "schema": "",
+      "columns": {
+        "code": {
+          "name": "code",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name_vi": {
+          "name": "name_vi",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name_en": {
+          "name": "name_en",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.family": {
+      "name": "family",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.measurement": {
+      "name": "measurement",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "child_id": {
+          "name": "child_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "measured_on": {
+          "name": "measured_on",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "weight_g": {
+          "name": "weight_g",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "length_mm": {
+          "name": "length_mm",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "head_mm": {
+          "name": "head_mm",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "position": {
+          "name": "position",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "weight_estimated": {
+          "name": "weight_estimated",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "length_estimated": {
+          "name": "length_estimated",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "head_estimated": {
+          "name": "head_estimated",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "note": {
+          "name": "note",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "measurement_child_id_child_id_fk": {
+          "name": "measurement_child_id_child_id_fk",
+          "tableFrom": "measurement",
+          "tableTo": "child",
+          "columnsFrom": ["child_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "measurement_has_value": {
+          "name": "measurement_has_value",
+          "value": "\"measurement\".\"weight_g\" is not null or \"measurement\".\"length_mm\" is not null or \"measurement\".\"head_mm\" is not null"
+        },
+        "measurement_weight_positive": {
+          "name": "measurement_weight_positive",
+          "value": "\"measurement\".\"weight_g\" > 0"
+        },
+        "measurement_length_positive": {
+          "name": "measurement_length_positive",
+          "value": "\"measurement\".\"length_mm\" > 0"
+        },
+        "measurement_head_positive": {
+          "name": "measurement_head_positive",
+          "value": "\"measurement\".\"head_mm\" > 0"
+        },
+        "measurement_position_check": {
+          "name": "measurement_position_check",
+          "value": "\"measurement\".\"position\" in ('lying', 'standing')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.product_disease": {
+      "name": "product_disease",
+      "schema": "",
+      "columns": {
+        "product_code": {
+          "name": "product_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "disease_code": {
+          "name": "disease_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "product_disease_product_code_vaccine_product_code_fk": {
+          "name": "product_disease_product_code_vaccine_product_code_fk",
+          "tableFrom": "product_disease",
+          "tableTo": "vaccine_product",
+          "columnsFrom": ["product_code"],
+          "columnsTo": ["code"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "product_disease_disease_code_disease_code_fk": {
+          "name": "product_disease_disease_code_disease_code_fk",
+          "tableFrom": "product_disease",
+          "tableTo": "disease",
+          "columnsFrom": ["disease_code"],
+          "columnsTo": ["code"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "product_disease_product_code_disease_code_pk": {
+          "name": "product_disease_product_code_disease_code_pk",
+          "columns": ["product_code", "disease_code"]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.vaccination": {
+      "name": "vaccination",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "child_id": {
+          "name": "child_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "product_code": {
+          "name": "product_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dose_no": {
+          "name": "dose_no",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "given_on": {
+          "name": "given_on",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "place": {
+          "name": "place",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lot": {
+          "name": "lot",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "note": {
+          "name": "note",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "vaccination_child_id_child_id_fk": {
+          "name": "vaccination_child_id_child_id_fk",
+          "tableFrom": "vaccination",
+          "tableTo": "child",
+          "columnsFrom": ["child_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "vaccination_product_code_vaccine_product_code_fk": {
+          "name": "vaccination_product_code_vaccine_product_code_fk",
+          "tableFrom": "vaccination",
+          "tableTo": "vaccine_product",
+          "columnsFrom": ["product_code"],
+          "columnsTo": ["code"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "vaccination_child_dose": {
+          "name": "vaccination_child_dose",
+          "nullsNotDistinct": false,
+          "columns": ["child_id", "product_code", "dose_no"]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "vaccination_dose_positive": {
+          "name": "vaccination_dose_positive",
+          "value": "\"vaccination\".\"dose_no\" > 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.vaccine_product": {
+      "name": "vaccine_product",
+      "schema": "",
+      "columns": {
+        "code": {
+          "name": "code",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
