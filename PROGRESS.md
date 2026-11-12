@@ -17,20 +17,21 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 
 ## Steps
 
-| #   | Step                                                                 | Branch               | Status |
-| --- | -------------------------------------------------------------------- | -------------------- | ------ |
-| 1   | Repository from the `ductran-starter` template                       | `main`               | ✅     |
-| 2   | Rename to `notch`, drop the sample package, PostgreSQL on port 5433  | `chore/setup`        | ✅     |
-| 3   | `@notch/growth`: WHO LMS z-scores and percentiles, generated data    | `feat/growth`        | ✅     |
-| 4   | `@notch/vaccines`: catalog, appointments, schedule engine            | `feat/vaccines`      | ✅     |
-| 5   | `@notch/db`: schema, migrations, queries, mutations, seed, demo data | `feat/db`            | ✅     |
-| 6   | Today, Growth and Vaccinations screens                               | `feat/web`           | ✅     |
-| 7   | Forms for measurements, doses and appointments; `.ics` download      | `feat/forms`         | ✅     |
-| 8   | Material Design 3 with a lotus palette, on Sen UI                    | `feat/theme`         | ✅     |
-| 9   | Playwright and axe tests, `Browser` job in CI                        | `test/e2e`           | ✅     |
-| 10  | README and this progress log                                         | `docs/readme`        | ✅     |
-| 11  | Settings page with a light, dark or system theme                     | `feat/theme-setting` | ✅     |
-| 12  | Vietnamese and English, chosen in Settings                           | `feat/i18n`          | ✅     |
+| #   | Step                                                                 | Branch                | Status |
+| --- | -------------------------------------------------------------------- | --------------------- | ------ |
+| 1   | Repository from the `ductran-starter` template                       | `main`                | ✅     |
+| 2   | Rename to `notch`, drop the sample package, PostgreSQL on port 5433  | `chore/setup`         | ✅     |
+| 3   | `@notch/growth`: WHO LMS z-scores and percentiles, generated data    | `feat/growth`         | ✅     |
+| 4   | `@notch/vaccines`: catalog, appointments, schedule engine            | `feat/vaccines`       | ✅     |
+| 5   | `@notch/db`: schema, migrations, queries, mutations, seed, demo data | `feat/db`             | ✅     |
+| 6   | Today, Growth and Vaccinations screens                               | `feat/web`            | ✅     |
+| 7   | Forms for measurements, doses and appointments; `.ics` download      | `feat/forms`          | ✅     |
+| 8   | Material Design 3 with a lotus palette, on Sen UI                    | `feat/theme`          | ✅     |
+| 9   | Playwright and axe tests, `Browser` job in CI                        | `test/e2e`            | ✅     |
+| 10  | README and this progress log                                         | `docs/readme`         | ✅     |
+| 11  | Settings page with a light, dark or system theme                     | `feat/theme-setting`  | ✅     |
+| 12  | Vietnamese and English, chosen in Settings                           | `feat/i18n`           | ✅     |
+| 13  | Lotus watermark behind the content                                   | `feat/lotus-backdrop` | ✅     |
 
 Each step is a pull request with green checks (`Browser` from step 9), merged with rebase.
 
@@ -66,6 +67,7 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 | Theme kept in a cookie and applied on the server                  | The page never flashes the wrong theme on load; "System" removes the cookie and follows the device                          |
 | Language from a cookie, then the browser; no locale in URLs       | The app is private and not indexed, so URLs stay short; Vietnamese is the fallback                                          |
 | Flat dictionaries, Vietnamese as the reference                    | TypeScript rejects unknown keys; a unit test keeps English on the same keys and placeholders                                |
+| Lotus drawn in SVG, not a photo                                   | It takes its colors from the scheme, so it follows light and dark, weighs a few hundred bytes and needs no image license    |
 | No Co-Authored-By trailer in commits                              | Maintainer's preference                                                                                                     |
 
 ## Follow-ups
