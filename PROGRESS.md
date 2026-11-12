@@ -37,6 +37,7 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 | 16  | Lotus drawings on the summary cards                                  | `feat/card-lotus`      | ✅     |
 | 17  | Daylily (huyên thảo) palette and drawings, chosen in Settings        | `feat/daylily-palette` | ✅     |
 | 18  | Cloud (mây) palette and drawings                                     | `feat/cloud-palette`   | ✅     |
+| 19  | Quiet chips for given doses; status colors harmonized                | `feat/quiet-done`      | ✅     |
 
 Each step is a pull request with green checks (`Browser` from step 9), merged with rebase.
 
@@ -77,6 +78,8 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 | Palettes switch with a `data-palette` attribute and CSS           | Every scheme is in `theme.css` and every drawing is rendered for every palette, so the page repaints at once; the cookie only serves the next visit |
 | Daylily as a second palette, lotus stays the default              | In East Asian tradition the daylily stands for the mother; parents can pick the flower they prefer                                                  |
 | Cloud palette with its own "done" green                           | Sky blue, sunset peach and sun yellow carry the theme; "done" stays green so its meaning does not change with the palette                           |
+| Given doses as outlined chips with a green check                  | A given dose is the normal state; strong color is kept for what needs action (overdue, upcoming), so a long list does not turn the page green       |
+| Status colors harmonized toward the primary, at most 8°           | As M3 does for custom colors; at the usual 15° the lotus's "done" green turned olive                                                                |
 | No Co-Authored-By trailer in commits                              | Maintainer's preference                                                                                                                             |
 
 ## Follow-ups

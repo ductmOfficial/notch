@@ -142,13 +142,21 @@ export default async function VaccinesPage({ searchParams }: Props) {
                 aria-label={t("vaccines.dosesFor", { disease: row.name })}
               >
                 {row.doses.map((d) => (
+                  // A given dose is the normal state, so it stays quiet: an outlined chip with a
+                  // green check. Strong color is kept for what needs action (overdue, upcoming).
                   <li
                     key={`${d.productCode}-${String(d.doseNo)}`}
-                    className="label-large inline-flex h-8 items-center rounded-m3-sm bg-success-container px-3 whitespace-nowrap text-on-success-container"
+                    className="label-large inline-flex h-8 items-center gap-1.5 rounded-m3-sm border border-outline-variant pr-3 pl-2 whitespace-nowrap text-on-surface"
                   >
-                    {d.productName} {d.doseNo}
-                    <span className="tabular-nums opacity-80">
-                      &nbsp;· {formatDate(d.givenOn, locale)}
+                    <span className="text-success">
+                      <Icon name="check" size={18} />
+                    </span>
+                    <span>
+                      {d.productName} {d.doseNo}
+                      <span className="tabular-nums text-on-surface-variant">
+                        {" · "}
+                        {formatDate(d.givenOn, locale)}
+                      </span>
                     </span>
                   </li>
                 ))}

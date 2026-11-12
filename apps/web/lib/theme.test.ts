@@ -48,7 +48,11 @@ const TEXT: [string, string][] = [
   ["on-warning-container", "warning-container"],
   ["inverse-on-surface", "inverse-surface"],
 ];
-const NON_TEXT: [string, string][] = [["outline", "surface"]];
+const NON_TEXT: [string, string][] = [
+  ["outline", "surface"],
+  // The check on a given dose.
+  ["success", "surface-container-low"],
+];
 
 const DAYLILY = '[data-palette="daylily"]';
 const CLOUD = '[data-palette="cloud"]';
