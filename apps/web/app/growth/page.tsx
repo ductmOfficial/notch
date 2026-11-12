@@ -1,4 +1,4 @@
-import { type Child, listMeasurements } from "@notch/db";
+import { type Child, listMeasurements, type Measurement } from "@notch/db";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -42,7 +42,7 @@ export default async function GrowthPage({ searchParams }: Props) {
   const indicator: ChartIndicator = isChartIndicator(params.indicator)
     ? params.indicator
     : "weight";
-  const measurements: MeasurementInput[] = await listMeasurements(db, child.id);
+  const measurements = await listMeasurements(db, child.id);
   const chart = buildChart(indicator, child.sex, child.birthDate, measurements);
   const today = todayInVietnam();
 
@@ -56,9 +56,17 @@ export default async function GrowthPage({ searchParams }: Props) {
             so với chuẩn WHO
           </p>
         </div>
-        {children.length > 1 && (
-          <ChildPicker items={children} current={child.id} indicator={indicator} />
-        )}
+        <div className="flex flex-wrap items-center gap-3">
+          {children.length > 1 && (
+            <ChildPicker items={children} current={child.id} indicator={indicator} />
+          )}
+          <Link
+            href={`/growth/new${children.length > 1 ? `?child=${child.id}` : ""}`}
+            className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-medium text-[var(--surface)] hover:opacity-90"
+          >
+            Thêm lần đo
+          </Link>
+        </div>
       </header>
 
       <Summary sex={child.sex} birthDate={child.birthDate} measurements={measurements} />
@@ -219,7 +227,7 @@ function MeasurementTable({
 }: {
   sex: Child["sex"];
   birthDate: string;
-  measurements: MeasurementInput[];
+  measurements: Measurement[];
 }) {
   const weight = new Map(
     chartPoints("weight", sex, birthDate, measurements).map((p) => [p.date, p]),
@@ -262,14 +270,17 @@ function MeasurementTable({
               <th scope="col" className="py-2 pr-4 text-right font-normal">
                 Cân nặng (kg)
               </th>
-              <th scope="col" className="py-2 text-right font-normal">
+              <th scope="col" className="py-2 pr-4 text-right font-normal">
                 Chiều dài (cm)
+              </th>
+              <th scope="col" className="py-2">
+                <span className="sr-only">Thao tác</span>
               </th>
             </tr>
           </thead>
           <tbody className="tabular-nums">
             {rows.map((m) => (
-              <tr key={m.measuredOn} className="border-t border-[var(--border)]">
+              <tr key={m.id} className="border-t border-[var(--border)]">
                 <td className="py-2 pr-4 whitespace-nowrap">{formatDate(m.measuredOn)}</td>
                 <td className="py-2 pr-4 whitespace-nowrap text-[var(--muted)]">
                   {formatAge(birthDate, m.measuredOn)}
@@ -277,8 +288,17 @@ function MeasurementTable({
                 <td className="py-2 pr-4 text-right whitespace-nowrap">
                   {cell(weight.get(m.measuredOn), 2)}
                 </td>
-                <td className="py-2 text-right whitespace-nowrap">
+                <td className="py-2 pr-4 text-right whitespace-nowrap">
                   {cell(length.get(m.measuredOn), 1)}
+                </td>
+                <td className="py-2 text-right">
+                  <Link
+                    href={`/growth/${m.id}/edit`}
+                    className="text-[var(--accent)] hover:underline"
+                    aria-label={`Sửa lần đo ${formatDate(m.measuredOn)}`}
+                  >
+                    Sửa
+                  </Link>
                 </td>
               </tr>
             ))}
