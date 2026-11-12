@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
 // These tests change the shared database; the mobile project skips this file (playwright.config.ts).
 
@@ -111,6 +111,13 @@ test("the calendar file lists appointments with generic titles only", async ({ r
   expect(ics).not.toContain("Mây");
 });
 
+/** The page switches before the server action stores the cookie; reload only once it has. */
+async function cookieSaved(page: Page, name: string, value: string | undefined) {
+  await expect
+    .poll(async () => (await page.context().cookies()).find((c) => c.name === name)?.value)
+    .toBe(value);
+}
+
 test("the theme chosen in settings applies at once and survives a reload", async ({ page }) => {
   await page.goto("/settings");
   const html = page.locator("html");
@@ -119,12 +126,14 @@ test("the theme chosen in settings applies at once and survives a reload", async
   // The radio inputs are visually hidden inside their segment labels, as in a segmented button.
   await page.locator("label").filter({ hasText: "Tối" }).click();
   await expect(html).toHaveAttribute("data-theme", "dark");
+  await cookieSaved(page, "notch-theme", "dark");
   await page.reload();
   await expect(html).toHaveAttribute("data-theme", "dark");
   await expect(page.getByRole("radio", { name: "Tối" })).toBeChecked();
 
   await page.locator("label").filter({ hasText: "Theo hệ thống" }).click();
   await expect(html).not.toHaveAttribute("data-theme");
+  await cookieSaved(page, "notch-theme", undefined);
   await page.reload();
   await expect(html).not.toHaveAttribute("data-theme");
 });
@@ -136,6 +145,7 @@ test("the palette applies at once and survives a reload", async ({ page }) => {
 
   await page.locator("label").filter({ hasText: "Huyên thảo" }).click();
   await expect(html).toHaveAttribute("data-palette", "daylily");
+  await cookieSaved(page, "notch-palette", "daylily");
   await page.reload();
   await expect(html).toHaveAttribute("data-palette", "daylily");
   await expect(page.getByRole("radio", { name: "Huyên thảo" })).toBeChecked();
@@ -145,11 +155,13 @@ test("the palette applies at once and survives a reload", async ({ page }) => {
 
   await page.locator("label").filter({ hasText: "Mây" }).click();
   await expect(html).toHaveAttribute("data-palette", "cloud");
+  await cookieSaved(page, "notch-palette", "cloud");
   await expect(page.locator(".motif-cloud").filter({ visible: true }).first()).toBeVisible();
   await expect(page.locator(".motif-daylily").filter({ visible: true })).toHaveCount(0);
 
   await page.locator("label").filter({ hasText: "Sen" }).click();
   await expect(html).not.toHaveAttribute("data-palette");
+  await cookieSaved(page, "notch-palette", undefined);
   await page.reload();
   await expect(html).not.toHaveAttribute("data-palette");
   await expect(page.locator(".motif-daylily, .motif-cloud").filter({ visible: true })).toHaveCount(
