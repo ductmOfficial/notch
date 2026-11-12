@@ -4,6 +4,7 @@ import type { AppointmentRow } from "@notch/db";
 import { CATALOG } from "@notch/vaccines";
 import Link from "next/link";
 import { useActionState } from "react";
+import { useI18n } from "../../lib/i18n/client";
 
 import { saveAppointmentAction } from "../../app/actions";
 import { fieldValue, type FormState } from "../../lib/form-values";
@@ -27,6 +28,7 @@ export function AppointmentForm({
   appointment?: AppointmentRow;
 }) {
   const [state, action] = useActionState<FormState, FormData>(saveAppointmentAction, {});
+  const { t } = useI18n();
   const v = (name: string, fallback = "") => fieldValue(state, name, fallback);
 
   return (
@@ -39,16 +41,16 @@ export function AppointmentForm({
         <SelectField
           // React 19 resets forms after an action; remount so the choice survives errors.
           key={v("productCode", appointment?.productCode ?? "")}
-          label="Vaccine"
+          label={t("form.vaccine")}
           name="productCode"
           items={PRODUCTS}
           defaultValue={v("productCode", appointment?.productCode ?? "")}
-          placeholder="Chọn vaccine…"
+          placeholder={t("form.pickVaccine")}
           error={state.errors?.productCode}
           isRequired
         />
         <NumberField
-          label="Mũi số"
+          label={t("form.doseNo")}
           name="doseNo"
           defaultValue={v("doseNo", String(appointment?.doseNo ?? 1))}
           error={state.errors?.doseNo}
@@ -58,24 +60,26 @@ export function AppointmentForm({
 
       <div className="grid gap-6 sm:grid-cols-2">
         <DateField
-          label="Ngày hẹn"
-          hint="Để trống nếu chưa có ngày"
+          label={t("form.dueOn")}
+          hint={t("form.dueOnHint")}
           name="dueOn"
           defaultValue={v("dueOn", appointment?.dueOn ?? "")}
           error={state.errors?.dueOn}
         />
         <TextField
-          label="Ghi chú"
-          hint="Ví dụ: sau 1 tuổi"
+          label={t("common.note")}
+          hint={t("form.noteHint")}
           name="note"
           defaultValue={v("note", appointment?.note ?? "")}
         />
       </div>
 
       <div className="flex flex-row-reverse flex-wrap items-center justify-start gap-2">
-        <SubmitButton>{appointment ? "Lưu lịch hẹn" : "Thêm lịch hẹn"}</SubmitButton>
+        <SubmitButton>
+          {appointment ? t("form.saveAppointment") : t("form.addAppointment")}
+        </SubmitButton>
         <Link href="/vaccines" className={BUTTON.text}>
-          Huỷ
+          {t("common.cancel")}
         </Link>
       </div>
     </form>

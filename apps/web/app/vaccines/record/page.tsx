@@ -5,9 +5,13 @@ import { DoseForm } from "../../../components/form/DoseForm";
 import { NoChild, NoDatabase } from "../../../components/ui";
 import { getCurrentChild } from "../../../lib/child";
 import { getDb } from "../../../lib/db";
+import { getI18n } from "../../../lib/i18n/server";
 import { todayInVietnam } from "../../../lib/format";
 
-export const metadata: Metadata = { title: "Ghi nhận mũi tiêm" };
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return { title: t("page.recordDose") };
+}
 export const dynamic = "force-dynamic";
 
 interface Props {
@@ -17,6 +21,7 @@ interface Props {
 /** Opened from an appointment ("?product=bexsero&dose=2") or from scratch. */
 export default async function RecordDosePage({ searchParams }: Props) {
   const params = await searchParams;
+  const { t } = await getI18n();
   const db = getDb();
   if (!db) return <NoDatabase />;
   const { child } = await getCurrentChild(db, params.child);
@@ -25,9 +30,9 @@ export default async function RecordDosePage({ searchParams }: Props) {
 
   return (
     <FormPage
-      title="Ghi nhận mũi tiêm"
+      title={t("page.recordDose")}
       childName={child.name}
-      back={{ href: "/vaccines", label: "Tiêm chủng" }}
+      back={{ href: "/vaccines", label: t("nav.vaccines") }}
     >
       <DoseForm
         childId={child.id}

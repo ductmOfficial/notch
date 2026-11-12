@@ -11,6 +11,7 @@ import {
 import { type ComponentProps, type ReactNode, useId } from "react";
 import { useFormStatus } from "react-dom";
 
+import { useI18n } from "../../lib/i18n/client";
 import { BUTTON, type ButtonStyle } from "../button-styles";
 
 type InputProps = Omit<ComponentProps<"input">, "type"> & {
@@ -127,16 +128,17 @@ export function CheckboxField({
 export function SubmitButton({
   children,
   variant = "filled",
-  pendingLabel = "Đang lưu…",
+  pendingLabel,
 }: {
   children: ReactNode;
   variant?: ButtonStyle;
   pendingLabel?: string;
 }) {
   const { pending } = useFormStatus();
+  const { t } = useI18n();
   return (
     <Button type="submit" disabled={pending} className={BUTTON[variant]}>
-      {pending ? pendingLabel : children}
+      {pending ? (pendingLabel ?? t("common.saving")) : children}
     </Button>
   );
 }

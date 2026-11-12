@@ -43,6 +43,19 @@ describe("formatting", () => {
   });
 });
 
+describe("English", () => {
+  it("formats ages, dates and numbers", () => {
+    expect(formatAge("2030-03-16", "2031-05-20", "en")).toBe("1 year 2 months");
+    expect(formatAge("2030-01-31", "2030-03-01", "en")).toBe("1 month 1 day");
+    expect(formatAge("2030-03-16", "2032-03-16", "en")).toBe("2 years");
+    expect(formatAge("2030-03-16", "2030-03-01", "en")).toBe("not born yet");
+    expect(formatDate("2030-11-09", "en")).toBe("9 Nov 2030");
+    expect(formatNumber(1234.5, 1, "en")).toBe("1,234.5");
+    expect(formatZ(-1.234, "en")).toBe("−1.23");
+    expect(zBand(0, "en")).toBe("within ±2 SD");
+  });
+});
+
 describe("todayInVietnam", () => {
   it("uses the Vietnam calendar day", () => {
     expect(todayInVietnam(new Date("2030-11-08T18:30:00Z"))).toBe("2030-11-09");

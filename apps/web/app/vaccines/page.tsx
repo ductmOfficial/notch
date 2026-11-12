@@ -10,10 +10,14 @@ import { Icon } from "../../components/icons";
 import { Card, NoChild, NoDatabase } from "../../components/ui";
 import { getCurrentChild } from "../../lib/child";
 import { getDb } from "../../lib/db";
+import { getI18n } from "../../lib/i18n/server";
 import { formatAge, formatDate, todayInVietnam } from "../../lib/format";
 import { buildVaccinationView, productName } from "../../lib/vaccines-view";
 
-export const metadata: Metadata = { title: "Tiêm chủng" };
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return { title: t("vaccines.title") };
+}
 export const dynamic = "force-dynamic";
 
 interface Props {
@@ -22,6 +26,7 @@ interface Props {
 
 export default async function VaccinesPage({ searchParams }: Props) {
   const params = await searchParams;
+  const { t, locale } = await getI18n();
   const db = getDb();
   if (!db) return <NoDatabase />;
   const { child } = await getCurrentChild(db, params.child);
@@ -32,7 +37,7 @@ export default async function VaccinesPage({ searchParams }: Props) {
     listAppointments(db, child.id),
   ]);
   const today = todayInVietnam();
-  const view = buildVaccinationView(doses, appointments, today);
+  const view = buildVaccinationView(doses, appointments, today, undefined, locale);
   // Views work on product + dose number; map them back to row ids for edit links.
   const key = (productCode: string, doseNo: number) => `${productCode}#${String(doseNo)}`;
   const appointmentIds = new Map(appointments.map((a) => [key(a.productCode, a.doseNo), a.id]));
@@ -42,35 +47,39 @@ export default async function VaccinesPage({ searchParams }: Props) {
     <div className="space-y-6 pt-2">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="headline-medium">Tiêm chủng của {child.name}</h1>
+          <h1 className="headline-medium">{t("vaccines.heading", { name: child.name })}</h1>
           <p className="body-medium mt-1 text-on-surface-variant">
-            {formatAge(child.birthDate, today)} · {doses.length} mũi đã tiêm · {view.covered.length}
-            /{view.covered.length + view.uncovered.length} bệnh đã có mũi
+            {t("vaccines.subtitle", {
+              age: formatAge(child.birthDate, today, locale),
+              doses: doses.length,
+              covered: view.covered.length,
+              total: view.covered.length + view.uncovered.length,
+            })}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <a href="/calendar.ics" download className={BUTTON.outlined}>
             <Icon name="download" size={18} />
-            Tải lịch (.ics)
+            {t("vaccines.download")}
           </a>
           <Link href="/vaccines/appointments/new" className={BUTTON.tonal}>
             <Icon name="event" size={18} />
-            Thêm lịch hẹn
+            {t("vaccines.addAppointment")}
           </Link>
           <Link href="/vaccines/record" className={BUTTON.filled}>
             <Icon name="add" size={18} />
-            Ghi nhận mũi tiêm
+            {t("vaccines.recordDose")}
           </Link>
         </div>
       </header>
 
       <Card className="p-0">
         <h2 id="appointments-title" className="title-medium px-4 pt-4 pb-2">
-          Lịch hẹn
+          {t("vaccines.appointments")}
         </h2>
         {view.open.length === 0 && view.undated.length === 0 ? (
           <p className="body-medium px-4 pb-4 text-on-surface-variant">
-            Không có lịch hẹn nào đang chờ.
+            {t("vaccines.noAppointments")}
           </p>
         ) : (
           <ul aria-labelledby="appointments-title" className="divide-y divide-outline-variant pb-2">
@@ -82,27 +91,30 @@ export default async function VaccinesPage({ searchParams }: Props) {
                 <span className="min-w-44">
                   <span className="body-large block">
                     {productName(a.productCode)}
-                    <span className="text-on-surface-variant"> · mũi {a.doseNo}</span>
+                    <span className="text-on-surface-variant">
+                      {" "}
+                      · {t("common.dose", { n: a.doseNo })}
+                    </span>
                   </span>
                   <span className="body-medium tabular-nums text-on-surface-variant">
-                    {a.dueOn ? formatDate(a.dueOn) : (a.note ?? "Chưa có ngày")}
+                    {a.dueOn ? formatDate(a.dueOn, locale) : (a.note ?? t("common.noDate"))}
                   </span>
                 </span>
-                <AppointmentBadge state={a} />
+                <AppointmentBadge state={a} locale={locale} />
                 <span className="ml-auto flex flex-wrap items-center gap-1">
                   <Link
                     href={`/vaccines/appointments/${appointmentIds.get(key(a.productCode, a.doseNo)) ?? ""}/edit`}
                     className={BUTTON.text}
                   >
                     <Icon name="edit" size={18} />
-                    Sửa
+                    {t("common.edit")}
                   </Link>
                   <Link
                     href={`/vaccines/record?product=${a.productCode}&dose=${String(a.doseNo)}`}
                     className={BUTTON.tonal}
                   >
                     <Icon name="check" size={18} />
-                    Đã tiêm
+                    {t("vaccines.given")}
                   </Link>
                 </span>
               </li>
@@ -113,11 +125,8 @@ export default async function VaccinesPage({ searchParams }: Props) {
 
       <Card className="p-0">
         <div className="px-4 pt-4 pb-2">
-          <h2 className="title-medium">Theo bệnh</h2>
-          <p className="body-small mt-1 text-on-surface-variant">
-            Một mũi vaccine phối hợp được tính cho mọi bệnh nó phòng (ví dụ Infanrix Hexa phòng 6
-            bệnh).
-          </p>
+          <h2 className="title-medium">{t("vaccines.byDisease")}</h2>
+          <p className="body-small mt-1 text-on-surface-variant">{t("vaccines.byDiseaseHint")}</p>
         </div>
         <ul className="divide-y divide-outline-variant">
           {view.covered.map((row) => (
@@ -125,12 +134,12 @@ export default async function VaccinesPage({ searchParams }: Props) {
               <p className="flex items-baseline justify-between gap-3 sm:block">
                 <span className="body-large">{row.name}</span>{" "}
                 <span className="body-medium block whitespace-nowrap text-on-surface-variant">
-                  {row.doses.length} mũi
+                  {t("vaccines.doseCount", { n: row.doses.length })}
                 </span>
               </p>
               <ul
                 className="flex flex-wrap content-start items-start gap-2"
-                aria-label={`Các mũi phòng ${row.name}`}
+                aria-label={t("vaccines.dosesFor", { disease: row.name })}
               >
                 {row.doses.map((d) => (
                   <li
@@ -138,7 +147,9 @@ export default async function VaccinesPage({ searchParams }: Props) {
                     className="label-large inline-flex h-8 items-center rounded-m3-sm bg-success-container px-3 whitespace-nowrap text-on-success-container"
                   >
                     {d.productName} {d.doseNo}
-                    <span className="tabular-nums opacity-80">&nbsp;· {formatDate(d.givenOn)}</span>
+                    <span className="tabular-nums opacity-80">
+                      &nbsp;· {formatDate(d.givenOn, locale)}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -148,7 +159,7 @@ export default async function VaccinesPage({ searchParams }: Props) {
         {view.uncovered.length > 0 && (
           <details className="body-medium border-t border-outline-variant px-4 py-3">
             <summary className="cursor-pointer text-on-surface-variant">
-              Chưa có mũi nào ({view.uncovered.length} bệnh)
+              {t("vaccines.uncovered", { n: view.uncovered.length })}
             </summary>
             <p className="mt-2 text-on-surface-variant">
               {view.uncovered.map((r) => r.name).join(" · ")}
@@ -159,7 +170,7 @@ export default async function VaccinesPage({ searchParams }: Props) {
 
       <Card className="p-0">
         <h2 id="history-title" className="title-medium px-4 pt-4 pb-2">
-          Lịch sử tiêm ({view.history.length})
+          {t("vaccines.history", { n: view.history.length })}
         </h2>
         <ol aria-labelledby="history-title" className="divide-y divide-outline-variant pb-2">
           {view.history.map((h) => (
@@ -168,11 +179,14 @@ export default async function VaccinesPage({ searchParams }: Props) {
               className="grid items-center gap-x-4 gap-y-1 px-4 py-3 sm:grid-cols-[7rem_1fr_auto]"
             >
               <span className="body-medium tabular-nums text-on-surface-variant">
-                {formatDate(h.givenOn)}
+                {formatDate(h.givenOn, locale)}
               </span>
               <span>
                 <span className="body-large">{h.productName}</span>
-                <span className="text-on-surface-variant"> · mũi {h.doseNo}</span>
+                <span className="text-on-surface-variant">
+                  {" "}
+                  · {t("common.dose", { n: h.doseNo })}
+                </span>
                 <span className="body-small block text-on-surface-variant">
                   {h.diseases.join(", ")}
                 </span>
@@ -182,9 +196,9 @@ export default async function VaccinesPage({ searchParams }: Props) {
                   action={deleteDoseAction}
                   childId={child.id}
                   id={doseIds.get(key(h.productCode, h.doseNo)) ?? ""}
-                  label="Xoá"
-                  title={`Xoá ${h.productName} mũi ${String(h.doseNo)}?`}
-                  confirm={`Mũi tiêm ngày ${formatDate(h.givenOn)} sẽ bị xoá khỏi lịch sử. Không hoàn tác được.`}
+                  label={t("common.delete")}
+                  title={t("vaccines.deleteDoseTitle", { product: h.productName, n: h.doseNo })}
+                  confirm={t("vaccines.deleteDoseConfirm", { date: formatDate(h.givenOn, locale) })}
                 />
               </span>
             </li>
@@ -192,9 +206,7 @@ export default async function VaccinesPage({ searchParams }: Props) {
         </ol>
       </Card>
 
-      <p className="body-small text-on-surface-variant">
-        Lịch hẹn theo sổ tiêm của phòng tiêm. Hỏi bác sĩ hoặc phòng tiêm trước khi thay đổi lịch.
-      </p>
+      <p className="body-small text-on-surface-variant">{t("vaccines.footnote")}</p>
     </div>
   );
 }

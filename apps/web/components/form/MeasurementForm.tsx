@@ -3,6 +3,7 @@
 import type { Measurement } from "@notch/db";
 import Link from "next/link";
 import { useActionState } from "react";
+import { useI18n } from "../../lib/i18n/client";
 
 import { saveMeasurementAction } from "../../app/actions";
 import { fieldValue, type FormState } from "../../lib/form-values";
@@ -29,6 +30,7 @@ export function MeasurementForm({
   measurement?: Measurement;
 }) {
   const [state, action] = useActionState<FormState, FormData>(saveMeasurementAction, {});
+  const { t } = useI18n();
   const v = (name: string, fallback = "") => fieldValue(state, name, fallback);
   const checked = (name: string, stored: boolean | undefined) =>
     state.values ? state.values[name] === "on" : Boolean(stored);
@@ -40,7 +42,7 @@ export function MeasurementForm({
       <FormMessage message={state.message} />
 
       <DateField
-        label="Ngày đo"
+        label={t("form.measuredOn")}
         name="measuredOn"
         max={today}
         defaultValue={v("measuredOn", measurement?.measuredOn ?? today)}
@@ -52,59 +54,61 @@ export function MeasurementForm({
       <div className="grid gap-6 sm:grid-cols-3">
         <div className="space-y-2">
           <DecimalField
-            label="Cân nặng (kg)"
-            hint="Ví dụ 8,6"
+            label={t("form.weight")}
+            hint={t("form.weightHint")}
             name="weightKg"
             defaultValue={v("weightKg", decimal(measurement?.weightG, 1000))}
             error={state.errors?.weightKg}
           />
           <CheckboxField
             name="weightEstimated"
-            label="Ước lượng (~)"
+            label={t("common.estimated")}
             defaultChecked={checked("weightEstimated", measurement?.weightEstimated)}
           />
         </div>
         <div className="space-y-2">
           <DecimalField
-            label="Chiều dài / cao (cm)"
-            hint="Ví dụ 69"
+            label={t("form.length")}
+            hint={t("form.lengthHint")}
             name="lengthCm"
             defaultValue={v("lengthCm", decimal(measurement?.lengthMm, 10))}
             error={state.errors?.lengthCm}
           />
           <CheckboxField
             name="lengthEstimated"
-            label="Ước lượng (~)"
+            label={t("common.estimated")}
             defaultChecked={checked("lengthEstimated", measurement?.lengthEstimated)}
           />
         </div>
         <div className="space-y-2">
           <DecimalField
-            label="Vòng đầu (cm)"
-            hint="Không bắt buộc"
+            label={t("form.head")}
+            hint={t("common.optional")}
             name="headCm"
             defaultValue={v("headCm", decimal(measurement?.headMm, 10))}
             error={state.errors?.headCm}
           />
           <CheckboxField
             name="headEstimated"
-            label="Ước lượng (~)"
+            label={t("common.estimated")}
             defaultChecked={checked("headEstimated", measurement?.headEstimated)}
           />
         </div>
       </div>
 
       <NoteField
-        label="Ghi chú"
-        hint="Không bắt buộc"
+        label={t("common.note")}
+        hint={t("common.optional")}
         name="note"
         defaultValue={v("note", measurement?.note ?? "")}
       />
 
       <div className="flex flex-row-reverse flex-wrap items-center justify-start gap-2">
-        <SubmitButton>{measurement ? "Lưu thay đổi" : "Thêm lần đo"}</SubmitButton>
+        <SubmitButton>
+          {measurement ? t("form.saveChanges") : t("form.addMeasurement")}
+        </SubmitButton>
         <Link href="/growth" className={BUTTON.text}>
-          Huỷ
+          {t("common.cancel")}
         </Link>
       </div>
     </form>

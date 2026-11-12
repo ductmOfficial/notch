@@ -13,7 +13,7 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 | P0    | Foundation: growth and vaccines engines, database, app skeleton             | 🔄     |
 | P1    | Today, Growth and Vaccinations screens, forms, `.ics` calendar, design, E2E | 🔄     |
 | P2    | Health log, post-vaccination follow-up, PDF, family sharing                 | ⬜     |
-| P3    | PWA, Vietnamese/English, demo mode, deployment                              | ⬜     |
+| P3    | PWA, demo mode, deployment                                                  | ⬜     |
 
 ## Steps
 
@@ -30,6 +30,7 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 | 9   | Playwright and axe tests, `Browser` job in CI                        | `test/e2e`           | ✅     |
 | 10  | README and this progress log                                         | `docs/readme`        | ✅     |
 | 11  | Settings page with a light, dark or system theme                     | `feat/theme-setting` | ✅     |
+| 12  | Vietnamese and English, chosen in Settings                           | `feat/i18n`          | ✅     |
 
 Each step is a pull request with green checks (`Browser` from step 9), merged with rebase.
 
@@ -63,6 +64,8 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 | E2E on a fresh PGlite database, flows on desktop only             | Tests are independent of any local data; flows change data, so they run once while accessibility runs on desktop and mobile |
 | Browser checks with the runner's Chrome                           | No browser download and no apt packages in CI; Playwright's Chromium stays the fallback                                     |
 | Theme kept in a cookie and applied on the server                  | The page never flashes the wrong theme on load; "System" removes the cookie and follows the device                          |
+| Language from a cookie, then the browser; no locale in URLs       | The app is private and not indexed, so URLs stay short; Vietnamese is the fallback                                          |
+| Flat dictionaries, Vietnamese as the reference                    | TypeScript rejects unknown keys; a unit test keeps English on the same keys and placeholders                                |
 | No Co-Authored-By trailer in commits                              | Maintainer's preference                                                                                                     |
 
 ## Follow-ups

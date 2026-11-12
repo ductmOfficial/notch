@@ -1,10 +1,11 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { getI18n } from "../lib/i18n/server";
 import { Icon } from "./icons";
 
 /** Page frame for a form: back link, title, the child it is for, and the form on a surface. */
-export function FormPage({
+export async function FormPage({
   title,
   childName,
   back,
@@ -17,6 +18,7 @@ export function FormPage({
   children: ReactNode;
   footer?: ReactNode;
 }) {
+  const { t } = await getI18n();
   return (
     <div className="mx-auto max-w-2xl space-y-4 pt-2">
       <Link
@@ -28,7 +30,9 @@ export function FormPage({
       </Link>
       <header>
         <h1 className="headline-small">{title}</h1>
-        <p className="body-medium text-on-surface-variant">Cho {childName}</p>
+        <p className="body-medium text-on-surface-variant">
+          {t("common.forChild", { name: childName })}
+        </p>
       </header>
       <section className="rounded-m3-md bg-surface-container-low p-4 sm:p-6">{children}</section>
       {footer}

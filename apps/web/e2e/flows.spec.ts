@@ -128,3 +128,29 @@ test("the theme chosen in settings applies at once and survives a reload", async
   await page.reload();
   await expect(html).not.toHaveAttribute("data-theme");
 });
+
+test("the language follows the browser and can be changed in settings", async ({ browser }) => {
+  const context = await browser.newContext({ locale: "en-US" });
+  const page = await context.newPage();
+  await page.goto("/");
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Mây is");
+
+  await page.goto("/settings");
+  await page.locator("label").filter({ hasText: "Tiếng Việt" }).click();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Cài đặt");
+  await page.goto("/");
+  await expect(page.locator("html")).toHaveAttribute("lang", "vi");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Mây được");
+  await context.close();
+});
+
+test("form errors come in the page's language", async ({ browser }) => {
+  const context = await browser.newContext({ locale: "en-US" });
+  const page = await context.newPage();
+  await page.goto("/growth/new");
+  await page.getByLabel("Weight (kg)").fill("abc");
+  await page.getByRole("button", { name: "Add measurement" }).click();
+  await expect(page.getByText("The weight must be a number, for example 8.6.")).toBeVisible();
+  await context.close();
+});

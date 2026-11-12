@@ -9,9 +9,13 @@ import { MeasurementForm } from "../../../../components/form/MeasurementForm";
 import { NoChild, NoDatabase } from "../../../../components/ui";
 import { getCurrentChild } from "../../../../lib/child";
 import { getDb } from "../../../../lib/db";
+import { getI18n } from "../../../../lib/i18n/server";
 import { formatDate, todayInVietnam } from "../../../../lib/format";
 
-export const metadata: Metadata = { title: "Sửa lần đo" };
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return { title: t("page.editMeasurement") };
+}
 export const dynamic = "force-dynamic";
 
 interface Props {
@@ -20,6 +24,7 @@ interface Props {
 }
 
 export default async function EditMeasurementPage({ params, searchParams }: Props) {
+  const { t, locale } = await getI18n();
   const db = getDb();
   if (!db) return <NoDatabase />;
   const { child } = await getCurrentChild(db, (await searchParams).child);
@@ -29,17 +34,19 @@ export default async function EditMeasurementPage({ params, searchParams }: Prop
 
   return (
     <FormPage
-      title={`Sửa lần đo ${formatDate(measurement.measuredOn)}`}
+      title={t("page.editMeasurementOn", { date: formatDate(measurement.measuredOn, locale) })}
       childName={child.name}
-      back={{ href: "/growth", label: "Tăng trưởng" }}
+      back={{ href: "/growth", label: t("nav.growth") }}
       footer={
         <DeleteForm
           action={deleteMeasurementAction}
           childId={child.id}
           id={measurement.id}
-          label="Xoá lần đo này"
-          title={`Xoá lần đo ${formatDate(measurement.measuredOn)}?`}
-          confirm="Cân nặng, chiều dài và vòng đầu của lần đo này sẽ bị xoá. Không hoàn tác được."
+          label={t("page.deleteMeasurement")}
+          title={t("page.deleteMeasurementTitle", {
+            date: formatDate(measurement.measuredOn, locale),
+          })}
+          confirm={t("page.deleteMeasurementConfirm")}
         />
       }
     >

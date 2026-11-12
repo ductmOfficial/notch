@@ -1,6 +1,9 @@
 import type { AppointmentInput, DoseInput, MeasurementInput } from "@notch/db";
 import { CATALOG, type Catalog } from "@notch/vaccines";
 
+import { formatNumber } from "./format";
+import { type Locale, type MessageKey, translator } from "./i18n/messages";
+
 /** What a form shows after a failed submit: messages per field and the values typed. */
 export interface FormState {
   readonly errors?: Readonly<Record<string, string>>;
@@ -14,7 +17,11 @@ export interface FormContext {
   readonly childId: string;
   readonly birthDate: string;
   readonly today: string;
+  /** Language of the error messages; Vietnamese by default. */
+  readonly locale?: Locale;
 }
+
+const tr = (ctx: FormContext) => translator(ctx.locale ?? "vi");
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -40,19 +47,22 @@ export function parseDecimal(raw: string): number | null {
 function checkDate(
   raw: string,
   ctx: FormContext,
-  label: string,
+  label: MessageKey,
   required: boolean,
 ): string | undefined {
-  if (raw === "") return required ? `Nhập ${label.toLowerCase()}.` : undefined;
-  if (!ISO_DATE.test(raw) || Number.isNaN(Date.parse(raw))) return `${label} không hợp lệ.`;
-  if (raw < ctx.birthDate) return `${label} không thể trước ngày sinh.`;
+  const t = tr(ctx);
+  const field = t(label);
+  if (raw === "") return required ? t("error.required", { field: field.toLowerCase() }) : undefined;
+  if (!ISO_DATE.test(raw) || Number.isNaN(Date.parse(raw)))
+    return t("error.invalidDate", { field });
+  if (raw < ctx.birthDate) return t("error.beforeBirth", { field });
   return undefined;
 }
 
-function checkPastDate(raw: string, ctx: FormContext, label: string): string | undefined {
+function checkPastDate(raw: string, ctx: FormContext, label: MessageKey): string | undefined {
   return (
     checkDate(raw, ctx, label, true) ??
-    (raw > ctx.today ? `${label} không thể ở tương lai.` : undefined)
+    (raw > ctx.today ? tr(ctx)("error.future", { field: tr(ctx)(label) }) : undefined)
   );
 }
 
@@ -61,26 +71,31 @@ function range(
   min: number,
   max: number,
   unit: string,
-  label: string,
+  label: MessageKey,
+  ctx: FormContext,
 ): [number | null, string | undefined] {
+  const t = tr(ctx);
   const n = parseDecimal(raw);
   if (n === null) return [null, undefined];
-  if (Number.isNaN(n)) return [null, `${label} phải là số, ví dụ 8,6.`];
-  if (n < min || n > max)
-    return [null, `${label} phải từ ${String(min)} đến ${String(max)} ${unit}.`];
+  const example = formatNumber(8.6, 1, ctx.locale ?? "vi");
+  if (Number.isNaN(n)) return [null, t("error.notNumber", { field: t(label), example })];
+  if (n < min || n > max) return [null, t("error.outOfRange", { field: t(label), min, max, unit })];
   return [n, undefined];
 }
 
-function wholeNumber(raw: string, label: string): [number, string | undefined] {
+function wholeNumber(
+  raw: string,
+  label: MessageKey,
+  ctx: FormContext,
+): [number, string | undefined] {
   const n = Number(raw);
-  if (!/^\d+$/.test(raw) || n < 1 || n > 20) return [0, `${label} phải là số nguyên từ 1 đến 20.`];
+  if (!/^\d+$/.test(raw) || n < 1 || n > 20)
+    return [0, tr(ctx)("error.wholeNumber", { field: tr(ctx)(label) })];
   return [n, undefined];
 }
 
-function checkProduct(code: string, catalog: Catalog): string | undefined {
-  return catalog.products.some((p) => p.code === code)
-    ? undefined
-    : "Chọn vaccine trong danh sách.";
+function checkProduct(code: string, catalog: Catalog, ctx: FormContext): string | undefined {
+  return catalog.products.some((p) => p.code === code) ? undefined : tr(ctx)("error.pickVaccine");
 }
 
 function result<T>(
@@ -98,9 +113,9 @@ function result<T>(
 
 export function parseMeasurementForm(form: FormData, ctx: FormContext): Parsed<MeasurementInput> {
   const measuredOn = text(form, "measuredOn");
-  const [weight, weightError] = range(text(form, "weightKg"), 0.3, 60, "kg", "Cân nặng");
-  const [length, lengthError] = range(text(form, "lengthCm"), 30, 150, "cm", "Chiều dài");
-  const [head, headError] = range(text(form, "headCm"), 20, 70, "cm", "Vòng đầu");
+  const [weight, weightError] = range(text(form, "weightKg"), 0.3, 60, "kg", "field.weight", ctx);
+  const [length, lengthError] = range(text(form, "lengthCm"), 30, 150, "cm", "field.length", ctx);
+  const [head, headError] = range(text(form, "headCm"), 20, 70, "cm", "field.head", ctx);
   const empty =
     weight === null &&
     length === null &&
@@ -113,8 +128,8 @@ export function parseMeasurementForm(form: FormData, ctx: FormContext): Parsed<M
   return result(
     form,
     {
-      measuredOn: checkPastDate(measuredOn, ctx, "Ngày đo"),
-      weightKg: weightError ?? (empty ? "Nhập ít nhất một chỉ số." : undefined),
+      measuredOn: checkPastDate(measuredOn, ctx, "field.measuredOn"),
+      weightKg: weightError ?? (empty ? tr(ctx)("error.atLeastOne") : undefined),
       lengthCm: lengthError,
       headCm: headError,
     },
@@ -139,26 +154,26 @@ export function parseDoseForm(
 ): Parsed<DoseInput> {
   const productCode = text(form, "productCode");
   const givenOn = text(form, "givenOn");
-  const [doseNo, doseError] = wholeNumber(text(form, "doseNo"), "Mũi số");
+  const [doseNo, doseError] = wholeNumber(text(form, "doseNo"), "field.doseNo", ctx);
   const nextDueOn = text(form, "nextDueOn");
   const nextNote = text(form, "nextNote");
   const wantsNext = nextDueOn !== "" || nextNote !== "";
   const [nextDoseNo, nextDoseError] = wantsNext
-    ? wholeNumber(text(form, "nextDoseNo"), "Mũi hẹn")
+    ? wholeNumber(text(form, "nextDoseNo"), "field.nextDoseNo", ctx)
     : [0, undefined];
   const nextDateError =
-    checkDate(nextDueOn, ctx, "Ngày hẹn", false) ??
+    checkDate(nextDueOn, ctx, "field.dueOn", false) ??
     (nextDueOn !== "" && givenOn !== "" && nextDueOn <= givenOn
-      ? "Ngày hẹn phải sau ngày tiêm."
+      ? tr(ctx)("error.dueAfterGiven")
       : undefined);
   const optional = (name: string) => text(form, name) || null;
 
   return result(
     form,
     {
-      productCode: checkProduct(productCode, catalog),
+      productCode: checkProduct(productCode, catalog, ctx),
       doseNo: doseError,
-      givenOn: checkPastDate(givenOn, ctx, "Ngày tiêm"),
+      givenOn: checkPastDate(givenOn, ctx, "field.givenOn"),
       nextDoseNo: nextDoseError,
       nextDueOn: nextDateError,
     },
@@ -189,16 +204,16 @@ export function parseAppointmentForm(
   const productCode = text(form, "productCode");
   const dueOn = text(form, "dueOn");
   const note = text(form, "note");
-  const [doseNo, doseError] = wholeNumber(text(form, "doseNo"), "Mũi số");
+  const [doseNo, doseError] = wholeNumber(text(form, "doseNo"), "field.doseNo", ctx);
 
   return result(
     form,
     {
-      productCode: checkProduct(productCode, catalog),
+      productCode: checkProduct(productCode, catalog, ctx),
       doseNo: doseError,
       dueOn:
-        checkDate(dueOn, ctx, "Ngày hẹn", false) ??
-        (dueOn === "" && note === "" ? "Nhập ngày hẹn, hoặc ghi chú như “sau 1 tuổi”." : undefined),
+        checkDate(dueOn, ctx, "field.dueOn", false) ??
+        (dueOn === "" && note === "" ? tr(ctx)("error.dueOrNote") : undefined),
     },
     () => ({
       childId: ctx.childId,

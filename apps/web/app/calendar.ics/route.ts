@@ -4,6 +4,7 @@ import { appointmentStates } from "@notch/vaccines";
 import { getCurrentChild } from "../../lib/child";
 import { getDb } from "../../lib/db";
 import { todayInVietnam } from "../../lib/format";
+import { getI18n } from "../../lib/i18n/server";
 import { buildCalendar } from "../../lib/ics";
 
 export const dynamic = "force-dynamic";
@@ -22,6 +23,7 @@ export async function GET(request: Request): Promise<Response> {
   );
   if (!child) return new Response("No child", { status: 404 });
 
+  const { t } = await getI18n();
   const [doses, appointments] = await Promise.all([
     listVaccinations(db, child.id),
     listAppointments(db, child.id),
@@ -32,16 +34,16 @@ export async function GET(request: Request): Promise<Response> {
     .map((a) => ({
       uid: `${ids.get(`${a.productCode}#${String(a.doseNo)}`) ?? `${a.productCode}-${String(a.doseNo)}`}@notch`,
       date: a.dueOn ?? "",
-      summary: "Lịch tiêm cho bé",
-      description: "Mở Notch để xem mũi tiêm.",
+      summary: t("calendar.summary"),
+      description: t("calendar.description"),
     }));
 
   const body = buildCalendar(events, {
-    name: "Notch · Lịch tiêm",
+    name: t("calendar.name"),
     now: new Date(),
     alarms: [
-      { trigger: "-P6DT15H", text: "Còn 1 tuần tới lịch tiêm" },
-      { trigger: "-PT15H", text: "Ngày mai có lịch tiêm" },
+      { trigger: "-P6DT15H", text: t("calendar.weekBefore") },
+      { trigger: "-PT15H", text: t("calendar.dayBefore") },
     ],
   });
   return new Response(body, {
