@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { AppointmentBadge } from "../components/AppointmentBadge";
+import type { CardLotusProps } from "../components/CardLotus";
 import { Icon } from "../components/icons";
 import { LotusMark } from "../components/LotusMark";
 import { Card, NoChild, NoDatabase } from "../components/ui";
@@ -12,6 +13,11 @@ import { getI18n } from "../lib/i18n/server";
 import { formatAge, formatDate, formatNumber, formatZ, todayInVietnam, zBand } from "../lib/format";
 import { chartPoints, INDICATORS } from "../lib/growth-chart";
 import { buildVaccinationView, dueLabel, productName } from "../lib/vaccines-view";
+
+const TODAY_LOTUS: Record<"weight" | "length", CardLotusProps> = {
+  weight: { motif: "bud", place: "topRight", tilt: 14 },
+  length: { motif: "pad", place: "bottomRight", tilt: -20 },
+};
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getI18n();
@@ -117,7 +123,12 @@ export default async function TodayPage({ searchParams }: Props) {
         {latest.map(({ indicator, point }) => {
           const info = INDICATORS[indicator];
           return (
-            <Card key={indicator} tone="filled" className="flex flex-col gap-2 p-5">
+            <Card
+              key={indicator}
+              lotus={TODAY_LOTUS[indicator]}
+              tone="filled"
+              className="flex flex-col gap-2 p-5"
+            >
               <h2 className="title-small flex items-center gap-2 text-on-surface-variant">
                 <Icon name={indicator === "weight" ? "scale" : "straighten"} size={20} />
                 {t(info.labelKey)}
@@ -137,7 +148,11 @@ export default async function TodayPage({ searchParams }: Props) {
           );
         })}
 
-        <Card tone="outlined" className="flex flex-col gap-2 p-5 md:col-span-2">
+        <Card
+          lotus={{ motif: "budOnPad", place: "right", tilt: -6 }}
+          tone="outlined"
+          className="flex flex-col gap-2 p-5 md:col-span-2"
+        >
           <h2 className="title-small text-on-surface-variant">{t("today.vaccinations")}</h2>
           <p className="body-large">
             {t("today.vaccinationSummary", { doses: view.history.length, open: view.open.length })}
@@ -145,7 +160,11 @@ export default async function TodayPage({ searchParams }: Props) {
           </p>
         </Card>
 
-        <Card tone="outlined" className="flex flex-col justify-between gap-2 p-5">
+        <Card
+          lotus={{ motif: "pod", place: "topRight", tilt: 15 }}
+          tone="outlined"
+          className="flex flex-col justify-between gap-2 p-5"
+        >
           <h2 className="title-small text-on-surface-variant">{t("today.lastMeasurement")}</h2>
           <p className="body-large">
             {lastDate ? formatDate(lastDate, locale) : t("today.noMeasurements")}
