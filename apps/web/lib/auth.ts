@@ -11,6 +11,7 @@ import { getDb } from "./db";
 import { getI18n } from "./i18n/server";
 import { sendMail } from "./mail";
 import { signInMail } from "./sign-in-mail";
+import { siteUrls } from "./site-url";
 
 /** Sign-in links last ten minutes and work once. */
 export const LINK_MINUTES = 10;
@@ -18,7 +19,8 @@ export const LINK_MINUTES = 10;
 function createAuth(db: NonNullable<ReturnType<typeof getDb>>) {
   return betterAuth({
     appName: "Notch",
-    // BETTER_AUTH_SECRET and BETTER_AUTH_URL come from the environment.
+    // BETTER_AUTH_SECRET comes from the environment; the URL from BETTER_AUTH_URL or Vercel.
+    ...siteUrls(),
     database: drizzleAdapter(db, {
       provider: "pg",
       schema: {

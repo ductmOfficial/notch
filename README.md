@@ -103,6 +103,14 @@ With PostgreSQL and your own records instead: `cp .env.example .env`, set `NOTCH
 - **Vietnamese and English.** Every text comes from `lib/i18n/messages.ts`. The language chosen in Settings is kept in a cookie; otherwise the browser's language is used, with Vietnamese as the fallback. Dates, ages and numbers follow the language.
 - **Icons** are Material Symbols (Rounded), generated into `components/icons.tsx` as inline SVG.
 
+## Deployment
+
+Vercel for the app, [Neon](https://neon.tech) for PostgreSQL (region `aws-ap-southeast-1`), Resend for the sign-in email.
+
+- The Vercel project's root directory is `apps/web`. `apps/web/vercel.json` builds the workspace with Turborepo, then applies pending migrations to the database of that environment, so a deployment never runs against an older schema.
+- Production and Preview use different Neon branches. The preview branch holds only the fictional demo child, never a copy of production.
+- Environment variables, per Vercel environment: `DATABASE_URL` (Neon's pooled connection string), `BETTER_AUTH_SECRET` (a different one per environment), `NOTCH_ALLOWED_EMAILS`, `RESEND_API_KEY`, `MAIL_FROM`. `BETTER_AUTH_URL` is optional: without it, sign-in links point at the production domain in production and at the deployment itself in previews (see `lib/site-url.ts`).
+
 ## Contributing workflow
 
 1. Branch from `main`: `git switch -c feat/short-description`
