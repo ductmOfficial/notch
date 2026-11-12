@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 
 import { NavLinks } from "../components/NavLinks";
 import { QuickAdd } from "../components/QuickAdd";
+import { getTheme } from "../lib/preferences";
 
 export const metadata: Metadata = {
   title: { default: "Notch", template: "%s · Notch" },
@@ -14,8 +15,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fff8f6" },
-    { media: "(prefers-color-scheme: dark)", color: "#1a110e" },
+    { media: "(prefers-color-scheme: light)", color: "#fff8f2" },
+    { media: "(prefers-color-scheme: dark)", color: "#16130d" },
   ],
 };
 
@@ -23,9 +24,11 @@ export const viewport: Viewport = {
  * M3 layout: a navigation rail with the FAB on wide screens; on phones a top app bar,
  * a bottom navigation bar and a floating FAB.
  */
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  // The theme chosen in Settings is rendered on the server, so the page never flashes.
+  const theme = await getTheme();
   return (
-    <html lang="vi">
+    <html lang="vi" data-theme={theme === "system" ? undefined : theme}>
       <body className="min-h-dvh bg-surface antialiased">
         <a
           href="#main"

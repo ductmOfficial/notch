@@ -23,6 +23,10 @@ const ICONS = {
   chevronRight: "chevron_right",
   back: "arrow_back",
   check: "check",
+  settings: "settings",
+  lightMode: "light_mode",
+  darkMode: "dark_mode",
+  contrast: "contrast",
   download: "download",
 };
 

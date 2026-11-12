@@ -110,3 +110,21 @@ test("the calendar file lists appointments with generic titles only", async ({ r
   expect(ics).toContain("SUMMARY:Lịch tiêm cho bé");
   expect(ics).not.toContain("Mây");
 });
+
+test("the theme chosen in settings applies at once and survives a reload", async ({ page }) => {
+  await page.goto("/settings");
+  const html = page.locator("html");
+  await expect(html).not.toHaveAttribute("data-theme");
+
+  // The radio inputs are visually hidden inside their segment labels, as in a segmented button.
+  await page.locator("label").filter({ hasText: "Tối" }).click();
+  await expect(html).toHaveAttribute("data-theme", "dark");
+  await page.reload();
+  await expect(html).toHaveAttribute("data-theme", "dark");
+  await expect(page.getByRole("radio", { name: "Tối" })).toBeChecked();
+
+  await page.locator("label").filter({ hasText: "Theo hệ thống" }).click();
+  await expect(html).not.toHaveAttribute("data-theme");
+  await page.reload();
+  await expect(html).not.toHaveAttribute("data-theme");
+});
