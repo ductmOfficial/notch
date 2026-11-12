@@ -40,7 +40,14 @@
   --sen-control-height-md: 3.5rem;
   --sen-font-family: "Roboto Flex Variable", system-ui, sans-serif;
   --sen-easing-standard: cubic-bezier(0.2, 0, 0, 1);
-  --sen-duration-fast: 150ms;
+}
+
+/* M3's short duration, only for people who have not asked for reduced motion: Sen UI turns its
+   transitions off for them, and an unconditional value here would turn them back on. */
+@media (prefers-reduced-motion: no-preference) {
+  :root {
+    --sen-duration-fast: 150ms;
+  }
 }
 
 @theme inline {

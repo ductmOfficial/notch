@@ -40,8 +40,20 @@ test("the quick-add dialog is announced and keeps focus inside", async ({ page }
   await page.getByRole("button", { name: "Thêm nhanh" }).filter({ visible: true }).click();
   const dialog = page.getByRole("dialog", { name: "Thêm nhanh" });
   await expect(dialog).toBeVisible();
+  // React Aria marks the overlay with data-entering while it fades in; scan the final colors.
+  await expect(page.locator("[data-entering]")).toHaveCount(0);
   const { violations } = await new AxeBuilder({ page }).include('[role="dialog"]').analyze();
   expect(violations).toEqual([]);
   await page.keyboard.press("Escape");
   await expect(dialog).toBeHidden();
+});
+
+test("dialogs open without animation when reduced motion is requested", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const duration = await page.evaluate(() =>
+    getComputedStyle(document.documentElement).getPropertyValue("--sen-duration-fast").trim(),
+  );
+  // Browsers may normalize "0ms" to "0s".
+  expect(Number.parseFloat(duration)).toBe(0);
 });
