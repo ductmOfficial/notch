@@ -100,14 +100,15 @@
   --chart-grid: var(--md-sys-color-surface-container-highest);
 }
 
-/* The flower behind the content stays a watermark in both schemes. */
-.flower-backdrop {
+/* The drawing behind the content stays a watermark in light and dark. */
+.motif-backdrop {
   opacity: 0.2;
 }
 
-/* Flower drawings come in both palettes; only the current one shows. */
-:root:not([data-palette="daylily"]) .flower-daylily,
-[data-palette="daylily"] .flower-lotus {
+/* Drawings come in every palette; only the current one shows (no attribute: lotus). */
+[data-palette] .motif-lotus,
+:root:not([data-palette="daylily"]) .motif-daylily,
+:root:not([data-palette="cloud"]) .motif-cloud {
   display: none;
 }
 

@@ -16,14 +16,14 @@
 
 ## What's inside
 
-| Area          | Tools                                                                                                                                 |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| App           | Next.js 16 (App Router, Server Components, Server Actions), React 19                                                                  |
-| Design system | Material Design 3 with lotus and daylily palettes, on [Sen UI](https://github.com/ductmOfficial/sen-ui) components and Tailwind CSS 4 |
-| Domain        | `@notch/growth` (WHO z-scores and percentiles), `@notch/vaccines` (catalog, appointments)                                             |
-| Data          | PostgreSQL or PGlite with Drizzle, Zod validation                                                                                     |
-| Testing       | Vitest; Playwright with axe (WCAG 2.2 AA, light and dark, desktop and mobile)                                                         |
-| CI            | GitHub Actions (`Verify`, `Browser`), protected `main`, Conventional Commits, Dependabot                                              |
+| Area          | Tools                                                                                                                                        |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| App           | Next.js 16 (App Router, Server Components, Server Actions), React 19                                                                         |
+| Design system | Material Design 3 with lotus, daylily and cloud palettes, on [Sen UI](https://github.com/ductmOfficial/sen-ui) components and Tailwind CSS 4 |
+| Domain        | `@notch/growth` (WHO z-scores and percentiles), `@notch/vaccines` (catalog, appointments)                                                    |
+| Data          | PostgreSQL or PGlite with Drizzle, Zod validation                                                                                            |
+| Testing       | Vitest; Playwright with axe (WCAG 2.2 AA, light and dark, desktop and mobile)                                                                |
+| CI            | GitHub Actions (`Verify`, `Browser`), protected `main`, Conventional Commits, Dependabot                                                     |
 
 ## Structure
 
@@ -81,10 +81,11 @@ With PostgreSQL and your own records instead: `cp .env.example .env`, set `NOTCH
 
 - **Material Design 3.** Navigation rail with the floating action button on wide screens; top app bar, bottom navigation bar and a floating FAB on phones. M3 type scale with Roboto Flex, M3 shapes (12px cards, 28px dialogs, fully rounded buttons) and state layers.
 - **Lotus palette.** `scripts/generate-theme.mjs` builds the M3 scheme, light and dark, with Google's Material Color Utilities from the colors of a lotus: petal pink (primary), leaf green (tertiary and "done"), stamen yellow ("upcoming") and a cream neutral for surfaces. The colors are generated, not typed by hand; `lib/theme.test.ts` checks WCAG AA contrast for every text and border pairing in both themes.
-- **Daylily palette.** A second scheme from the daylily (huyên thảo): orange petal (primary), the green of its long leaves (tertiary) and its yellow throat ("upcoming"). Settings switches between lotus, the default, and daylily; the choice is a `data-palette` attribute on `<html>`, kept in a cookie and rendered on the server. The same contrast test covers both palettes.
+- **Daylily palette.** A second scheme from the daylily (huyên thảo): orange petal (primary), the green of its long leaves (tertiary) and its yellow throat ("upcoming"). Settings switches between lotus, the default, daylily and cloud; the choice is a `data-palette` attribute on `<html>`, kept in a cookie and rendered on the server. The same contrast test covers every palette.
+- **Cloud palette.** A third scheme from the sky (mây): sky blue (primary), the peach of clouds at sunset (tertiary), sun yellow ("upcoming"), leaf green ("done") and a cool cloud-grey neutral.
 - **Sen UI.** Buttons, text fields, selects, checkboxes and dialogs are Sen UI components. Its `--sen-*` tokens point at the M3 color roles, so they follow the scheme; Sen UI sits below Tailwind utilities in the cascade layer order.
-- **Flower mark.** A small flower (`components/Flowers.tsx`, drawings in `components/flowers/`) sits next to the name, on empty states and in the favicon (`app/icon.svg`), Faint drawings also sit at the edge of the summary cards on Today and Growth, each card with its own motif, place and tilt: for the lotus a bloom, a bud, a lily pad, a seed pod or fallen petals; for the daylily a flower, buds, leaves, its throat or fallen petals. The favicon stays a lotus. Every drawing exists in both palettes and CSS shows the current one, so switching needs no reload. Data cards and navigation keep their Material Symbols, so each icon still says what the item is.
-- **Flower watermark.** A faint lotus or daylily, drawn in SVG from the same color roles, sits behind the content in the bottom corner. It is decorative only: hidden from screen readers, never under text on a plain background, and left out of print.
+- **Palette drawings.** A small mark (`components/Motifs.tsx`, drawings in `components/motifs/`) sits next to the name and on empty states. Faint drawings also sit at the edge of the summary cards on Today and Growth, each card with its own motif, place and tilt: for the lotus a bloom, a bud, a lily pad, a seed pod or fallen petals; for the daylily a flower, buds, leaves, its throat or fallen petals; for the cloud a cumulus, the sun peeking out, stacked clouds, the sun, a rainbow or birds. The favicon (`app/icon.svg`) stays a lotus. Every drawing exists in every palette and CSS shows the current one, so switching needs no reload. Data cards and navigation keep their Material Symbols, so each icon still says what the item is.
+- **Watermark.** A faint lotus, daylily or sky, drawn in SVG from the same color roles, sits behind the content in the bottom corner. It is decorative only: hidden from screen readers, never under text on a plain background, and left out of print.
 - **Light, dark or system.** Settings has a theme picker. The choice is kept in a cookie and applied on the server, so the page never flashes the wrong theme; "System" follows the device.
 - **Vietnamese and English.** Every text comes from `lib/i18n/messages.ts`. The language chosen in Settings is kept in a cookie; otherwise the browser's language is used, with Vietnamese as the fallback. Dates, ages and numbers follow the language.
 - **Icons** are Material Symbols (Rounded), generated into `components/icons.tsx` as inline SVG.

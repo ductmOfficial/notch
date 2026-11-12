@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 
 import { describe, expect, it } from "vitest";
 
-// The generated M3 schemes (lotus and daylily) must keep text readable: WCAG 2.2 AA asks 4.5:1 for text and 3:1 for
+// The generated M3 schemes (lotus, daylily and cloud) must keep text readable: WCAG 2.2 AA asks 4.5:1 for text and 3:1 for
 // borders and controls, in light and in dark.
 const css = readFileSync(new URL("../app/theme.css", import.meta.url), "utf8");
 
@@ -51,12 +51,15 @@ const TEXT: [string, string][] = [
 const NON_TEXT: [string, string][] = [["outline", "surface"]];
 
 const DAYLILY = '[data-palette="daylily"]';
+const CLOUD = '[data-palette="cloud"]';
 
 describe.each([
   ["lotus light", ':root,\n[data-theme="light"]'],
   ["lotus dark", '[data-theme="dark"]'],
   ["daylily light", `${DAYLILY},\n${DAYLILY}[data-theme="light"]`],
   ["daylily dark", `${DAYLILY}[data-theme="dark"]`],
+  ["cloud light", `${CLOUD},\n${CLOUD}[data-theme="light"]`],
+  ["cloud dark", `${CLOUD}[data-theme="dark"]`],
 ])("%s scheme", (_, selector) => {
   const colors = scheme(selector);
   const pick = (role: string) => {

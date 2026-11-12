@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { type ArtProps, type FlowerMotif, LEAF, BLOOM, HEART } from "./art";
+import { type ArtProps, type MotifKind, LEAF, BLOOM, HEART } from "./art";
 
 const PETAL = "M0 0C3.2 -4 3.2 -10.5 0 -15C-3.2 -10.5 -3.2 -4 0 0Z";
 
@@ -114,7 +114,7 @@ function Petals() {
 }
 
 /** Card drawings: bloom, bud, lily pad, seed pod, bud on a pad, fallen petals. */
-export const LOTUS_MOTIFS: Record<FlowerMotif, () => ReactNode> = {
+export const LOTUS_MOTIFS: Record<MotifKind, () => ReactNode> = {
   bloom: Bloom,
   bud: Bud,
   leaf: Pad,

@@ -16,7 +16,7 @@ export async function setThemeAction(theme: string): Promise<void> {
   else store.set(THEME_COOKIE, theme, { path: "/", maxAge: YEAR, sameSite: "lax" });
 }
 
-/** Remembers the flower palette; the lotus, the default, needs no cookie. */
+/** Remembers the palette; the lotus, the default, needs no cookie. */
 export async function setPaletteAction(palette: string): Promise<void> {
   if (!isPalette(palette)) return;
   const store = await cookies();

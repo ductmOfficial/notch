@@ -139,7 +139,7 @@
   --md-sys-color-on-warning-container: #ffdf9e;
 }
 
-/* Daylily. Its selectors are more specific or come later, so they win over the lotus. */
+/* The other palettes. Their selectors are more specific or come later, so they win over the lotus. */
 [data-palette="daylily"],
 [data-palette="daylily"][data-theme="light"] {
   color-scheme: light;
@@ -276,4 +276,142 @@
   --md-sys-color-on-warning: #422c00;
   --md-sys-color-warning-container: #5f4100;
   --md-sys-color-on-warning-container: #ffdeac;
+}
+
+[data-palette="cloud"],
+[data-palette="cloud"][data-theme="light"] {
+  color-scheme: light;
+  --md-sys-color-primary: #1660a5;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #d3e4ff;
+  --md-sys-color-on-primary-container: #004882;
+  --md-sys-color-secondary: #545f70;
+  --md-sys-color-on-secondary: #ffffff;
+  --md-sys-color-secondary-container: #d8e3f8;
+  --md-sys-color-on-secondary-container: #3c4758;
+  --md-sys-color-tertiary: #924b29;
+  --md-sys-color-on-tertiary: #ffffff;
+  --md-sys-color-tertiary-container: #ffdbcd;
+  --md-sys-color-on-tertiary-container: #743414;
+  --md-sys-color-error: #ba1a1a;
+  --md-sys-color-on-error: #ffffff;
+  --md-sys-color-error-container: #ffdad6;
+  --md-sys-color-on-error-container: #93000a;
+  --md-sys-color-surface: #f8f9fe;
+  --md-sys-color-surface-dim: #d9dade;
+  --md-sys-color-surface-bright: #f8f9fe;
+  --md-sys-color-on-surface: #191c1f;
+  --md-sys-color-on-surface-variant: #41474f;
+  --md-sys-color-surface-container-lowest: #ffffff;
+  --md-sys-color-surface-container-low: #f3f3f8;
+  --md-sys-color-surface-container: #edeef2;
+  --md-sys-color-surface-container-high: #e7e8ec;
+  --md-sys-color-surface-container-highest: #e1e2e7;
+  --md-sys-color-outline: #727880;
+  --md-sys-color-outline-variant: #c1c7d0;
+  --md-sys-color-inverse-surface: #2e3134;
+  --md-sys-color-inverse-on-surface: #f0f0f5;
+  --md-sys-color-inverse-primary: #a2c9ff;
+  --md-sys-color-scrim: #000000;
+  --md-sys-color-shadow: #000000;
+  --md-sys-color-success: #316b21;
+  --md-sys-color-on-success: #ffffff;
+  --md-sys-color-success-container: #b2f498;
+  --md-sys-color-on-success-container: #032100;
+  --md-sys-color-warning: #7a5900;
+  --md-sys-color-on-warning: #ffffff;
+  --md-sys-color-warning-container: #ffdea3;
+  --md-sys-color-on-warning-container: #261900;
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-palette="cloud"]:not([data-theme="light"]) {
+    color-scheme: dark;
+    --md-sys-color-primary: #a2c9ff;
+    --md-sys-color-on-primary: #00315c;
+    --md-sys-color-primary-container: #004882;
+    --md-sys-color-on-primary-container: #d3e4ff;
+    --md-sys-color-secondary: #bcc7db;
+    --md-sys-color-on-secondary: #263141;
+    --md-sys-color-secondary-container: #3c4758;
+    --md-sys-color-on-secondary-container: #d8e3f8;
+    --md-sys-color-tertiary: #ffb596;
+    --md-sys-color-on-tertiary: #571f01;
+    --md-sys-color-tertiary-container: #743414;
+    --md-sys-color-on-tertiary-container: #ffdbcd;
+    --md-sys-color-error: #ffb4ab;
+    --md-sys-color-on-error: #690005;
+    --md-sys-color-error-container: #93000a;
+    --md-sys-color-on-error-container: #ffdad6;
+    --md-sys-color-surface: #111417;
+    --md-sys-color-surface-dim: #111417;
+    --md-sys-color-surface-bright: #37393d;
+    --md-sys-color-on-surface: #e1e2e7;
+    --md-sys-color-on-surface-variant: #c1c7d0;
+    --md-sys-color-surface-container-lowest: #0c0e12;
+    --md-sys-color-surface-container-low: #191c1f;
+    --md-sys-color-surface-container: #1d2023;
+    --md-sys-color-surface-container-high: #282a2e;
+    --md-sys-color-surface-container-highest: #323539;
+    --md-sys-color-outline: #8b919a;
+    --md-sys-color-outline-variant: #41474f;
+    --md-sys-color-inverse-surface: #e1e2e7;
+    --md-sys-color-inverse-on-surface: #2e3134;
+    --md-sys-color-inverse-primary: #1660a5;
+    --md-sys-color-scrim: #000000;
+    --md-sys-color-shadow: #000000;
+    --md-sys-color-success: #97d77f;
+    --md-sys-color-on-success: #083900;
+    --md-sys-color-success-container: #185208;
+    --md-sys-color-on-success-container: #b2f498;
+    --md-sys-color-warning: #f5be45;
+    --md-sys-color-on-warning: #402d00;
+    --md-sys-color-warning-container: #5d4200;
+    --md-sys-color-on-warning-container: #ffdea3;
+  }
+}
+
+[data-palette="cloud"][data-theme="dark"] {
+  color-scheme: dark;
+  --md-sys-color-primary: #a2c9ff;
+  --md-sys-color-on-primary: #00315c;
+  --md-sys-color-primary-container: #004882;
+  --md-sys-color-on-primary-container: #d3e4ff;
+  --md-sys-color-secondary: #bcc7db;
+  --md-sys-color-on-secondary: #263141;
+  --md-sys-color-secondary-container: #3c4758;
+  --md-sys-color-on-secondary-container: #d8e3f8;
+  --md-sys-color-tertiary: #ffb596;
+  --md-sys-color-on-tertiary: #571f01;
+  --md-sys-color-tertiary-container: #743414;
+  --md-sys-color-on-tertiary-container: #ffdbcd;
+  --md-sys-color-error: #ffb4ab;
+  --md-sys-color-on-error: #690005;
+  --md-sys-color-error-container: #93000a;
+  --md-sys-color-on-error-container: #ffdad6;
+  --md-sys-color-surface: #111417;
+  --md-sys-color-surface-dim: #111417;
+  --md-sys-color-surface-bright: #37393d;
+  --md-sys-color-on-surface: #e1e2e7;
+  --md-sys-color-on-surface-variant: #c1c7d0;
+  --md-sys-color-surface-container-lowest: #0c0e12;
+  --md-sys-color-surface-container-low: #191c1f;
+  --md-sys-color-surface-container: #1d2023;
+  --md-sys-color-surface-container-high: #282a2e;
+  --md-sys-color-surface-container-highest: #323539;
+  --md-sys-color-outline: #8b919a;
+  --md-sys-color-outline-variant: #41474f;
+  --md-sys-color-inverse-surface: #e1e2e7;
+  --md-sys-color-inverse-on-surface: #2e3134;
+  --md-sys-color-inverse-primary: #1660a5;
+  --md-sys-color-scrim: #000000;
+  --md-sys-color-shadow: #000000;
+  --md-sys-color-success: #97d77f;
+  --md-sys-color-on-success: #083900;
+  --md-sys-color-success-container: #185208;
+  --md-sys-color-on-success-container: #b2f498;
+  --md-sys-color-warning: #f5be45;
+  --md-sys-color-on-warning: #402d00;
+  --md-sys-color-warning-container: #5d4200;
+  --md-sys-color-on-warning-container: #ffdea3;
 }

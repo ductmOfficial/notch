@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { type ArtProps, BLOOM, type FlowerMotif, HEART, LEAF } from "./art";
+import { type ArtProps, BLOOM, type MotifKind, HEART, LEAF } from "./art";
 
 /**
  * Daylily (huyên thảo) drawings: a six-petalled star with a yellow throat and long
@@ -100,7 +100,7 @@ const CARD_LEAVES = [
 ];
 
 /** Card drawings: open flower, buds, leaves, the throat close up, buds over leaves, petals. */
-export const DAYLILY_MOTIFS: Record<FlowerMotif, () => ReactNode> = {
+export const DAYLILY_MOTIFS: Record<MotifKind, () => ReactNode> = {
   bloom: () => (
     <>
       <path d="M24 26C25 34 23 41 20 48" fill="none" stroke={LEAF} strokeWidth="2" />
