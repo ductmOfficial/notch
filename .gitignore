@@ -32,3 +32,5 @@ test-results/
 # End-to-end sign-in: stored session and outbox
 apps/web/e2e/.auth/
 .e2e-outbox.jsonl
+.e2e-db-empty/
+.e2e-outbox-empty.jsonl

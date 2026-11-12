@@ -40,13 +40,14 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 | 19  | Quiet chips for given doses; status colors harmonized                | `feat/quiet-done`      | ✅     |
 | 20  | Reload settings only once the choice is saved (test)                 | `test/settings-cookie` | ✅     |
 | 21  | Sign-in by email link with an allowlist; data limited to the family  | `feat/auth`            | ✅     |
+| 22  | Welcome page for the first child                                     | `feat/onboarding`      | ✅     |
 
 Each step is a pull request with green checks (`Browser` from step 9), merged with rebase.
 
 ### Still open in P0 and P1
 
 - [x] Sign-in (Better Auth, magic link, allowlist)
-- [ ] Onboarding: create the family and the first child after the first sign-in
+- [x] Onboarding: the first child after the first sign-in
 - [ ] Vercel and Neon preview deploys, then the `.ics` subscription URL
 - [ ] Vietnamese EPI (TCMR) schedule data, generated from an official source
 
@@ -89,6 +90,8 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 | Session checked on the server, the proxy only redirects           | The proxy reads the cookie for a quick redirect; pages, actions and routes still verify the session and the child's family                          |
 | Rate limits stored in the database                                | Memory limits reset per serverless instance; a table keeps them across instances                                                                    |
 | Sign-in tests through the real flow                               | The setup project requests a link, reads it from the test outbox and stores the session for the other tests                                         |
+| Onboarding asks only name, sex and date of birth                  | The WHO charts need sex and age; everything else (measurements, doses) has its own form                                                             |
+| A second e2e server with an empty database                        | The first run can only be tested on a family without a child; the main server keeps the demo child                                                  |
 | No Co-Authored-By trailer in commits                              | Maintainer's preference                                                                                                                             |
 
 ## Follow-ups

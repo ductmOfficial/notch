@@ -2,11 +2,21 @@ import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import type { Db } from "./client.js";
-import type { AppointmentRow, Measurement, Vaccination } from "./queries.js";
-import { appointment, measurement, vaccination } from "./schema.js";
+import type { AppointmentRow, Child, Measurement, Vaccination } from "./queries.js";
+import { appointment, child, measurement, vaccination } from "./schema.js";
 
 const isoDate = z.iso.date();
 const note = z.string().trim().max(500).nullable();
+
+/** A child's profile, as entered when the family starts. */
+export const childInputSchema = z.object({
+  familyId: z.uuid(),
+  name: z.string().trim().min(1).max(60),
+  sex: z.enum(["female", "male"]),
+  birthDate: isoDate,
+});
+
+export type ChildInput = z.input<typeof childInputSchema>;
 
 /** One measurement; values in grams and millimetres, at least one present. */
 export const measurementInputSchema = z
@@ -80,6 +90,13 @@ function pgCode(error: unknown): string | undefined {
     e = typeof e === "object" && "cause" in e ? e.cause : undefined;
   }
   return undefined;
+}
+
+export async function addChild(db: Db, input: ChildInput): Promise<Child> {
+  const values = childInputSchema.parse(input);
+  const [row] = await db.insert(child).values(values).returning();
+  if (!row) throw new Error("Child not saved");
+  return row;
 }
 
 export async function addMeasurement(db: Db, input: MeasurementInput): Promise<Measurement> {
