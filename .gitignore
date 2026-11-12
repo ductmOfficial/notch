@@ -20,3 +20,6 @@ coverage/
 
 # Local-only Vietnamese progress notes
 PROGRESS.vi.md
+
+# Local PGlite databases
+.data/
