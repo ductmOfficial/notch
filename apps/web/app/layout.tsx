@@ -4,6 +4,7 @@ import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { LotusBackdrop } from "../components/LotusBackdrop";
 import { NavLinks } from "../components/NavLinks";
 import { QuickAdd } from "../components/QuickAdd";
 import { I18nProvider } from "../lib/i18n/client";
@@ -37,6 +38,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     <html lang={locale} data-theme={theme === "system" ? undefined : theme}>
       <body className="min-h-dvh bg-surface antialiased">
         <I18nProvider locale={locale}>
+          <LotusBackdrop />
           <a
             href="#main"
             className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-m3-sm focus:bg-inverse-surface focus:px-4 focus:py-2 focus:text-inverse-on-surface"
