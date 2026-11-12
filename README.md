@@ -4,7 +4,7 @@
 
 **Notch · Sổ lớn khôn của bé.** A web app for parents to track a child's growth against the WHO Child Growth Standards, the vaccination schedule, and health history. The name comes from the marks parents make on a door frame each time they measure their child's height.
 
-> Status: runs locally. Today, Growth and Vaccinations screens, forms for measurements, doses and appointments, a calendar download and a Settings page, in Vietnamese and English. **No sign-in yet, so it is not deployed.** See [PROGRESS.md](PROGRESS.md).
+> Status: runs locally. Today, Growth and Vaccinations screens, forms for measurements, doses and appointments, a calendar download and a Settings page, in Vietnamese and English. Sign-in by email link, limited to an allowlist. **Not deployed yet.** See [PROGRESS.md](PROGRESS.md).
 
 ## Principles
 
@@ -60,8 +60,10 @@ pnpm build
 export DATABASE_URL=pglite:.data/pglite
 pnpm --filter @notch/db migrate
 NOTCH_SEED_FILE=packages/db/fixtures/demo-child.json pnpm --filter @notch/db seed
-pnpm --filter web dev             # http://localhost:3000
+NOTCH_ALLOWED_EMAILS=you@example.com pnpm --filter web dev   # http://localhost:3000
 ```
+
+Sign in with that address: without a mail service, the sign-in link is printed in the terminal running `dev`.
 
 With PostgreSQL and your own records instead: `cp .env.example .env`, set `NOTCH_SEED_FILE` to a file **outside the repository**, then `pnpm db:up` and the same `migrate`, `seed` and `dev` commands. PostgreSQL listens on port 5433, so it can run next to other local databases on 5432.
 
@@ -76,6 +78,15 @@ With PostgreSQL and your own records instead: `cp .env.example .env`, set `NOTCH
 | `pnpm db:up` / `db:psql`  | Start local PostgreSQL / open `psql` in the container                                  |
 
 `e2e` uses Playwright's Chromium (`pnpm --filter web exec playwright install chromium`), or the browser in `CHROME_PATH`.
+
+## Sign-in
+
+- **Email link only** ([Better Auth](https://www.better-auth.com) with its magic-link plugin). No passwords to store or leak. A link works once, for 10 minutes.
+- **Allowlist.** Only the addresses in `NOTCH_ALLOWED_EMAILS` get a link or an account. The form answers the same for any address, so it does not reveal who uses Notch. Someone removed from the list is signed out on their next request.
+- **One household.** Everyone on the allowlist joins the same family (the oldest one, such as the seeded family), so both parents see the same children.
+- **Checked on the server.** A proxy sends visitors without a session cookie to `/sign-in`; every page, server action and the calendar route then check the session and that the child belongs to the signed-in family.
+- **Mail.** Through Resend when `RESEND_API_KEY` is set; otherwise written to `MAIL_OUTBOX` (the end-to-end tests read it) or printed to the console in development. The email holds only the link, nothing about the child.
+- **Limits.** Better Auth's rate limits (5 link requests a minute per client) are kept in the database, so they hold on serverless hosting.
 
 ## Design
 

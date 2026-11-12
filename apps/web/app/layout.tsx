@@ -10,6 +10,7 @@ import { QuickAdd } from "../components/QuickAdd";
 import { I18nProvider } from "../lib/i18n/client";
 import { getI18n } from "../lib/i18n/server";
 import { getPalette, getTheme } from "../lib/preferences";
+import { getViewer } from "../lib/session";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getI18n();
@@ -32,7 +33,7 @@ export const viewport: Viewport = {
  */
 export default async function RootLayout({ children }: { children: ReactNode }) {
   // Theme and palette chosen in Settings are rendered on the server, so the page never flashes.
-  const [theme, palette] = await Promise.all([getTheme(), getPalette()]);
+  const [theme, palette, viewer] = await Promise.all([getTheme(), getPalette(), getViewer()]);
   const { t, locale } = await getI18n();
   return (
     <html
@@ -50,41 +51,58 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             {t("app.skipToContent")}
           </a>
 
-          <nav
-            aria-label={t("app.mainNav")}
-            className="fixed inset-y-0 left-0 z-10 hidden w-20 flex-col items-center gap-10 bg-surface pt-4 md:flex"
-          >
-            <Link href="/" className="label-large flex flex-col items-center gap-1 text-primary">
-              <MotifMark size={32} />
-              Notch
-            </Link>
-            <QuickAdd placement="rail" />
-            <NavLinks variant="rail" />
-          </nav>
+          {/* Signed out (the sign-in page), there is nowhere to go: no navigation. */}
+          {viewer ? (
+            <>
+              <nav
+                aria-label={t("app.mainNav")}
+                className="fixed inset-y-0 left-0 z-10 hidden w-20 flex-col items-center gap-10 bg-surface pt-4 md:flex"
+              >
+                <Link
+                  href="/"
+                  className="label-large flex flex-col items-center gap-1 text-primary"
+                >
+                  <MotifMark size={32} />
+                  Notch
+                </Link>
+                <QuickAdd placement="rail" />
+                <NavLinks variant="rail" />
+              </nav>
 
-          <header className="flex h-16 items-center px-4 md:hidden">
-            <Link href="/" className="title-large flex items-center gap-2 text-primary">
-              <MotifMark size={28} />
-              Notch
-            </Link>
-          </header>
+              <header className="flex h-16 items-center px-4 md:hidden">
+                <Link href="/" className="title-large flex items-center gap-2 text-primary">
+                  <MotifMark size={28} />
+                  Notch
+                </Link>
+              </header>
+            </>
+          ) : (
+            <header className="flex h-16 items-center px-4 md:px-6">
+              <span className="title-large flex items-center gap-2 text-primary">
+                <MotifMark size={28} />
+                Notch
+              </span>
+            </header>
+          )}
 
           <main
             id="main"
-            className="mx-auto max-w-5xl px-4 pb-32 md:pb-10 md:pl-24 md:pt-6 lg:pl-28"
+            className={`mx-auto max-w-5xl px-4 ${viewer ? "pb-32 md:pb-10 md:pl-24 md:pt-6 lg:pl-28" : "pb-10"}`}
           >
             {children}
           </main>
 
-          <div className="md:hidden">
-            <QuickAdd placement="floating" />
-            <nav
-              aria-label={t("app.mainNav")}
-              className="fixed inset-x-0 bottom-0 z-10 bg-surface-container pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]"
-            >
-              <NavLinks variant="bar" />
-            </nav>
-          </div>
+          {viewer && (
+            <div className="md:hidden">
+              <QuickAdd placement="floating" />
+              <nav
+                aria-label={t("app.mainNav")}
+                className="fixed inset-x-0 bottom-0 z-10 bg-surface-container pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]"
+              >
+                <NavLinks variant="bar" />
+              </nav>
+            </div>
+          )}
         </I18nProvider>
       </body>
     </html>

@@ -22,12 +22,14 @@ import {
 const handle = createDb("pglite:memory");
 const { db } = handle;
 let childId = "";
+let familyId = "";
 
 beforeAll(async () => {
   await handle.migrate();
   await syncCatalog(db, CATALOG);
   const [f] = await db.insert(family).values({ name: "Test family" }).returning();
   if (!f) throw new Error("family not created");
+  familyId = f.id;
   const [c] = await db
     .insert(child)
     .values({ familyId: f.id, name: "Test", sex: "female", birthDate: "2030-01-01" })
@@ -107,7 +109,8 @@ describe("syncCatalog", () => {
 
 describe("queries", () => {
   it("lists children and finds one by id", async () => {
-    expect((await listChildren(db)).map((c) => c.id)).toEqual([childId]);
+    expect((await listChildren(db, familyId)).map((c) => c.id)).toEqual([childId]);
+    expect(await listChildren(db, "00000000-0000-0000-0000-000000000000")).toEqual([]);
     expect((await getChild(db, childId))?.birthDate).toBe("2030-01-01");
     expect(await getChild(db, "00000000-0000-0000-0000-000000000000")).toBeUndefined();
   });

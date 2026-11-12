@@ -21,6 +21,7 @@
     "@notch/db": "workspace:*",
     "@notch/growth": "workspace:*",
     "@notch/vaccines": "workspace:*",
+    "better-auth": "1.7.18",
     "next": "16.4.5",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
