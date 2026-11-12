@@ -32,6 +32,8 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 | 11  | Settings page with a light, dark or system theme                     | `feat/theme-setting`  | ✅     |
 | 12  | Vietnamese and English, chosen in Settings                           | `feat/i18n`           | ✅     |
 | 13  | Lotus watermark behind the content                                   | `feat/lotus-backdrop` | ✅     |
+| 14  | Add button flat in the navigation rail                               | `fix/rail-fab-flat`   | ✅     |
+| 15  | Lotus mark next to the name, on empty states, as the favicon         | `feat/lotus-mark`     | ✅     |
 
 Each step is a pull request with green checks (`Browser` from step 9), merged with rebase.
 
@@ -68,6 +70,7 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 | Language from a cookie, then the browser; no locale in URLs       | The app is private and not indexed, so URLs stay short; Vietnamese is the fallback                                          |
 | Flat dictionaries, Vietnamese as the reference                    | TypeScript rejects unknown keys; a unit test keeps English on the same keys and placeholders                                |
 | Lotus drawn in SVG, not a photo                                   | It takes its colors from the scheme, so it follows light and dark, weighs a few hundred bytes and needs no image license    |
+| The lotus mark stays off data cards and navigation                | Those icons tell what an item is (weight, vaccine, settings); the lotus is the brand, shown where nothing else needs saying |
 | No Co-Authored-By trailer in commits                              | Maintainer's preference                                                                                                     |
 
 ## Follow-ups
