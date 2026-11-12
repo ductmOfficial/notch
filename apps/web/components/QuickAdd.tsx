@@ -23,7 +23,11 @@ const ACTIONS: { href: string; label: MessageKey; hint: MessageKey; icon: IconNa
   },
 ];
 
-/** M3 floating action button that opens the quick-add choices: one tap to the right form. */
+/**
+ * M3 floating action button that opens the quick-add choices: one tap to the right form.
+ * On phones it floats over scrolling content, so it keeps elevation level 3; in the
+ * navigation rail it sits flat, like the destinations next to it.
+ */
 export function QuickAdd({ placement }: { placement: "rail" | "floating" }) {
   const { t } = useI18n();
   return (
@@ -31,8 +35,10 @@ export function QuickAdd({ placement }: { placement: "rail" | "floating" }) {
       <Button
         variant="secondary"
         aria-label={t("quickAdd.title")}
-        className={`state-layer size-14 rounded-m3-lg border-0 bg-primary-container p-0 text-on-primary-container shadow-[0_4px_8px_3px_rgb(0_0_0/0.15),0_1px_3px_rgb(0_0_0/0.3)] ${
-          placement === "floating" ? "fixed right-4 bottom-24 z-20" : ""
+        className={`state-layer size-14 rounded-m3-lg border-0 bg-primary-container p-0 text-on-primary-container ${
+          placement === "floating"
+            ? "fixed right-4 bottom-24 z-20 shadow-[0_4px_8px_3px_rgb(0_0_0/0.15),0_1px_3px_rgb(0_0_0/0.3)]"
+            : "shadow-none"
         }`}
       >
         <Icon name="add" />
