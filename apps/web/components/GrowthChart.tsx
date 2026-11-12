@@ -1,5 +1,6 @@
 import { type ChartModel, INDICATORS } from "../lib/growth-chart";
 import { formatDate, formatNumber, formatZ } from "../lib/format";
+import { type Locale, translator } from "../lib/i18n/messages";
 
 const WIDTH = 720;
 const HEIGHT = 420;
@@ -18,7 +19,16 @@ const CURVE_STYLE: Record<number, { stroke: string; dash?: string; width: number
  * child's measurements. No client JavaScript; each point has a <title> for a
  * native tooltip, and the table below the chart carries the same data.
  */
-export function GrowthChart({ chart, titleId }: { chart: ChartModel; titleId: string }) {
+export function GrowthChart({
+  chart,
+  titleId,
+  locale,
+}: {
+  chart: ChartModel;
+  titleId: string;
+  locale: Locale;
+}) {
+  const t = translator(locale);
   const info = INDICATORS[chart.indicator];
   const x = (age: number) => PAD.left + (age / chart.maxAgeDays) * (WIDTH - PAD.left - PAD.right);
   const y = (value: number) =>
@@ -57,7 +67,7 @@ export function GrowthChart({ chart, titleId }: { chart: ChartModel; titleId: st
               fontSize="11"
               fill="var(--md-sys-color-on-surface-variant)"
             >
-              {formatNumber(v, Number.isInteger(v) ? 0 : 1)}
+              {formatNumber(v, Number.isInteger(v) ? 0 : 1, locale)}
             </text>
           </g>
         ))}
@@ -88,7 +98,7 @@ export function GrowthChart({ chart, titleId }: { chart: ChartModel; titleId: st
           fontSize="11"
           fill="var(--md-sys-color-on-surface-variant)"
         >
-          Tháng tuổi
+          {t("growth.monthsOfAge")}
         </text>
         <text
           x={PAD.left - 8}
@@ -120,7 +130,9 @@ export function GrowthChart({ chart, titleId }: { chart: ChartModel; titleId: st
                   fontSize="10"
                   fill="var(--md-sys-color-on-surface-variant)"
                 >
-                  {curve.z === 0 ? "TB" : `${curve.z > 0 ? "+" : "−"}${String(Math.abs(curve.z))}`}
+                  {curve.z === 0
+                    ? t("growth.median")
+                    : `${curve.z > 0 ? "+" : "−"}${String(Math.abs(curve.z))}`}
                 </text>
               )}
             </g>
@@ -148,8 +160,8 @@ export function GrowthChart({ chart, titleId }: { chart: ChartModel; titleId: st
           strokeWidth={2}
         >
           <title>
-            {`${formatDate(p.date)}: ${p.estimated ? "≈" : ""}${formatNumber(p.value, info.digits)} ${info.unit}` +
-              (p.z === undefined ? "" : `, z ${formatZ(p.z)}`)}
+            {`${formatDate(p.date, locale)}: ${p.estimated ? "≈" : ""}${formatNumber(p.value, info.digits, locale)} ${info.unit}` +
+              (p.z === undefined ? "" : `, z ${formatZ(p.z, locale)}`)}
           </title>
         </circle>
       ))}

@@ -2,6 +2,8 @@
 
 import { cookies } from "next/headers";
 
+import { isLocale } from "../../lib/i18n/messages";
+import { LOCALE_COOKIE } from "../../lib/i18n/server";
 import { isTheme, THEME_COOKIE } from "../../lib/preferences";
 
 const YEAR = 60 * 60 * 24 * 365;
@@ -12,4 +14,10 @@ export async function setThemeAction(theme: string): Promise<void> {
   const store = await cookies();
   if (theme === "system") store.delete(THEME_COOKIE);
   else store.set(THEME_COOKIE, theme, { path: "/", maxAge: YEAR, sameSite: "lax" });
+}
+
+/** Remembers the language for this browser; without it the browser's language is used. */
+export async function setLocaleAction(locale: string): Promise<void> {
+  if (!isLocale(locale)) return;
+  (await cookies()).set(LOCALE_COOKIE, locale, { path: "/", maxAge: YEAR, sameSite: "lax" });
 }

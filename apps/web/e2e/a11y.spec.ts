@@ -36,6 +36,22 @@ for (const path of pages) {
   });
 }
 
+test.describe("in English", () => {
+  test.use({ locale: "en-US" });
+  for (const path of pages) {
+    test(`${path} has no WCAG 2.2 AA violations and is marked as English`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto(path);
+      await expect(page.locator("html")).toHaveAttribute("lang", "en");
+      await expect(page.locator("main h1")).toBeVisible();
+      const { violations } = await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+        .analyze();
+      expect(violations, violations.map((v) => `${v.id}: ${v.help}`).join("\n")).toEqual([]);
+    });
+  }
+});
+
 /** Opacity the element is painted with: its own times every ancestor's (a fading overlay). */
 const paintedOpacity = (element: Element) => {
   let opacity = 1;

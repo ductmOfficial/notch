@@ -2,6 +2,7 @@
 
 import { Button, Dialog, DialogActions, DialogTrigger } from "@ductmofficial/sen-ui";
 
+import { useI18n } from "../../lib/i18n/client";
 import { BUTTON } from "../button-styles";
 import { Icon } from "../icons";
 import { SubmitButton } from "./fields";
@@ -25,6 +26,7 @@ export function DeleteForm({
   title: string;
   confirm: string;
 }) {
+  const { t } = useI18n();
   return (
     <DialogTrigger>
       <Button variant="secondary" className={BUTTON.dangerText}>
@@ -39,10 +41,10 @@ export function DeleteForm({
             <p className="body-medium text-on-surface-variant">{confirm}</p>
             <DialogActions>
               <Button variant="secondary" className={BUTTON.text} onClick={close}>
-                Huỷ
+                {t("common.cancel")}
               </Button>
-              <SubmitButton variant="danger" pendingLabel="Đang xoá…">
-                Xoá
+              <SubmitButton variant="danger" pendingLabel={t("common.deleting")}>
+                {t("common.delete")}
               </SubmitButton>
             </DialogActions>
           </form>

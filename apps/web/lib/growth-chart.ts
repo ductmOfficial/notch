@@ -1,3 +1,4 @@
+import type { MessageKey } from "./i18n/messages";
 import {
   ageInDays,
   bmi,
@@ -23,7 +24,7 @@ export interface MeasurementInput {
 
 interface IndicatorInfo {
   readonly who: Indicator;
-  readonly label: string;
+  readonly labelKey: MessageKey;
   readonly unit: string;
   readonly digits: number;
   readonly value: (m: MeasurementInput) => number | null;
@@ -34,7 +35,7 @@ interface IndicatorInfo {
 export const INDICATORS: Record<ChartIndicator, IndicatorInfo> = {
   weight: {
     who: "weight-for-age",
-    label: "Cân nặng",
+    labelKey: "indicator.weight",
     unit: "kg",
     digits: 2,
     value: (m) => (m.weightG === null ? null : m.weightG / 1000),
@@ -42,7 +43,7 @@ export const INDICATORS: Record<ChartIndicator, IndicatorInfo> = {
   },
   length: {
     who: "length-height-for-age",
-    label: "Chiều dài / cao",
+    labelKey: "indicator.length",
     unit: "cm",
     digits: 1,
     value: (m) => (m.lengthMm === null ? null : m.lengthMm / 10),
@@ -50,7 +51,7 @@ export const INDICATORS: Record<ChartIndicator, IndicatorInfo> = {
   },
   bmi: {
     who: "bmi-for-age",
-    label: "BMI",
+    labelKey: "indicator.bmi",
     unit: "kg/m²",
     digits: 1,
     value: (m) =>
@@ -59,7 +60,7 @@ export const INDICATORS: Record<ChartIndicator, IndicatorInfo> = {
   },
   head: {
     who: "head-circumference-for-age",
-    label: "Vòng đầu",
+    labelKey: "indicator.head",
     unit: "cm",
     digits: 1,
     value: (m) => (m.headMm === null ? null : m.headMm / 10),

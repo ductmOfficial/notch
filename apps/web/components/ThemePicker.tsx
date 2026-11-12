@@ -3,14 +3,16 @@
 import { useState, useTransition } from "react";
 
 import { setThemeAction } from "../app/settings/actions";
+import type { MessageKey } from "../lib/i18n/messages";
+import { useI18n } from "../lib/i18n/client";
 import { Icon, type IconName } from "./icons";
 
 type Theme = "system" | "light" | "dark";
 
-const OPTIONS: { value: Theme; label: string; icon: IconName }[] = [
-  { value: "system", label: "Theo hệ thống", icon: "contrast" },
-  { value: "light", label: "Sáng", icon: "lightMode" },
-  { value: "dark", label: "Tối", icon: "darkMode" },
+const OPTIONS: { value: Theme; label: MessageKey; icon: IconName }[] = [
+  { value: "system", label: "settings.themeSystem", icon: "contrast" },
+  { value: "light", label: "settings.themeLight", icon: "lightMode" },
+  { value: "dark", label: "settings.themeDark", icon: "darkMode" },
 ];
 
 /**
@@ -19,6 +21,7 @@ const OPTIONS: { value: Theme; label: string; icon: IconName }[] = [
  * in a cookie so the server renders it on the next visit without a flash.
  */
 export function ThemePicker({ initial }: { initial: Theme }) {
+  const { t } = useI18n();
   const [theme, setTheme] = useState(initial);
   const [, startTransition] = useTransition();
 
@@ -32,7 +35,7 @@ export function ThemePicker({ initial }: { initial: Theme }) {
 
   return (
     <fieldset>
-      <legend className="title-small mb-3">Giao diện</legend>
+      <legend className="title-small mb-3">{t("settings.theme")}</legend>
       <div className="inline-flex flex-wrap rounded-full border border-outline">
         {OPTIONS.map((o) => (
           <label
@@ -50,7 +53,7 @@ export function ThemePicker({ initial }: { initial: Theme }) {
               className="sr-only"
             />
             <Icon name={theme === o.value ? "check" : o.icon} size={18} />
-            {o.label}
+            {t(o.label)}
           </label>
         ))}
       </div>

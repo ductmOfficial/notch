@@ -12,6 +12,7 @@ import {
 } from "@notch/vaccines";
 
 import { formatDate } from "./format";
+import { type Locale, translator } from "./i18n/messages";
 
 export interface DiseaseRow {
   readonly code: DiseaseCode;
@@ -44,14 +45,17 @@ export function productName(code: string, catalog: Catalog = CATALOG): string {
 }
 
 /** "Hôm nay", "Ngày mai", "Còn 14 ngày", "Quá hạn 3 ngày", "Chưa có ngày", "Đã tiêm 12/10/2026". */
-export function dueLabel(state: AppointmentState): string {
+export function dueLabel(state: AppointmentState, locale: Locale = "vi"): string {
+  const t = translator(locale);
   if (state.status === "fulfilled")
-    return state.givenOn ? `Đã tiêm ${formatDate(state.givenOn)}` : "Đã tiêm";
-  if (state.daysUntil === undefined) return "Chưa có ngày";
-  if (state.daysUntil === 0) return "Hôm nay";
-  if (state.daysUntil === 1) return "Ngày mai";
-  if (state.daysUntil > 0) return `Còn ${String(state.daysUntil)} ngày`;
-  return `Quá hạn ${String(-state.daysUntil)} ngày`;
+    return state.givenOn
+      ? t("due.givenOn", { date: formatDate(state.givenOn, locale) })
+      : t("due.given");
+  if (state.daysUntil === undefined) return t("common.noDate");
+  if (state.daysUntil === 0) return t("due.today");
+  if (state.daysUntil === 1) return t("due.tomorrow");
+  if (state.daysUntil > 0) return t("due.inDays", { n: state.daysUntil });
+  return t("due.overdue", { n: -state.daysUntil });
 }
 
 export function buildVaccinationView(
@@ -59,6 +63,7 @@ export function buildVaccinationView(
   appointments: readonly Appointment[],
   today: string,
   catalog: Catalog = CATALOG,
+  locale: Locale = "vi",
 ): VaccinationView {
   const states = appointmentStates(appointments, records, today);
   const open = states
@@ -66,7 +71,7 @@ export function buildVaccinationView(
     .toSorted((a, b) => (a.daysUntil ?? 0) - (b.daysUntil ?? 0));
   const undated = states.filter((s) => s.status === "undated");
 
-  const names = new Map(catalog.diseases.map((d) => [d.code, d.name.vi]));
+  const names = new Map(catalog.diseases.map((d) => [d.code, d.name[locale]]));
   const rows = [...dosesByDisease(records, catalog)].map(([code, doses]) => ({
     code,
     name: names.get(code) ?? code,

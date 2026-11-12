@@ -25,6 +25,7 @@ import {
   parseMeasurementForm,
 } from "../lib/form-values";
 import { todayInVietnam } from "../lib/format";
+import { getI18n } from "../lib/i18n/server";
 
 // No sign-in yet: these actions are meant for a local, single-family setup.
 // Authentication (P0-d) must come before the app is deployed anywhere.
@@ -32,11 +33,14 @@ import { todayInVietnam } from "../lib/format";
 async function context(form: FormData): Promise<{ ctx: FormContext } | { error: FormState }> {
   const db = getDb();
   const childId = form.get("childId");
-  if (!db) return { error: { message: "Chưa cấu hình database (DATABASE_URL)." } };
-  if (typeof childId !== "string") return { error: { message: "Thiếu hồ sơ bé." } };
+  const { t, locale } = await getI18n();
+  if (!db) return { error: { message: t("error.noDatabase") } };
+  if (typeof childId !== "string") return { error: { message: t("error.noChildId") } };
   const child = await getChild(db, childId).catch(() => undefined);
-  if (!child) return { error: { message: "Không tìm thấy hồ sơ bé." } };
-  return { ctx: { childId: child.id, birthDate: child.birthDate, today: todayInVietnam() } };
+  if (!child) return { error: { message: t("error.childNotFound") } };
+  return {
+    ctx: { childId: child.id, birthDate: child.birthDate, today: todayInVietnam(), locale },
+  };
 }
 
 function refresh(...paths: string[]) {
@@ -58,7 +62,7 @@ export async function saveMeasurementAction(_: FormState, form: FormData): Promi
   const id = form.get("id");
   if (typeof id === "string" && id !== "") {
     const saved = await updateMeasurement(db(), id, parsed.input);
-    if (!saved) return { message: "Lần đo này không còn tồn tại." };
+    if (!saved) return { message: (await getI18n()).t("error.measurementGone") };
   } else {
     await addMeasurement(db(), parsed.input);
   }
@@ -84,7 +88,10 @@ export async function recordDoseAction(_: FormState, form: FormData): Promise<Fo
     await recordDose(db(), parsed.input);
   } catch (error) {
     if (error instanceof DuplicateDoseError) {
-      return { errors: { doseNo: "Mũi này đã được ghi nhận." }, values: formValues(form) };
+      return {
+        errors: { doseNo: (await getI18n()).t("error.doseExists") },
+        values: formValues(form),
+      };
     }
     throw error;
   }
@@ -113,11 +120,11 @@ export async function saveAppointmentAction(_: FormState, form: FormData): Promi
       parsed.input,
       typeof id === "string" && id !== "" ? id : undefined,
     );
-    if (!saved) return { message: "Lịch hẹn này không còn tồn tại." };
+    if (!saved) return { message: (await getI18n()).t("error.appointmentGone") };
   } catch (error) {
     if (error instanceof DuplicateAppointmentError) {
       return {
-        errors: { doseNo: "Đã có lịch hẹn cho mũi này; hãy sửa lịch hẹn đó." },
+        errors: { doseNo: (await getI18n()).t("error.appointmentExists") },
         values: formValues(form),
       };
     }

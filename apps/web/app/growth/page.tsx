@@ -8,6 +8,8 @@ import { Icon } from "../../components/icons";
 import { NoChild, NoDatabase } from "../../components/ui";
 import { getCurrentChild } from "../../lib/child";
 import { getDb } from "../../lib/db";
+import type { Locale, Translate } from "../../lib/i18n/messages";
+import { getI18n } from "../../lib/i18n/server";
 import {
   formatAge,
   formatDate,
@@ -25,7 +27,10 @@ import {
   type MeasurementInput,
 } from "../../lib/growth-chart";
 
-export const metadata: Metadata = { title: "Tăng trưởng" };
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return { title: t("growth.title") };
+}
 export const dynamic = "force-dynamic";
 
 const TABS: readonly ChartIndicator[] = ["weight", "length", "bmi", "head"];
@@ -36,6 +41,7 @@ interface Props {
 
 export default async function GrowthPage({ searchParams }: Props) {
   const params = await searchParams;
+  const { t, locale } = await getI18n();
   const db = getDb();
   if (!db) return <NoDatabase />;
   const { children, child } = await getCurrentChild(db, params.child);
@@ -52,34 +58,42 @@ export default async function GrowthPage({ searchParams }: Props) {
     <div className="space-y-6 pt-2">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="headline-medium">Tăng trưởng của {child.name}</h1>
+          <h1 className="headline-medium">{t("growth.heading", { name: child.name })}</h1>
           <p className="body-medium mt-1 text-on-surface-variant">
-            {child.sex === "female" ? "Bé gái" : "Bé trai"} · {formatAge(child.birthDate, today)} ·
-            so với chuẩn WHO
+            {t("growth.subtitle", {
+              sex: t(child.sex === "female" ? "common.female" : "common.male"),
+              age: formatAge(child.birthDate, today, locale),
+            })}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           {children.length > 1 && (
-            <ChildPicker items={children} current={child.id} indicator={indicator} />
+            <ChildPicker items={children} current={child.id} indicator={indicator} t={t} />
           )}
           <Link
             href={`/growth/new${children.length > 1 ? `?child=${child.id}` : ""}`}
             className={BUTTON.filled}
           >
             <Icon name="add" size={18} />
-            Thêm lần đo
+            {t("growth.add")}
           </Link>
         </div>
       </header>
 
-      <Summary sex={child.sex} birthDate={child.birthDate} measurements={measurements} />
+      <Summary
+        sex={child.sex}
+        birthDate={child.birthDate}
+        measurements={measurements}
+        t={t}
+        locale={locale}
+      />
 
       <section aria-labelledby="chart-title" className="rounded-m3-md bg-surface-container-low p-4">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <h2 id="chart-title" className="title-medium">
-            {INDICATORS[indicator].label} theo tuổi
+            {t("growth.byAge", { indicator: t(INDICATORS[indicator].labelKey) })}
           </h2>
-          <nav aria-label="Chỉ số" className="flex flex-wrap gap-2">
+          <nav aria-label={t("growth.indicators")} className="flex flex-wrap gap-2">
             {TABS.map((tab) => (
               <Link
                 key={tab}
@@ -87,14 +101,14 @@ export default async function GrowthPage({ searchParams }: Props) {
                 aria-current={tab === indicator ? "page" : undefined}
                 className="state-layer label-large inline-flex h-8 items-center rounded-m3-sm border border-outline-variant px-3 text-on-surface-variant aria-[current=page]:border-transparent aria-[current=page]:bg-secondary-container aria-[current=page]:text-on-secondary-container"
               >
-                {INDICATORS[tab].label}
+                {t(INDICATORS[tab].labelKey)}
               </Link>
             ))}
           </nav>
         </div>
         {chart.points.length === 0 ? (
           <p className="body-medium py-12 text-center text-on-surface-variant">
-            Chưa có số đo {INDICATORS[indicator].label.toLowerCase()}.
+            {t("growth.noValues", { indicator: t(INDICATORS[indicator].labelKey).toLowerCase() })}
           </p>
         ) : (
           // On narrow screens the chart scrolls sideways. A right-to-left scroll
@@ -110,19 +124,22 @@ export default async function GrowthPage({ searchParams }: Props) {
             className="-mx-4 overflow-x-auto px-4"
           >
             <div dir="ltr" className="w-max min-w-full">
-              <GrowthChart chart={chart} titleId="chart-title" />
+              <GrowthChart chart={chart} titleId="chart-title" locale={locale} />
             </div>
           </div>
         )}
-        <Legend />
+        <Legend t={t} />
       </section>
 
-      <MeasurementTable sex={child.sex} birthDate={child.birthDate} measurements={measurements} />
+      <MeasurementTable
+        sex={child.sex}
+        birthDate={child.birthDate}
+        measurements={measurements}
+        t={t}
+        locale={locale}
+      />
 
-      <p className="body-small text-on-surface-variant">
-        Số liệu đối chiếu với Chuẩn tăng trưởng trẻ em của WHO (0–5 tuổi). Đây không phải đánh giá y
-        khoa; hãy hỏi bác sĩ khi có điều cần lưu ý.
-      </p>
+      <p className="body-small text-on-surface-variant">{t("growth.disclaimer")}</p>
     </div>
   );
 }
@@ -131,13 +148,15 @@ function ChildPicker({
   items,
   current,
   indicator,
+  t,
 }: {
   items: Child[];
   current: string;
   indicator: ChartIndicator;
+  t: Translate;
 }) {
   return (
-    <nav aria-label="Chọn bé" className="flex gap-2">
+    <nav aria-label={t("growth.pickChild")} className="flex gap-2">
       {items.map((c) => (
         <Link
           key={c.id}
@@ -156,10 +175,14 @@ function Summary({
   sex,
   birthDate,
   measurements,
+  t,
+  locale,
 }: {
   sex: Child["sex"];
   birthDate: string;
   measurements: MeasurementInput[];
+  t: Translate;
+  locale: Locale;
 }) {
   const cards = (["weight", "length", "bmi"] as const).flatMap((indicator) => {
     const latest = chartPoints(indicator, sex, birthDate, measurements).at(-1);
@@ -173,24 +196,26 @@ function Summary({
         const info = INDICATORS[indicator];
         return (
           <div key={indicator} className="rounded-m3-md bg-surface-container-highest p-4">
-            <dt className="title-small text-on-surface-variant">{info.label}</dt>
+            <dt className="title-small text-on-surface-variant">{t(info.labelKey)}</dt>
             <dd className="mt-1">
               <span className="headline-medium tabular-nums">
                 {latest.estimated ? "≈" : ""}
-                {formatNumber(latest.value, info.digits)}
+                {formatNumber(latest.value, info.digits, locale)}
               </span>{" "}
               <span className="body-medium text-on-surface-variant">{info.unit}</span>
             </dd>
             {latest.z !== undefined && latest.percentile !== undefined && (
               <dd className="body-medium mt-1">
-                Bách phân vị{" "}
+                {t("growth.percentile")}{" "}
                 <strong className="tabular-nums">{Math.round(latest.percentile)}</strong> · z{" "}
-                <span className="tabular-nums">{formatZ(latest.z)}</span>
-                <span className="body-small block text-on-surface-variant">{zBand(latest.z)}</span>
+                <span className="tabular-nums">{formatZ(latest.z, locale)}</span>
+                <span className="body-small block text-on-surface-variant">
+                  {zBand(latest.z, locale)}
+                </span>
               </dd>
             )}
             <dd className="body-small mt-1 text-on-surface-variant">
-              Đo ngày {formatDate(latest.date)}
+              {t("growth.measuredOn", { date: formatDate(latest.date, locale) })}
             </dd>
           </div>
         );
@@ -199,9 +224,12 @@ function Summary({
   );
 }
 
-function Legend() {
+function Legend({ t }: { t: Translate }) {
   const items = [
-    { label: "Trung bình (TB)", style: { borderColor: "var(--chart-median)", borderTopWidth: 2 } },
+    {
+      label: t("growth.legendMedian"),
+      style: { borderColor: "var(--chart-median)", borderTopWidth: 2 },
+    },
     { label: "±2 SD", style: { borderColor: "var(--chart-sd2)", borderTopWidth: 2 } },
     {
       label: "±3 SD",
@@ -211,7 +239,10 @@ function Legend() {
         borderTopStyle: "dashed" as const,
       },
     },
-    { label: "Số đo của bé", style: { borderColor: "var(--chart-point)", borderTopWidth: 3 } },
+    {
+      label: t("growth.legendChild"),
+      style: { borderColor: "var(--chart-point)", borderTopWidth: 3 },
+    },
   ];
   return (
     <ul className="body-small mt-3 flex flex-wrap gap-x-5 gap-y-1 text-on-surface-variant">
@@ -221,7 +252,7 @@ function Legend() {
           {item.label}
         </li>
       ))}
-      <li>Chấm rỗng: số đo ước lượng</li>
+      <li>{t("growth.legendEstimated")}</li>
     </ul>
   );
 }
@@ -230,10 +261,14 @@ function MeasurementTable({
   sex,
   birthDate,
   measurements,
+  t,
+  locale,
 }: {
   sex: Child["sex"];
   birthDate: string;
   measurements: Measurement[];
+  t: Translate;
+  locale: Locale;
 }) {
   const weight = new Map(
     chartPoints("weight", sex, birthDate, measurements).map((p) => [p.date, p]),
@@ -246,7 +281,7 @@ function MeasurementTable({
     p ? (
       <>
         {p.estimated ? "≈" : ""}
-        {formatNumber(p.value, digits)}
+        {formatNumber(p.value, digits, locale)}
         {p.percentile !== undefined && (
           <span className="body-small ml-2 text-on-surface-variant">
             P{Math.round(p.percentile)}
@@ -260,35 +295,35 @@ function MeasurementTable({
   return (
     <section aria-labelledby="table-title" className="rounded-m3-md bg-surface-container-low p-4">
       <h2 id="table-title" className="title-medium mb-2">
-        Các lần đo ({measurements.length})
+        {t("growth.measurements", { n: measurements.length })}
       </h2>
       <div className="overflow-x-auto">
         <table className="body-medium w-full">
           <thead className="label-large text-left text-on-surface-variant">
             <tr>
               <th scope="col" className="py-2 pr-4 font-medium">
-                Ngày
+                {t("growth.colDate")}
               </th>
               <th scope="col" className="py-2 pr-4 font-medium">
-                Tuổi
+                {t("growth.colAge")}
               </th>
               <th scope="col" className="py-2 pr-4 text-right font-medium">
-                Cân nặng (kg)
+                {t("growth.colWeight")}
               </th>
               <th scope="col" className="py-2 pr-4 text-right font-medium">
-                Chiều dài (cm)
+                {t("growth.colLength")}
               </th>
               <th scope="col" className="py-2">
-                <span className="sr-only">Thao tác</span>
+                <span className="sr-only">{t("growth.colActions")}</span>
               </th>
             </tr>
           </thead>
           <tbody className="tabular-nums">
             {rows.map((m) => (
               <tr key={m.id} className="border-t border-outline-variant">
-                <td className="py-1 pr-4 whitespace-nowrap">{formatDate(m.measuredOn)}</td>
+                <td className="py-1 pr-4 whitespace-nowrap">{formatDate(m.measuredOn, locale)}</td>
                 <td className="py-1 pr-4 whitespace-nowrap text-on-surface-variant">
-                  {formatAge(birthDate, m.measuredOn)}
+                  {formatAge(birthDate, m.measuredOn, locale)}
                 </td>
                 <td className="py-1 pr-4 text-right whitespace-nowrap">
                   {cell(weight.get(m.measuredOn), 2)}
@@ -300,10 +335,10 @@ function MeasurementTable({
                   <Link
                     href={`/growth/${m.id}/edit`}
                     className={BUTTON.text}
-                    aria-label={`Sửa lần đo ${formatDate(m.measuredOn)}`}
+                    aria-label={t("growth.editRow", { date: formatDate(m.measuredOn, locale) })}
                   >
                     <Icon name="edit" size={18} />
-                    Sửa
+                    {t("common.edit")}
                   </Link>
                 </td>
               </tr>

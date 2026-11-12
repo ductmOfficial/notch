@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import { getI18n } from "../lib/i18n/server";
+
 const CARD = {
   /** M3 filled card: the default container for a block of content. */
   filled: "bg-surface-container-highest text-on-surface",
@@ -53,18 +55,16 @@ export function Badge({ tone, children }: { tone: keyof typeof TONES; children: 
   );
 }
 
-export function NoDatabase() {
-  return (
-    <Notice title="Chưa cấu hình database">
-      Đặt DATABASE_URL trong file .env ở thư mục gốc repo.
-    </Notice>
-  );
+export async function NoDatabase() {
+  const { t } = await getI18n();
+  return <Notice title={t("setup.noDatabase")}>{t("setup.noDatabaseHint")}</Notice>;
 }
 
-export function NoChild() {
+export async function NoChild() {
+  const { t } = await getI18n();
   return (
-    <Notice title="Chưa có hồ sơ bé">
-      Chạy <code>pnpm --filter @notch/db seed</code> với NOTCH_SEED_FILE trỏ tới file dữ liệu.
+    <Notice title={t("setup.noChild")}>
+      {t("setup.noChildHint", { command: "pnpm --filter @notch/db seed" })}
     </Notice>
   );
 }

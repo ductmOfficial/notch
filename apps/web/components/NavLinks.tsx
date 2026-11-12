@@ -3,13 +3,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import type { MessageKey } from "../lib/i18n/messages";
+import { useI18n } from "../lib/i18n/client";
 import { Icon, type IconName } from "./icons";
 
-const LINKS: { href: string; label: string; icon: IconName }[] = [
-  { href: "/", label: "Hôm nay", icon: "today" },
-  { href: "/growth", label: "Tăng trưởng", icon: "growth" },
-  { href: "/vaccines", label: "Tiêm chủng", icon: "vaccines" },
-  { href: "/settings", label: "Cài đặt", icon: "settings" },
+const LINKS: { href: string; label: MessageKey; icon: IconName }[] = [
+  { href: "/", label: "nav.today", icon: "today" },
+  { href: "/growth", label: "nav.growth", icon: "growth" },
+  { href: "/vaccines", label: "nav.vaccines", icon: "vaccines" },
+  { href: "/settings", label: "nav.settings", icon: "settings" },
 ];
 
 const isActive = (pathname: string, href: string) =>
@@ -21,6 +23,7 @@ const isActive = (pathname: string, href: string) =>
  */
 export function NavLinks({ variant }: { variant: "rail" | "bar" }) {
   const pathname = usePathname();
+  const { t } = useI18n();
   return (
     <ul className={variant === "rail" ? "flex flex-col gap-3" : "grid grid-cols-4"}>
       {LINKS.map((link) => {
@@ -39,7 +42,7 @@ export function NavLinks({ variant }: { variant: "rail" | "bar" }) {
               >
                 <Icon name={link.icon} filled={active} />
               </span>
-              {link.label}
+              {t(link.label)}
             </Link>
           </li>
         );
