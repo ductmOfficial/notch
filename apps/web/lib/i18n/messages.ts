@@ -184,6 +184,9 @@ export const vi = {
   "settings.themeLight": "Sáng",
   "settings.themeDark": "Tối",
   "settings.language": "Ngôn ngữ",
+  "settings.palette": "Màu hoa",
+  "settings.paletteLotus": "Sen",
+  "settings.paletteDaylily": "Huyên thảo",
 
   "setup.noDatabase": "Chưa cấu hình database",
   "setup.noDatabaseHint": "Đặt DATABASE_URL trong file .env ở thư mục gốc repo.",
@@ -386,6 +389,9 @@ export const en: Messages = {
   "settings.themeLight": "Light",
   "settings.themeDark": "Dark",
   "settings.language": "Language",
+  "settings.palette": "Flower",
+  "settings.paletteLotus": "Lotus",
+  "settings.paletteDaylily": "Daylily",
 
   "setup.noDatabase": "The database is not configured",
   "setup.noDatabaseHint": "Set DATABASE_URL in the .env file at the repository root.",

@@ -52,6 +52,28 @@ test.describe("in English", () => {
   }
 });
 
+test.describe("with the daylily palette", () => {
+  for (const path of pages) {
+    for (const scheme of ["light", "dark"] as const) {
+      test(`${path} has no WCAG 2.2 AA violations (${scheme})`, async ({
+        page,
+        context,
+        baseURL,
+      }) => {
+        await context.addCookies([{ name: "notch-palette", value: "daylily", url: baseURL ?? "" }]);
+        await page.emulateMedia({ colorScheme: scheme, reducedMotion: "reduce" });
+        await page.goto(path);
+        await expect(page.locator("html")).toHaveAttribute("data-palette", "daylily");
+        await expect(page.locator("main h1")).toBeVisible();
+        const { violations } = await new AxeBuilder({ page })
+          .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+          .analyze();
+        expect(violations, violations.map((v) => `${v.id}: ${v.help}`).join("\n")).toEqual([]);
+      });
+    }
+  }
+});
+
 /** Opacity the element is painted with: its own times every ancestor's (a fading overlay). */
 const paintedOpacity = (element: Element) => {
   let opacity = 1;

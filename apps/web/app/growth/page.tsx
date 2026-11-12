@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { BUTTON } from "../../components/button-styles";
-import { CardLotus, type CardLotusProps } from "../../components/CardLotus";
+import { CardFlower, type CardFlowerProps } from "../../components/Flowers";
 import { GrowthChart } from "../../components/GrowthChart";
 import { Icon } from "../../components/icons";
 import { NoChild, NoDatabase } from "../../components/ui";
@@ -28,7 +28,7 @@ import {
   type MeasurementInput,
 } from "../../lib/growth-chart";
 
-const GROWTH_LOTUS: Record<"weight" | "length" | "bmi", CardLotusProps> = {
+const GROWTH_FLOWERS: Record<"weight" | "length" | "bmi", CardFlowerProps> = {
   weight: { motif: "bloom", place: "bottomRight", tilt: -8 },
   length: { motif: "bud", place: "right", tilt: 22 },
   bmi: { motif: "petals", place: "topRight" },
@@ -206,7 +206,7 @@ function Summary({
             key={indicator}
             className="relative isolate overflow-hidden rounded-m3-md bg-surface-container-highest p-4"
           >
-            <CardLotus {...GROWTH_LOTUS[indicator]} />
+            <CardFlower {...GROWTH_FLOWERS[indicator]} />
             <dt className="title-small text-on-surface-variant">{t(info.labelKey)}</dt>
             <dd className="mt-1">
               <span className="headline-medium tabular-nums">
