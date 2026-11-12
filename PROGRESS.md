@@ -17,18 +17,19 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 
 ## Steps
 
-| #   | Step                                                                 | Branch          | Status |
-| --- | -------------------------------------------------------------------- | --------------- | ------ |
-| 1   | Repository from the `ductran-starter` template                       | `main`          | ✅     |
-| 2   | Rename to `notch`, drop the sample package, PostgreSQL on port 5433  | `chore/setup`   | ✅     |
-| 3   | `@notch/growth`: WHO LMS z-scores and percentiles, generated data    | `feat/growth`   | ✅     |
-| 4   | `@notch/vaccines`: catalog, appointments, schedule engine            | `feat/vaccines` | ✅     |
-| 5   | `@notch/db`: schema, migrations, queries, mutations, seed, demo data | `feat/db`       | ✅     |
-| 6   | Today, Growth and Vaccinations screens                               | `feat/web`      | ✅     |
-| 7   | Forms for measurements, doses and appointments; `.ics` download      | `feat/forms`    | ✅     |
-| 8   | Material Design 3 with a lotus palette, on Sen UI                    | `feat/theme`    | ✅     |
-| 9   | Playwright and axe tests, `Browser` job in CI                        | `test/e2e`      | ✅     |
-| 10  | README and this progress log                                         | `docs/readme`   | ✅     |
+| #   | Step                                                                 | Branch               | Status |
+| --- | -------------------------------------------------------------------- | -------------------- | ------ |
+| 1   | Repository from the `ductran-starter` template                       | `main`               | ✅     |
+| 2   | Rename to `notch`, drop the sample package, PostgreSQL on port 5433  | `chore/setup`        | ✅     |
+| 3   | `@notch/growth`: WHO LMS z-scores and percentiles, generated data    | `feat/growth`        | ✅     |
+| 4   | `@notch/vaccines`: catalog, appointments, schedule engine            | `feat/vaccines`      | ✅     |
+| 5   | `@notch/db`: schema, migrations, queries, mutations, seed, demo data | `feat/db`            | ✅     |
+| 6   | Today, Growth and Vaccinations screens                               | `feat/web`           | ✅     |
+| 7   | Forms for measurements, doses and appointments; `.ics` download      | `feat/forms`         | ✅     |
+| 8   | Material Design 3 with a lotus palette, on Sen UI                    | `feat/theme`         | ✅     |
+| 9   | Playwright and axe tests, `Browser` job in CI                        | `test/e2e`           | ✅     |
+| 10  | README and this progress log                                         | `docs/readme`        | ✅     |
+| 11  | Settings page with a light, dark or system theme                     | `feat/theme-setting` | ✅     |
 
 Each step is a pull request with green checks (`Browser` from step 9), merged with rebase.
 
@@ -61,6 +62,7 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 | `@material/material-color-utilities` 0.3.x                        | 0.4.0 imports its own files without extensions, which Node's ESM loader rejects                                             |
 | E2E on a fresh PGlite database, flows on desktop only             | Tests are independent of any local data; flows change data, so they run once while accessibility runs on desktop and mobile |
 | Browser checks with the runner's Chrome                           | No browser download and no apt packages in CI; Playwright's Chromium stays the fallback                                     |
+| Theme kept in a cookie and applied on the server                  | The page never flashes the wrong theme on load; "System" removes the cookie and follows the device                          |
 | No Co-Authored-By trailer in commits                              | Maintainer's preference                                                                                                     |
 
 ## Follow-ups

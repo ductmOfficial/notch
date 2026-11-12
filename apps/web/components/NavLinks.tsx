@@ -9,6 +9,7 @@ const LINKS: { href: string; label: string; icon: IconName }[] = [
   { href: "/", label: "Hôm nay", icon: "today" },
   { href: "/growth", label: "Tăng trưởng", icon: "growth" },
   { href: "/vaccines", label: "Tiêm chủng", icon: "vaccines" },
+  { href: "/settings", label: "Cài đặt", icon: "settings" },
 ];
 
 const isActive = (pathname: string, href: string) =>
@@ -21,7 +22,7 @@ const isActive = (pathname: string, href: string) =>
 export function NavLinks({ variant }: { variant: "rail" | "bar" }) {
   const pathname = usePathname();
   return (
-    <ul className={variant === "rail" ? "flex flex-col gap-3" : "grid grid-cols-3"}>
+    <ul className={variant === "rail" ? "flex flex-col gap-3" : "grid grid-cols-4"}>
       {LINKS.map((link) => {
         const active = isActive(pathname, link.href);
         return (

@@ -4,7 +4,7 @@
 
 **Notch · Sổ lớn khôn của bé.** A web app for parents to track a child's growth against the WHO Child Growth Standards, the vaccination schedule, and health history. The name comes from the marks parents make on a door frame each time they measure their child's height.
 
-> Status: runs locally. Today, Growth and Vaccinations screens, forms for measurements, doses and appointments, and a calendar download. **No sign-in yet, so it is not deployed.** See [PROGRESS.md](PROGRESS.md).
+> Status: runs locally. Today, Growth and Vaccinations screens, forms for measurements, doses and appointments, a calendar download and a Settings page. **No sign-in yet, so it is not deployed.** See [PROGRESS.md](PROGRESS.md).
 
 ## Principles
 
@@ -82,6 +82,7 @@ With PostgreSQL and your own records instead: `cp .env.example .env`, set `NOTCH
 - **Material Design 3.** Navigation rail with the floating action button on wide screens; top app bar, bottom navigation bar and a floating FAB on phones. M3 type scale with Roboto Flex, M3 shapes (12px cards, 28px dialogs, fully rounded buttons) and state layers.
 - **Lotus palette.** `scripts/generate-theme.mjs` builds the M3 scheme, light and dark, with Google's Material Color Utilities from the colors of a lotus: petal pink (primary), leaf green (tertiary and "done"), stamen yellow ("upcoming") and a cream neutral for surfaces. The colors are generated, not typed by hand; `lib/theme.test.ts` checks WCAG AA contrast for every text and border pairing in both themes.
 - **Sen UI.** Buttons, text fields, selects, checkboxes and dialogs are Sen UI components. Its `--sen-*` tokens point at the M3 color roles, so they follow the scheme; Sen UI sits below Tailwind utilities in the cascade layer order.
+- **Light, dark or system.** Settings has a theme picker. The choice is kept in a cookie and applied on the server, so the page never flashes the wrong theme; "System" follows the device.
 - **Icons** are Material Symbols (Rounded), generated into `components/icons.tsx` as inline SVG.
 
 ## Contributing workflow

@@ -9,6 +9,7 @@ const pages = [
   "/growth/new",
   "/vaccines/record",
   "/vaccines/appointments/new",
+  "/settings",
 ];
 
 for (const path of pages) {
