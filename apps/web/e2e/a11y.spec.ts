@@ -35,13 +35,23 @@ for (const path of pages) {
   });
 }
 
+/** Opacity the element is painted with: its own times every ancestor's (a fading overlay). */
+const paintedOpacity = (element: Element) => {
+  let opacity = 1;
+  for (let e: Element | null = element; e; e = e.parentElement)
+    opacity *= Number(getComputedStyle(e).opacity);
+  return opacity;
+};
+
 test("the quick-add dialog is announced and keeps focus inside", async ({ page }) => {
+  // Scan the dialog's final colors. With reduced motion it appears without fading in; a scan
+  // during the fade measures half-transparent text.
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   await page.getByRole("button", { name: "Thêm nhanh" }).filter({ visible: true }).click();
   const dialog = page.getByRole("dialog", { name: "Thêm nhanh" });
   await expect(dialog).toBeVisible();
-  // React Aria marks the overlay with data-entering while it fades in; scan the final colors.
-  await expect(page.locator("[data-entering]")).toHaveCount(0);
+  await expect.poll(() => dialog.evaluate(paintedOpacity)).toBe(1);
   const { violations } = await new AxeBuilder({ page }).include('[role="dialog"]').analyze();
   expect(violations).toEqual([]);
   await page.keyboard.press("Escape");
