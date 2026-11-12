@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { AppointmentBadge } from "../components/AppointmentBadge";
 import { Icon } from "../components/icons";
+import { LotusMark } from "../components/LotusMark";
 import { Card, NoChild, NoDatabase } from "../components/ui";
 import { getCurrentChild } from "../lib/child";
 import { getDb } from "../lib/db";
@@ -99,7 +100,10 @@ export default async function TodayPage({ searchParams }: Props) {
               )}
             </>
           ) : (
-            <p className="body-large">{t("today.noAppointments")}</p>
+            <p className="body-large flex items-center gap-3">
+              <LotusMark size={32} />
+              {t("today.noAppointments")}
+            </p>
           )}
           <Link
             href="/vaccines"

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { getI18n } from "../lib/i18n/server";
+import { LotusMark } from "./LotusMark";
 
 const CARD = {
   /** M3 filled card: the default container for a block of content. */
@@ -30,6 +31,7 @@ export function Card({
 export function Notice({ title, children }: { title: string; children: ReactNode }) {
   return (
     <Card tone="outlined" className="p-6">
+      <LotusMark size={48} className="mb-4" />
       <h1 className="title-large mb-2">{title}</h1>
       <p className="body-medium text-on-surface-variant">{children}</p>
     </Card>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { LotusBackdrop } from "../components/LotusBackdrop";
+import { LotusMark } from "../components/LotusMark";
 import { NavLinks } from "../components/NavLinks";
 import { QuickAdd } from "../components/QuickAdd";
 import { I18nProvider } from "../lib/i18n/client";
@@ -50,7 +51,8 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             aria-label={t("app.mainNav")}
             className="fixed inset-y-0 left-0 z-10 hidden w-20 flex-col items-center gap-10 bg-surface pt-4 md:flex"
           >
-            <Link href="/" className="title-medium text-primary">
+            <Link href="/" className="label-large flex flex-col items-center gap-1 text-primary">
+              <LotusMark size={32} />
               Notch
             </Link>
             <QuickAdd placement="rail" />
@@ -58,7 +60,8 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           </nav>
 
           <header className="flex h-16 items-center px-4 md:hidden">
-            <Link href="/" className="title-large text-primary">
+            <Link href="/" className="title-large flex items-center gap-2 text-primary">
+              <LotusMark size={28} />
               Notch
             </Link>
           </header>
