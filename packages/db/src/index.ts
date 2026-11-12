@@ -13,9 +13,11 @@ export {
 export * as schema from "./schema.js";
 export type { SeedFile, SeedOptions, SeedResult } from "./seed.js";
 export { SeedConflictError, seedChild, seedFileSchema } from "./seed.js";
-export type { AppointmentInput, DoseInput, MeasurementInput } from "./mutations.js";
+export type { AppointmentInput, ChildInput, DoseInput, MeasurementInput } from "./mutations.js";
 export {
+  addChild,
   addMeasurement,
+  childInputSchema,
   appointmentInputSchema,
   deleteAppointment,
   deleteMeasurement,

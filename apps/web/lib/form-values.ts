@@ -1,4 +1,4 @@
-import type { AppointmentInput, DoseInput, MeasurementInput } from "@notch/db";
+import type { AppointmentInput, ChildInput, DoseInput, MeasurementInput } from "@notch/db";
 import { CATALOG, type Catalog } from "@notch/vaccines";
 
 import { formatNumber } from "./format";
@@ -109,6 +109,41 @@ function result<T>(
   if (Object.keys(found).length > 0)
     return { ok: false, state: { errors: found, values: formValues(form) } };
   return { ok: true, input: build() };
+}
+
+/** A new child's profile; the family comes from the session, not the form. */
+export function parseChildForm(
+  form: FormData,
+  ctx: { readonly familyId: string; readonly today: string; readonly locale?: Locale },
+): Parsed<ChildInput> {
+  const t = translator(ctx.locale ?? "vi");
+  const name = text(form, "name");
+  const sex = text(form, "sex");
+  const birthDate = text(form, "birthDate");
+  const field = (key: MessageKey) => t(key);
+  const nameError =
+    name === ""
+      ? t("error.required", { field: field("field.childName").toLowerCase() })
+      : name.length > 60
+        ? t("error.tooLong", { field: field("field.childName"), max: 60 })
+        : undefined;
+  const dateError =
+    birthDate === ""
+      ? t("error.required", { field: field("field.birthDate").toLowerCase() })
+      : !ISO_DATE.test(birthDate) || Number.isNaN(Date.parse(birthDate))
+        ? t("error.invalidDate", { field: field("field.birthDate") })
+        : birthDate > ctx.today
+          ? t("error.future", { field: field("field.birthDate") })
+          : undefined;
+  return result(
+    form,
+    {
+      name: nameError,
+      sex: sex === "female" || sex === "male" ? undefined : t("error.pickSex"),
+      birthDate: dateError,
+    },
+    () => ({ familyId: ctx.familyId, name, sex: sex === "male" ? "male" : "female", birthDate }),
+  );
 }
 
 export function parseMeasurementForm(form: FormData, ctx: FormContext): Parsed<MeasurementInput> {

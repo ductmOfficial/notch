@@ -1,8 +1,21 @@
 import { defineConfig, devices } from "@playwright/test";
 
-import { OUTBOX, PARENT, SIGNED_IN } from "./e2e/constants";
+import { EMPTY_OUTBOX, EMPTY_PORT, OUTBOX, PARENT, PORT, SIGNED_IN } from "./e2e/constants";
 
-const port = 3200;
+/** A test server: `next start` on a fresh database, signing in only the test parent. */
+const server = (port: number, env: Record<string, string>) => ({
+  command: `node e2e/prepare-db.mjs && next start -p ${String(port)}`,
+  url: `http://localhost:${String(port)}`,
+  env: {
+    NEXT_TELEMETRY_DISABLED: "1",
+    BETTER_AUTH_SECRET: "e2e-only-secret-not-used-anywhere-else",
+    BETTER_AUTH_URL: `http://localhost:${String(port)}`,
+    NOTCH_ALLOWED_EMAILS: PARENT,
+    RESEND_API_KEY: "",
+    ...env,
+  },
+  reuseExistingServer: false,
+});
 
 export default defineConfig({
   testDir: "e2e",
@@ -11,7 +24,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
   use: {
-    baseURL: `http://localhost:${String(port)}`,
+    baseURL: `http://localhost:${String(PORT)}`,
     locale: "vi-VN",
     timezoneId: "Asia/Ho_Chi_Minh",
     // CI uses the Chrome that the runner image ships; locally, Playwright's Chromium.
@@ -24,27 +37,31 @@ export default defineConfig({
       name: "desktop",
       use: { ...devices["Desktop Chrome"], storageState: SIGNED_IN },
       dependencies: ["setup"],
+      testIgnore: /onboarding\.spec\.ts/,
     },
     // Flows that change data, and sign-in itself, run once, on desktop.
     {
       name: "mobile",
       use: { ...devices["Pixel 7"], storageState: SIGNED_IN },
       dependencies: ["setup"],
-      testIgnore: /(flows|auth)\.spec\.ts/,
+      testIgnore: /(flows|auth|onboarding)\.spec\.ts/,
+    },
+    // First run of a new family, on a second server whose database has no child.
+    {
+      name: "onboarding",
+      testMatch: /onboarding\.spec\.ts/,
+      use: { ...devices["Desktop Chrome"], baseURL: `http://localhost:${String(EMPTY_PORT)}` },
     },
   ],
-  webServer: {
-    command: `node e2e/prepare-db.mjs && next start -p ${String(port)}`,
-    url: `http://localhost:${String(port)}`,
-    env: {
+  webServer: [
+    server(PORT, {
       DATABASE_URL: "pglite:apps/web/.e2e-db",
-      NEXT_TELEMETRY_DISABLED: "1",
-      BETTER_AUTH_SECRET: "e2e-only-secret-not-used-anywhere-else",
-      BETTER_AUTH_URL: `http://localhost:${String(port)}`,
-      NOTCH_ALLOWED_EMAILS: PARENT,
+      NOTCH_SEED_FILE: "packages/db/fixtures/demo-child.json",
       MAIL_OUTBOX: OUTBOX,
-      RESEND_API_KEY: "",
-    },
-    reuseExistingServer: false,
-  },
+    }),
+    server(EMPTY_PORT, {
+      DATABASE_URL: "pglite:apps/web/.e2e-db-empty",
+      MAIL_OUTBOX: EMPTY_OUTBOX,
+    }),
+  ],
 });

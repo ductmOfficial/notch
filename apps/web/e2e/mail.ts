@@ -10,8 +10,8 @@ interface SentMail {
 }
 
 /** Every email the app "sent" so far (lib/mail.ts writes them to the outbox in tests). */
-export async function sentMail(): Promise<SentMail[]> {
-  const content = await readFile(OUTBOX, "utf8").catch(() => "");
+export async function sentMail(outbox = OUTBOX): Promise<SentMail[]> {
+  const content = await readFile(outbox, "utf8").catch(() => "");
   return content
     .split("\n")
     .filter((line) => line !== "")
@@ -19,11 +19,11 @@ export async function sentMail(): Promise<SentMail[]> {
 }
 
 /** The newest sign-in link sent to `to`, waiting for it to arrive. */
-export async function signInLink(to: string, after = 0): Promise<string> {
+export async function signInLink(to: string, after = 0, outbox = OUTBOX): Promise<string> {
   let link = "";
   await expect
     .poll(async () => {
-      const mails = (await sentMail()).filter((m) => m.to === to).slice(after);
+      const mails = (await sentMail(outbox)).filter((m) => m.to === to).slice(after);
       link = /https?:\/\/\S+/.exec(mails.at(-1)?.text ?? "")?.[0] ?? "";
       return link;
     })

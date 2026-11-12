@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   fieldValue,
   parseAppointmentForm,
+  parseChildForm,
   parseDecimal,
   parseDoseForm,
   parseMeasurementForm,
@@ -164,5 +165,45 @@ describe("parseAppointmentForm", () => {
 
   it("falls back to defaults when there is no typed value", () => {
     expect(fieldValue({}, "doseNo", "2")).toBe("2");
+  });
+});
+
+describe("parseChildForm", () => {
+  const ctx = { familyId: "00000000-0000-4000-8000-000000000009", today: "2030-06-01" };
+
+  it("builds the profile for the signed-in family", () => {
+    const parsed = parseChildForm(
+      form({ name: " Bông ", sex: "female", birthDate: "2030-05-01", familyId: "ignored" }),
+      ctx,
+    );
+    expect(parsed).toEqual({
+      ok: true,
+      input: { familyId: ctx.familyId, name: "Bông", sex: "female", birthDate: "2030-05-01" },
+    });
+  });
+
+  it("names every missing field", () => {
+    const parsed = parseChildForm(form({ name: "", sex: "", birthDate: "" }), ctx);
+    expect(parsed.ok).toBe(false);
+    if (parsed.ok) return;
+    expect(parsed.state.errors).toEqual({
+      name: "Nhập tên bé.",
+      sex: "Chọn bé gái hoặc bé trai.",
+      birthDate: "Nhập ngày sinh.",
+    });
+  });
+
+  it("refuses a birth date in the future and a name over 60 characters", () => {
+    const parsed = parseChildForm(
+      form({ name: "x".repeat(61), sex: "male", birthDate: "2030-06-02" }),
+      { ...ctx, locale: "en" },
+    );
+    expect(parsed.ok).toBe(false);
+    if (parsed.ok) return;
+    expect(parsed.state.errors).toEqual({
+      name: "The name can be at most 60 characters.",
+      birthDate: "The date of birth cannot be in the future.",
+    });
+    expect(parsed.state.values?.sex).toBe("male");
   });
 });

@@ -4,6 +4,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { syncCatalog } from "./catalog.js";
 import { createDb } from "./client.js";
 import {
+  addChild,
   addMeasurement,
   deleteAppointment,
   deleteMeasurement,
@@ -24,12 +25,14 @@ const handle = createDb("pglite:memory");
 const { db } = handle;
 let childId = "";
 let otherChildId = "";
+let familyId = "";
 
 beforeAll(async () => {
   await handle.migrate();
   await syncCatalog(db, CATALOG);
   const [f] = await db.insert(family).values({ name: "Test family" }).returning();
   if (!f) throw new Error("family not created");
+  familyId = f.id;
   const rows = await db
     .insert(child)
     .values([
@@ -43,6 +46,25 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await handle.close();
+});
+
+describe("children", () => {
+  it("adds a child to a family, trimming the name", async () => {
+    const added = await addChild(db, {
+      familyId,
+      name: "  C  ",
+      sex: "female",
+      birthDate: "2032-02-29",
+    });
+    expect(added).toMatchObject({ familyId, name: "C", sex: "female", birthDate: "2032-02-29" });
+  });
+
+  it("refuses an empty name, an unknown sex or a malformed date", async () => {
+    const base = { familyId, name: "D", sex: "male", birthDate: "2032-01-01" } as const;
+    await expect(addChild(db, { ...base, name: "  " })).rejects.toThrow();
+    await expect(addChild(db, { ...base, sex: "other" as "male" })).rejects.toThrow();
+    await expect(addChild(db, { ...base, birthDate: "2032-02-30" })).rejects.toThrow();
+  });
 });
 
 describe("measurements", () => {

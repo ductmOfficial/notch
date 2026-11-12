@@ -111,6 +111,12 @@ export const vi = {
   "due.overdue": "Quá hạn {n} ngày",
 
   "form.measuredOn": "Ngày đo",
+  "form.childName": "Tên bé",
+  "form.childNameHint": "Tên ở nhà cũng được. Tên chỉ hiện trong app, không vào lịch hay email.",
+  "form.sex": "Giới tính",
+  "form.pickSex": "Chọn bé gái hoặc bé trai",
+  "form.sexHint": "Biểu đồ WHO của bé gái và bé trai khác nhau.",
+  "form.birthDate": "Ngày sinh",
   "form.weight": "Cân nặng (kg)",
   "form.weightHint": "Ví dụ 8,6",
   "form.length": "Chiều dài / cao (cm)",
@@ -136,6 +142,9 @@ export const vi = {
   "form.addAppointment": "Thêm lịch hẹn",
 
   "page.addMeasurement": "Thêm lần đo",
+  "welcome.title": "Chào mừng đến với Notch",
+  "welcome.intro": "Bắt đầu với hồ sơ của bé. Sau đó bạn thêm số đo và mũi tiêm.",
+  "welcome.submit": "Tạo hồ sơ",
   "page.editMeasurement": "Sửa lần đo",
   "page.editMeasurementOn": "Sửa lần đo {date}",
   "page.deleteMeasurement": "Xoá lần đo này",
@@ -154,6 +163,8 @@ export const vi = {
   "error.invalidDate": "{field} không hợp lệ.",
   "error.beforeBirth": "{field} không thể trước ngày sinh.",
   "error.future": "{field} không thể ở tương lai.",
+  "error.tooLong": "{field} tối đa {max} ký tự.",
+  "error.pickSex": "Chọn bé gái hoặc bé trai.",
   "error.notNumber": "{field} phải là số, ví dụ {example}.",
   "error.outOfRange": "{field} phải từ {min} đến {max} {unit}.",
   "error.wholeNumber": "{field} phải là số nguyên từ 1 đến 20.",
@@ -176,6 +187,8 @@ export const vi = {
   "field.nextDoseNo": "Mũi hẹn",
   "field.givenOn": "Ngày tiêm",
   "field.dueOn": "Ngày hẹn",
+  "field.childName": "Tên bé",
+  "field.birthDate": "Ngày sinh",
 
   "settings.title": "Cài đặt",
   "settings.scope": "Áp dụng cho trình duyệt này.",
@@ -210,8 +223,6 @@ export const vi = {
 
   "setup.noDatabase": "Chưa cấu hình database",
   "setup.noDatabaseHint": "Đặt DATABASE_URL trong file .env ở thư mục gốc repo.",
-  "setup.noChild": "Chưa có hồ sơ bé",
-  "setup.noChildHint": "Chạy {command} với NOTCH_SEED_FILE trỏ tới file dữ liệu.",
 
   "calendar.name": "Notch · Lịch tiêm",
   "calendar.summary": "Lịch tiêm cho bé",
@@ -335,6 +346,13 @@ export const en: Messages = {
   "due.overdue": "{n} days overdue",
 
   "form.measuredOn": "Date measured",
+  "form.childName": "Child's name",
+  "form.childNameHint":
+    "A nickname is fine. It shows only in the app, never in calendars or emails.",
+  "form.sex": "Sex",
+  "form.pickSex": "Choose girl or boy",
+  "form.sexHint": "The WHO charts differ for girls and boys.",
+  "form.birthDate": "Date of birth",
   "form.weight": "Weight (kg)",
   "form.weightHint": "For example 8.6",
   "form.length": "Length / height (cm)",
@@ -360,6 +378,9 @@ export const en: Messages = {
   "form.addAppointment": "Add appointment",
 
   "page.addMeasurement": "Add a measurement",
+  "welcome.title": "Welcome to Notch",
+  "welcome.intro": "Start with your child's profile, then add measurements and doses.",
+  "welcome.submit": "Create profile",
   "page.editMeasurement": "Edit measurement",
   "page.editMeasurementOn": "Edit the measurement of {date}",
   "page.deleteMeasurement": "Delete this measurement",
@@ -379,6 +400,8 @@ export const en: Messages = {
   "error.invalidDate": "The {field} is not a valid date.",
   "error.beforeBirth": "The {field} cannot be before the birth date.",
   "error.future": "The {field} cannot be in the future.",
+  "error.tooLong": "The {field} can be at most {max} characters.",
+  "error.pickSex": "Choose girl or boy.",
   "error.notNumber": "The {field} must be a number, for example {example}.",
   "error.outOfRange": "The {field} must be between {min} and {max} {unit}.",
   "error.wholeNumber": "The {field} must be a whole number from 1 to 20.",
@@ -401,6 +424,8 @@ export const en: Messages = {
   "field.nextDoseNo": "next dose number",
   "field.givenOn": "date given",
   "field.dueOn": "appointment date",
+  "field.childName": "name",
+  "field.birthDate": "date of birth",
 
   "settings.title": "Settings",
   "settings.scope": "For this browser.",
@@ -435,8 +460,6 @@ export const en: Messages = {
 
   "setup.noDatabase": "The database is not configured",
   "setup.noDatabaseHint": "Set DATABASE_URL in the .env file at the repository root.",
-  "setup.noChild": "No child yet",
-  "setup.noChildHint": "Run {command} with NOTCH_SEED_FILE pointing at a data file.",
 
   "calendar.name": "Notch · Vaccines",
   "calendar.summary": "Vaccine appointment",

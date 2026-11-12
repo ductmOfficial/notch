@@ -63,7 +63,7 @@ NOTCH_SEED_FILE=packages/db/fixtures/demo-child.json pnpm --filter @notch/db see
 NOTCH_ALLOWED_EMAILS=you@example.com pnpm --filter web dev   # http://localhost:3000
 ```
 
-Sign in with that address: without a mail service, the sign-in link is printed in the terminal running `dev`.
+Sign in with that address: without a mail service, the sign-in link is printed in the terminal running `dev`. Skip the seed to start from the welcome page instead.
 
 With PostgreSQL and your own records instead: `cp .env.example .env`, set `NOTCH_SEED_FILE` to a file **outside the repository**, then `pnpm db:up` and the same `migrate`, `seed` and `dev` commands. PostgreSQL listens on port 5433, so it can run next to other local databases on 5432.
 
@@ -84,6 +84,7 @@ With PostgreSQL and your own records instead: `cp .env.example .env`, set `NOTCH
 - **Email link only** ([Better Auth](https://www.better-auth.com) with its magic-link plugin). No passwords to store or leak. A link works once, for 10 minutes.
 - **Allowlist.** Only the addresses in `NOTCH_ALLOWED_EMAILS` get a link or an account. The form answers the same for any address, so it does not reveal who uses Notch. Someone removed from the list is signed out on their next request.
 - **One household.** Everyone on the allowlist joins the same family (the oldest one, such as the seeded family), so both parents see the same children.
+- **First run.** A family without a child lands on `/welcome`, a short form for the first child (name, sex for the WHO charts, date of birth); every other page leads there until it is filled in. No seed file is needed.
 - **Checked on the server.** A proxy sends visitors without a session cookie to `/sign-in`; every page, server action and the calendar route then check the session and that the child belongs to the signed-in family.
 - **Mail.** Through Resend when `RESEND_API_KEY` is set; otherwise written to `MAIL_OUTBOX` (the end-to-end tests read it) or printed to the console in development. The email holds only the link, nothing about the child.
 - **Limits.** Better Auth's rate limits (5 link requests a minute per client) are kept in the database, so they hold on serverless hosting.

@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { getI18n } from "../lib/i18n/server";
@@ -72,11 +73,7 @@ export async function NoDatabase() {
   return <Notice title={t("setup.noDatabase")}>{t("setup.noDatabaseHint")}</Notice>;
 }
 
-export async function NoChild() {
-  const { t } = await getI18n();
-  return (
-    <Notice title={t("setup.noChild")}>
-      {t("setup.noChildHint", { command: "pnpm --filter @notch/db seed" })}
-    </Notice>
-  );
+/** No child in the signed-in family yet: the first run starts on the welcome page. */
+export function NoChild(): never {
+  redirect("/welcome");
 }
