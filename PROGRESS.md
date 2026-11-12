@@ -17,30 +17,31 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 
 ## Steps
 
-| #   | Step                                                                 | Branch                 | Status |
-| --- | -------------------------------------------------------------------- | ---------------------- | ------ |
-| 1   | Repository from the `ductran-starter` template                       | `main`                 | ✅     |
-| 2   | Rename to `notch`, drop the sample package, PostgreSQL on port 5433  | `chore/setup`          | ✅     |
-| 3   | `@notch/growth`: WHO LMS z-scores and percentiles, generated data    | `feat/growth`          | ✅     |
-| 4   | `@notch/vaccines`: catalog, appointments, schedule engine            | `feat/vaccines`        | ✅     |
-| 5   | `@notch/db`: schema, migrations, queries, mutations, seed, demo data | `feat/db`              | ✅     |
-| 6   | Today, Growth and Vaccinations screens                               | `feat/web`             | ✅     |
-| 7   | Forms for measurements, doses and appointments; `.ics` download      | `feat/forms`           | ✅     |
-| 8   | Material Design 3 with a lotus palette, on Sen UI                    | `feat/theme`           | ✅     |
-| 9   | Playwright and axe tests, `Browser` job in CI                        | `test/e2e`             | ✅     |
-| 10  | README and this progress log                                         | `docs/readme`          | ✅     |
-| 11  | Settings page with a light, dark or system theme                     | `feat/theme-setting`   | ✅     |
-| 12  | Vietnamese and English, chosen in Settings                           | `feat/i18n`            | ✅     |
-| 13  | Lotus watermark behind the content                                   | `feat/lotus-backdrop`  | ✅     |
-| 14  | Add button flat in the navigation rail                               | `fix/rail-fab-flat`    | ✅     |
-| 15  | Lotus mark next to the name, on empty states, as the favicon         | `feat/lotus-mark`      | ✅     |
-| 16  | Lotus drawings on the summary cards                                  | `feat/card-lotus`      | ✅     |
-| 17  | Daylily (huyên thảo) palette and drawings, chosen in Settings        | `feat/daylily-palette` | ✅     |
-| 18  | Cloud (mây) palette and drawings                                     | `feat/cloud-palette`   | ✅     |
-| 19  | Quiet chips for given doses; status colors harmonized                | `feat/quiet-done`      | ✅     |
-| 20  | Reload settings only once the choice is saved (test)                 | `test/settings-cookie` | ✅     |
-| 21  | Sign-in by email link with an allowlist; data limited to the family  | `feat/auth`            | ✅     |
-| 22  | Welcome page for the first child                                     | `feat/onboarding`      | ✅     |
+| #   | Step                                                                     | Branch                 | Status |
+| --- | ------------------------------------------------------------------------ | ---------------------- | ------ |
+| 1   | Repository from the `ductran-starter` template                           | `main`                 | ✅     |
+| 2   | Rename to `notch`, drop the sample package, PostgreSQL on port 5433      | `chore/setup`          | ✅     |
+| 3   | `@notch/growth`: WHO LMS z-scores and percentiles, generated data        | `feat/growth`          | ✅     |
+| 4   | `@notch/vaccines`: catalog, appointments, schedule engine                | `feat/vaccines`        | ✅     |
+| 5   | `@notch/db`: schema, migrations, queries, mutations, seed, demo data     | `feat/db`              | ✅     |
+| 6   | Today, Growth and Vaccinations screens                                   | `feat/web`             | ✅     |
+| 7   | Forms for measurements, doses and appointments; `.ics` download          | `feat/forms`           | ✅     |
+| 8   | Material Design 3 with a lotus palette, on Sen UI                        | `feat/theme`           | ✅     |
+| 9   | Playwright and axe tests, `Browser` job in CI                            | `test/e2e`             | ✅     |
+| 10  | README and this progress log                                             | `docs/readme`          | ✅     |
+| 11  | Settings page with a light, dark or system theme                         | `feat/theme-setting`   | ✅     |
+| 12  | Vietnamese and English, chosen in Settings                               | `feat/i18n`            | ✅     |
+| 13  | Lotus watermark behind the content                                       | `feat/lotus-backdrop`  | ✅     |
+| 14  | Add button flat in the navigation rail                                   | `fix/rail-fab-flat`    | ✅     |
+| 15  | Lotus mark next to the name, on empty states, as the favicon             | `feat/lotus-mark`      | ✅     |
+| 16  | Lotus drawings on the summary cards                                      | `feat/card-lotus`      | ✅     |
+| 17  | Daylily (huyên thảo) palette and drawings, chosen in Settings            | `feat/daylily-palette` | ✅     |
+| 18  | Cloud (mây) palette and drawings                                         | `feat/cloud-palette`   | ✅     |
+| 19  | Quiet chips for given doses; status colors harmonized                    | `feat/quiet-done`      | ✅     |
+| 20  | Reload settings only once the choice is saved (test)                     | `test/settings-cookie` | ✅     |
+| 21  | Sign-in by email link with an allowlist; data limited to the family      | `feat/auth`            | ✅     |
+| 22  | Welcome page for the first child                                         | `feat/onboarding`      | ✅     |
+| 23  | Ready for Vercel and Neon: build with migrations, sign-in URLs on Vercel | `chore/vercel`         | ✅     |
 
 Each step is a pull request with green checks (`Browser` from step 9), merged with rebase.
 
@@ -92,6 +93,8 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 | Sign-in tests through the real flow                               | The setup project requests a link, reads it from the test outbox and stores the session for the other tests                                         |
 | Onboarding asks only name, sex and date of birth                  | The WHO charts need sex and age; everything else (measurements, doses) has its own form                                                             |
 | A second e2e server with an empty database                        | The first run can only be tested on a family without a child; the main server keeps the demo child                                                  |
+| Migrations run in the Vercel build                                | Each environment's database is migrated before its deployment goes live; the changes so far only add tables and columns                             |
+| Sign-in URL from Vercel's variables when BETTER_AUTH_URL is unset | Preview URLs change with every deployment; the deployment, branch and production hosts are trusted                                                  |
 | No Co-Authored-By trailer in commits                              | Maintainer's preference                                                                                                                             |
 
 ## Follow-ups
