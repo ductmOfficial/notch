@@ -38,12 +38,15 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 | 17  | Daylily (huyên thảo) palette and drawings, chosen in Settings        | `feat/daylily-palette` | ✅     |
 | 18  | Cloud (mây) palette and drawings                                     | `feat/cloud-palette`   | ✅     |
 | 19  | Quiet chips for given doses; status colors harmonized                | `feat/quiet-done`      | ✅     |
+| 20  | Reload settings only once the choice is saved (test)                 | `test/settings-cookie` | ✅     |
+| 21  | Sign-in by email link with an allowlist; data limited to the family  | `feat/auth`            | ✅     |
 
 Each step is a pull request with green checks (`Browser` from step 9), merged with rebase.
 
 ### Still open in P0 and P1
 
-- [ ] Sign-in (Better Auth, magic link). **Required before any deployment**: the forms have no access control.
+- [x] Sign-in (Better Auth, magic link, allowlist)
+- [ ] Onboarding: create the family and the first child after the first sign-in
 - [ ] Vercel and Neon preview deploys, then the `.ics` subscription URL
 - [ ] Vietnamese EPI (TCMR) schedule data, generated from an official source
 
@@ -80,6 +83,12 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 | Cloud palette with its own "done" green                           | Sky blue, sunset peach and sun yellow carry the theme; "done" stays green so its meaning does not change with the palette                           |
 | Given doses as outlined chips with a green check                  | A given dose is the normal state; strong color is kept for what needs action (overdue, upcoming), so a long list does not turn the page green       |
 | Status colors harmonized toward the primary, at most 8°           | As M3 does for custom colors; at the usual 15° the lotus's "done" green turned olive                                                                |
+| Better Auth with magic links only                                 | No passwords to store; the library owns sessions, tokens and rate limits instead of hand-written code                                               |
+| Allowlist in an environment variable                              | Notch is for one household; adding a parent is a setting, not a sign-up page. The form answers the same for every address                           |
+| Everyone on the allowlist shares one family                       | Both parents see the same children without an invite flow; invitations can come with family sharing in P2                                           |
+| Session checked on the server, the proxy only redirects           | The proxy reads the cookie for a quick redirect; pages, actions and routes still verify the session and the child's family                          |
+| Rate limits stored in the database                                | Memory limits reset per serverless instance; a table keeps them across instances                                                                    |
+| Sign-in tests through the real flow                               | The setup project requests a link, reads it from the test outbox and stores the session for the other tests                                         |
 | No Co-Authored-By trailer in commits                              | Maintainer's preference                                                                                                                             |
 
 ## Follow-ups

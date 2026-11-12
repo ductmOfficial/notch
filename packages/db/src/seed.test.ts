@@ -1,11 +1,11 @@
 import { CATALOG } from "@notch/vaccines";
-import { count } from "drizzle-orm";
+import { asc, count } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { syncCatalog } from "./catalog.js";
 import { createDb } from "./client.js";
-import { listAppointments, listChildren, listMeasurements, listVaccinations } from "./queries.js";
-import { appointment, family, vaccination } from "./schema.js";
+import { listAppointments, listMeasurements, listVaccinations } from "./queries.js";
+import { appointment, child, family, vaccination } from "./schema.js";
 import { SeedConflictError, seedChild } from "./seed.js";
 
 // Fixture only; real seed files live outside the repository.
@@ -37,6 +37,9 @@ afterAll(async () => {
   await handle.close();
 });
 
+/** Every child in the database, whatever its family (each seeded child may get its own). */
+const allChildren = () => db.select().from(child).orderBy(asc(child.birthDate));
+
 describe("seedChild", () => {
   it("creates a family and child with all records, converting units", async () => {
     const result = await seedChild(db, CATALOG, SEED);
@@ -47,7 +50,7 @@ describe("seedChild", () => {
       appointments: 2,
     });
 
-    const [c] = await listChildren(db);
+    const [c] = await allChildren();
     expect(c).toMatchObject({
       name: "Test",
       sex: "female",
@@ -64,7 +67,7 @@ describe("seedChild", () => {
   });
 
   it("lists doses by date and appointments with undated ones last", async () => {
-    const [c] = await listChildren(db);
+    const [c] = await allChildren();
     if (!c) throw new Error("no child");
     expect(
       (await listVaccinations(db, c.id)).map((v) => [v.productCode, v.doseNo, v.givenOn]),
@@ -95,7 +98,7 @@ describe("seedChild", () => {
   });
 
   it("refuses to overwrite an existing child's records without replace", async () => {
-    const id = (await listChildren(db)).find((c) => c.name === "Test")?.id ?? "";
+    const id = (await allChildren()).find((c) => c.name === "Test")?.id ?? "";
     const countBefore = (await listMeasurements(db, id)).length;
     await expect(seedChild(db, CATALOG, SEED)).rejects.toBeInstanceOf(SeedConflictError);
     await expect(seedChild(db, CATALOG, SEED)).rejects.toThrow("--replace");
@@ -134,7 +137,7 @@ describe("seedChild", () => {
       vaccinations: [{ product: "Nope", doseNo: 1, date: "2030-03-01" }],
     };
     await expect(seedChild(db, CATALOG, bad)).rejects.toThrow('Unknown vaccine product "Nope"');
-    expect((await listChildren(db)).map((c) => c.name)).not.toContain("Bad");
+    expect((await allChildren()).map((c) => c.name)).not.toContain("Bad");
   });
 
   it("rejects malformed input", async () => {

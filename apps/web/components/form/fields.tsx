@@ -25,6 +25,20 @@ export function TextField({ hint, error, ...props }: InputProps) {
   return <SenTextField description={hint} error={error} autoComplete="off" {...props} />;
 }
 
+/** An email address, with the email keyboard on phones and the browser's autofill. */
+export function EmailField({ hint, error, ...props }: InputProps) {
+  return (
+    <SenTextField
+      type="email"
+      inputMode="email"
+      autoComplete="email"
+      description={hint}
+      error={error}
+      {...props}
+    />
+  );
+}
+
 /** Decimal input that accepts a comma ("8,6") and opens the numeric keyboard on phones. */
 export function DecimalField(props: InputProps) {
   return <TextField inputMode="decimal" {...props} />;

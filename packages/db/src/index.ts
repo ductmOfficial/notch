@@ -1,6 +1,7 @@
 export { syncCatalog } from "./catalog.js";
 export type { Db, DbHandle, Schema } from "./client.js";
 export { createDb, resolveDatabaseUrl } from "./client.js";
+export { familyIdForUser } from "./families.js";
 export type { AppointmentRow, Child, Measurement, Vaccination } from "./queries.js";
 export {
   getChild,

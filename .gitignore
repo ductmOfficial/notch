@@ -28,3 +28,7 @@ PROGRESS.vi.md
 # Test reports
 playwright-report/
 test-results/
+
+# End-to-end sign-in: stored session and outbox
+apps/web/e2e/.auth/
+.e2e-outbox.jsonl

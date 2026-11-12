@@ -8,8 +8,13 @@ export type Measurement = typeof measurement.$inferSelect;
 export type Vaccination = typeof vaccination.$inferSelect;
 export type AppointmentRow = typeof appointment.$inferSelect;
 
-export async function listChildren(db: Db): Promise<Child[]> {
-  return db.select().from(child).orderBy(asc(child.birthDate), asc(child.createdAt));
+/** A family's children, oldest first. */
+export async function listChildren(db: Db, familyId: string): Promise<Child[]> {
+  return db
+    .select()
+    .from(child)
+    .where(eq(child.familyId, familyId))
+    .orderBy(asc(child.birthDate), asc(child.createdAt));
 }
 
 export async function getChild(db: Db, id: string): Promise<Child | undefined> {

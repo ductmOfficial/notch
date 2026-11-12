@@ -1,5 +1,7 @@
 import { expect, type Page, test } from "@playwright/test";
 
+import { SIGNED_IN } from "./constants";
+
 // These tests change the shared database; the mobile project skips this file (playwright.config.ts).
 
 test("today shows the child, the next appointment and the latest measurements", async ({
@@ -171,7 +173,7 @@ test("the palette applies at once and survives a reload", async ({ page }) => {
 });
 
 test("the language follows the browser and can be changed in settings", async ({ browser }) => {
-  const context = await browser.newContext({ locale: "en-US" });
+  const context = await browser.newContext({ locale: "en-US", storageState: SIGNED_IN });
   const page = await context.newPage();
   await page.goto("/");
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
@@ -187,7 +189,7 @@ test("the language follows the browser and can be changed in settings", async ({
 });
 
 test("form errors come in the page's language", async ({ browser }) => {
-  const context = await browser.newContext({ locale: "en-US" });
+  const context = await browser.newContext({ locale: "en-US", storageState: SIGNED_IN });
   const page = await context.newPage();
   await page.goto("/growth/new");
   await page.getByLabel("Weight (kg)").fill("abc");
