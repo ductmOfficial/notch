@@ -3,6 +3,6 @@ import { defineConfig } from "eslint/config";
 import globals from "globals";
 
 export default defineConfig(next, {
-  files: ["scripts/**/*.mjs", "*.config.{js,mjs,ts}"],
+  files: ["scripts/**/*.mjs", "e2e/**/*.mjs", "*.config.{js,mjs,ts}"],
   languageOptions: { globals: globals.node },
 });

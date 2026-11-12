@@ -23,3 +23,8 @@ PROGRESS.vi.md
 
 # Local PGlite databases
 .data/
+.e2e-db/
+
+# Test reports
+playwright-report/
+test-results/
