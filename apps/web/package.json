@@ -10,9 +10,13 @@
     "lint": "eslint . --max-warnings=0",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "theme": "node scripts/generate-theme.mjs",
+    "icons": "node scripts/generate-icons.mjs"
   },
   "dependencies": {
+    "@ductmofficial/sen-ui": "^0.5.0",
+    "@fontsource-variable/roboto-flex": "^5.3.0",
     "@notch/db": "workspace:*",
     "@notch/growth": "workspace:*",
     "@notch/vaccines": "workspace:*",
@@ -22,6 +26,8 @@
     "server-only": "^0.0.1"
   },
   "devDependencies": {
+    "@material-symbols/svg-400": "^0.48.3",
+    "@material/material-color-utilities": "~0.3.0",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@tailwindcss/postcss": "^4.3.5",
@@ -30,6 +36,7 @@
     "@types/react-dom": "^19.3.0",
     "@vitest/coverage-v8": "^5.0.5",
     "eslint": "^10.13.0",
+    "globals": "^17.13.0",
     "tailwindcss": "^4.3.5",
     "typescript": "~6.0.3",
     "vitest": "^5.0.5"

@@ -6,11 +6,11 @@ const HEIGHT = 420;
 const PAD = { top: 28, right: 44, bottom: 40, left: 48 };
 
 const CURVE_STYLE: Record<number, { stroke: string; dash?: string; width: number }> = {
-  [-3]: { stroke: "var(--curve-3)", dash: "4 4", width: 1 },
-  [-2]: { stroke: "var(--curve-2)", width: 1.5 },
-  [0]: { stroke: "var(--curve-median)", width: 2 },
-  [2]: { stroke: "var(--curve-2)", width: 1.5 },
-  [3]: { stroke: "var(--curve-3)", dash: "4 4", width: 1 },
+  [-3]: { stroke: "var(--chart-sd3)", dash: "4 4", width: 1 },
+  [-2]: { stroke: "var(--chart-sd2)", width: 1.5 },
+  [0]: { stroke: "var(--chart-median)", width: 2 },
+  [2]: { stroke: "var(--chart-sd2)", width: 1.5 },
+  [3]: { stroke: "var(--chart-sd3)", dash: "4 4", width: 1 },
 };
 
 /**
@@ -42,14 +42,20 @@ export function GrowthChart({ chart, titleId }: { chart: ChartModel; titleId: st
       <g aria-hidden="true">
         {chart.yTicks.map((v) => (
           <g key={v}>
-            <line x1={PAD.left} x2={WIDTH - PAD.right} y1={y(v)} y2={y(v)} stroke="var(--grid)" />
+            <line
+              x1={PAD.left}
+              x2={WIDTH - PAD.right}
+              y1={y(v)}
+              y2={y(v)}
+              stroke="var(--chart-grid)"
+            />
             <text
               x={PAD.left - 8}
               y={y(v)}
               dy="0.32em"
               textAnchor="end"
               fontSize="11"
-              fill="var(--muted)"
+              fill="var(--md-sys-color-on-surface-variant)"
             >
               {formatNumber(v, Number.isInteger(v) ? 0 : 1)}
             </text>
@@ -62,14 +68,14 @@ export function GrowthChart({ chart, titleId }: { chart: ChartModel; titleId: st
               x2={x(t.ageDays)}
               y1={PAD.top}
               y2={HEIGHT - PAD.bottom}
-              stroke="var(--grid)"
+              stroke="var(--chart-grid)"
             />
             <text
               x={x(t.ageDays)}
               y={HEIGHT - PAD.bottom + 18}
               textAnchor="middle"
               fontSize="11"
-              fill="var(--muted)"
+              fill="var(--md-sys-color-on-surface-variant)"
             >
               {t.months}
             </text>
@@ -80,11 +86,17 @@ export function GrowthChart({ chart, titleId }: { chart: ChartModel; titleId: st
           y={HEIGHT - 4}
           textAnchor="middle"
           fontSize="11"
-          fill="var(--muted)"
+          fill="var(--md-sys-color-on-surface-variant)"
         >
           Tháng tuổi
         </text>
-        <text x={PAD.left - 8} y={12} textAnchor="end" fontSize="11" fill="var(--muted)">
+        <text
+          x={PAD.left - 8}
+          y={12}
+          textAnchor="end"
+          fontSize="11"
+          fill="var(--md-sys-color-on-surface-variant)"
+        >
           {info.unit}
         </text>
 
@@ -106,7 +118,7 @@ export function GrowthChart({ chart, titleId }: { chart: ChartModel; titleId: st
                   y={y(last[1])}
                   dy="0.32em"
                   fontSize="10"
-                  fill="var(--muted)"
+                  fill="var(--md-sys-color-on-surface-variant)"
                 >
                   {curve.z === 0 ? "TB" : `${curve.z > 0 ? "+" : "−"}${String(Math.abs(curve.z))}`}
                 </text>
@@ -119,7 +131,7 @@ export function GrowthChart({ chart, titleId }: { chart: ChartModel; titleId: st
           <path
             d={childPath}
             fill="none"
-            stroke="var(--point)"
+            stroke="var(--chart-point)"
             strokeWidth={2}
             strokeLinejoin="round"
           />
@@ -131,8 +143,8 @@ export function GrowthChart({ chart, titleId }: { chart: ChartModel; titleId: st
           cx={x(p.ageDays)}
           cy={y(p.value)}
           r={4}
-          fill={p.estimated ? "var(--surface)" : "var(--point)"}
-          stroke="var(--point)"
+          fill={p.estimated ? "var(--md-sys-color-surface-container-low)" : "var(--chart-point)"}
+          stroke="var(--chart-point)"
           strokeWidth={2}
         >
           <title>

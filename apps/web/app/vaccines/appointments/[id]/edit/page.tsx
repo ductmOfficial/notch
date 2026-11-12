@@ -38,7 +38,8 @@ export default async function EditAppointmentPage({ params, searchParams }: Prop
           childId={child.id}
           id={appointment.id}
           label="Xoá lịch hẹn này"
-          confirm="Không hoàn tác được."
+          title="Xoá lịch hẹn?"
+          confirm={`Lịch hẹn ${productName(appointment.productCode)} mũi ${String(appointment.doseNo)} sẽ bị xoá. Không hoàn tác được.`}
         />
       }
     >
