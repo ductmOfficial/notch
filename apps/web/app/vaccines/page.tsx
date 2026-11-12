@@ -1,7 +1,10 @@
 import { listAppointments, listVaccinations } from "@notch/db";
 import type { Metadata } from "next";
+import Link from "next/link";
 
+import { deleteDoseAction } from "../actions";
 import { AppointmentBadge } from "../../components/AppointmentBadge";
+import { DeleteForm } from "../../components/form/DeleteForm";
 import { Card, NoChild, NoDatabase } from "../../components/ui";
 import { getCurrentChild } from "../../lib/child";
 import { getDb } from "../../lib/db";
@@ -28,15 +31,42 @@ export default async function VaccinesPage({ searchParams }: Props) {
   ]);
   const today = todayInVietnam();
   const view = buildVaccinationView(doses, appointments, today);
+  // Views work on product + dose number; map them back to row ids for edit links.
+  const key = (productCode: string, doseNo: number) => `${productCode}#${String(doseNo)}`;
+  const appointmentIds = new Map(appointments.map((a) => [key(a.productCode, a.doseNo), a.id]));
+  const doseIds = new Map(doses.map((d) => [key(d.productCode, d.doseNo), d.id]));
 
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="text-2xl font-semibold tracking-tight">Tiêm chủng của {child.name}</h1>
-        <p className="text-sm text-[var(--muted)]">
-          {formatAge(child.birthDate, today)} · {doses.length} mũi đã tiêm · {view.covered.length}/
-          {view.covered.length + view.uncovered.length} bệnh đã có mũi
-        </p>
+      <header className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Tiêm chủng của {child.name}</h1>
+          <p className="text-sm text-[var(--muted)]">
+            {formatAge(child.birthDate, today)} · {doses.length} mũi đã tiêm · {view.covered.length}
+            /{view.covered.length + view.uncovered.length} bệnh đã có mũi
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/vaccines/record"
+            className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-medium text-[var(--surface)] hover:opacity-90"
+          >
+            Ghi nhận mũi tiêm
+          </Link>
+          <Link
+            href="/vaccines/appointments/new"
+            className="rounded-lg border border-[var(--border)] px-4 py-2 text-sm font-medium hover:bg-[var(--grid)]"
+          >
+            Thêm lịch hẹn
+          </Link>
+          <a
+            href="/calendar.ics"
+            download
+            className="rounded-lg border border-[var(--border)] px-4 py-2 text-sm font-medium hover:bg-[var(--grid)]"
+          >
+            Tải lịch (.ics)
+          </a>
+        </div>
       </header>
 
       <Card>
@@ -57,8 +87,20 @@ export default async function VaccinesPage({ searchParams }: Props) {
                 <span className="text-sm tabular-nums text-[var(--muted)]">
                   {a.dueOn ? formatDate(a.dueOn) : (a.note ?? "Chưa có ngày")}
                 </span>
-                <span className="ml-auto">
+                <span className="ml-auto flex flex-wrap items-center gap-3 text-sm">
                   <AppointmentBadge state={a} />
+                  <Link
+                    href={`/vaccines/record?product=${a.productCode}&dose=${String(a.doseNo)}`}
+                    className="text-[var(--accent)] hover:underline"
+                  >
+                    Đã tiêm
+                  </Link>
+                  <Link
+                    href={`/vaccines/appointments/${appointmentIds.get(key(a.productCode, a.doseNo)) ?? ""}/edit`}
+                    className="text-[var(--muted)] hover:text-[var(--text)]"
+                  >
+                    Sửa
+                  </Link>
                 </span>
               </li>
             ))}
@@ -125,6 +167,15 @@ export default async function VaccinesPage({ searchParams }: Props) {
                 <span className="font-medium">{h.productName}</span>{" "}
                 <span className="text-[var(--muted)]">· mũi {h.doseNo}</span>
                 <span className="block text-xs text-[var(--muted)]">{h.diseases.join(", ")}</span>
+                <span className="mt-1 block">
+                  <DeleteForm
+                    action={deleteDoseAction}
+                    childId={child.id}
+                    id={doseIds.get(key(h.productCode, h.doseNo)) ?? ""}
+                    label="Xoá"
+                    confirm={`Xoá ${h.productName} mũi ${String(h.doseNo)}? Không hoàn tác được.`}
+                  />
+                </span>
               </span>
             </li>
           ))}
