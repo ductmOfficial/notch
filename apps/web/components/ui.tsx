@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { getI18n } from "../lib/i18n/server";
+import { CardLotus, type CardLotusProps } from "./CardLotus";
 import { LotusMark } from "./LotusMark";
 
 const CARD = {
@@ -16,16 +17,26 @@ const CARD = {
   outlined: "border border-outline-variant bg-surface text-on-surface",
 } as const;
 
+/** A card; `lotus` adds a faint lotus drawing, for cards with room to spare. */
 export function Card({
   children,
   tone = "low",
   className = "",
+  lotus,
 }: {
   children: ReactNode;
   tone?: keyof typeof CARD;
   className?: string;
+  lotus?: CardLotusProps;
 }) {
-  return <section className={`rounded-m3-md p-4 ${CARD[tone]} ${className}`}>{children}</section>;
+  return (
+    <section
+      className={`rounded-m3-md p-4 ${CARD[tone]} ${lotus ? "relative isolate overflow-hidden" : ""} ${className}`}
+    >
+      {lotus && <CardLotus {...lotus} />}
+      {children}
+    </section>
+  );
 }
 
 export function Notice({ title, children }: { title: string; children: ReactNode }) {

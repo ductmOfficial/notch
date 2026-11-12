@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { BUTTON } from "../../components/button-styles";
+import { CardLotus, type CardLotusProps } from "../../components/CardLotus";
 import { GrowthChart } from "../../components/GrowthChart";
 import { Icon } from "../../components/icons";
 import { NoChild, NoDatabase } from "../../components/ui";
@@ -26,6 +27,12 @@ import {
   isChartIndicator,
   type MeasurementInput,
 } from "../../lib/growth-chart";
+
+const GROWTH_LOTUS: Record<"weight" | "length" | "bmi", CardLotusProps> = {
+  weight: { motif: "bloom", place: "bottomRight", tilt: -8 },
+  length: { motif: "bud", place: "right", tilt: 22 },
+  bmi: { motif: "petals", place: "topRight" },
+};
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getI18n();
@@ -195,7 +202,11 @@ function Summary({
       {cards.map(({ indicator, latest }) => {
         const info = INDICATORS[indicator];
         return (
-          <div key={indicator} className="rounded-m3-md bg-surface-container-highest p-4">
+          <div
+            key={indicator}
+            className="relative isolate overflow-hidden rounded-m3-md bg-surface-container-highest p-4"
+          >
+            <CardLotus {...GROWTH_LOTUS[indicator]} />
             <dt className="title-small text-on-surface-variant">{t(info.labelKey)}</dt>
             <dd className="mt-1">
               <span className="headline-medium tabular-nums">

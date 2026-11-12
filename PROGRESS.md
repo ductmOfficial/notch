@@ -34,6 +34,7 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 | 13  | Lotus watermark behind the content                                   | `feat/lotus-backdrop` | ✅     |
 | 14  | Add button flat in the navigation rail                               | `fix/rail-fab-flat`   | ✅     |
 | 15  | Lotus mark next to the name, on empty states, as the favicon         | `feat/lotus-mark`     | ✅     |
+| 16  | Lotus drawings on the summary cards                                  | `feat/card-lotus`     | ✅     |
 
 Each step is a pull request with green checks (`Browser` from step 9), merged with rebase.
 
