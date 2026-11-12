@@ -1,61 +1,77 @@
 # Progress
 
-> Last updated: 2026-11-10
+> Last updated: 2026-11-12
 >
 > Legend: ✅ done · 🔄 in progress · ⬜ not started
 
-A TypeScript monorepo template that every portfolio project starts from. This log records each step, the decisions behind it and the issues met along the way.
+Notch tracks a child's growth, vaccinations and health. This repo was created from [`ductran-starter`](https://github.com/ductmOfficial/ductran-starter). This log records each step, the decisions behind it and the issues met along the way.
+
+## Phases
+
+| Phase | Scope                                                                       | Status |
+| ----- | --------------------------------------------------------------------------- | ------ |
+| P0    | Foundation: growth and vaccines engines, database, app skeleton             | 🔄     |
+| P1    | Today, Growth and Vaccinations screens, forms, `.ics` calendar, design, E2E | 🔄     |
+| P2    | Health log, post-vaccination follow-up, PDF, family sharing                 | ⬜     |
+| P3    | PWA, Vietnamese/English, demo mode, deployment                              | ⬜     |
 
 ## Steps
 
-| #   | Step                                                                             | Branch                 | Status |
-| --- | -------------------------------------------------------------------------------- | ---------------------- | ------ |
-| 1   | pnpm workspace, Turborepo, shared tsconfig, MIT license                          | `main`                 | ✅     |
-| 2   | Shared ESLint and Prettier configs                                               | `main`                 | ✅     |
-| 3   | CI on pull requests and `main`, `Protect main` ruleset                           | `main`                 | ✅     |
-| 4   | `@repo/ui` sample with Vite library mode, Vitest and Testing Library             | `feat/ui-package`      | ✅     |
-| 5   | Conventional Commits (commitlint + husky), PR title re-check, PR and issue forms | `chore/conventions`    | ✅     |
-| 6   | Local PostgreSQL 18 with Docker Compose and `db:*` scripts                       | `chore/local-postgres` | ✅     |
-| 7   | Next.js presets                                                                  | `feat/next-presets`    | ✅     |
-| 8   | Vite app presets                                                                 | `feat/vite-presets`    | ✅     |
-| 9   | Dependabot for npm and GitHub Actions                                            | `chore/dependabot`     | ✅     |
-| 10  | README and this progress log                                                     | `docs/readme`          | ✅     |
+| #   | Step                                                                 | Branch          | Status |
+| --- | -------------------------------------------------------------------- | --------------- | ------ |
+| 1   | Repository from the `ductran-starter` template                       | `main`          | ✅     |
+| 2   | Rename to `notch`, drop the sample package, PostgreSQL on port 5433  | `chore/setup`   | ✅     |
+| 3   | `@notch/growth`: WHO LMS z-scores and percentiles, generated data    | `feat/growth`   | ✅     |
+| 4   | `@notch/vaccines`: catalog, appointments, schedule engine            | `feat/vaccines` | ✅     |
+| 5   | `@notch/db`: schema, migrations, queries, mutations, seed, demo data | `feat/db`       | ✅     |
+| 6   | Today, Growth and Vaccinations screens                               | `feat/web`      | ✅     |
+| 7   | Forms for measurements, doses and appointments; `.ics` download      | `feat/forms`    | ✅     |
+| 8   | Material Design 3 with a lotus palette, on Sen UI                    | `feat/theme`    | ✅     |
+| 9   | Playwright and axe tests, `Browser` job in CI                        | `test/e2e`      | ✅     |
+| 10  | README and this progress log                                         | `docs/readme`   | ✅     |
 
-Steps 1–3 were pushed straight to `main`, then the ruleset was applied; every later step is a pull request with a green `Verify` check, merged with rebase.
+Each step is a pull request with green checks (`Browser` from step 9), merged with rebase.
+
+### Still open in P0 and P1
+
+- [ ] Sign-in (Better Auth, magic link). **Required before any deployment**: the forms have no access control.
+- [ ] Vercel and Neon preview deploys, then the `.ics` subscription URL
+- [ ] Vietnamese EPI (TCMR) schedule data, generated from an official source
 
 ## Decisions
 
-| Decision                                                            | Reason                                                                                                                               |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| Node 24 LTS                                                         | Node 26 is not LTS yet. Upgrading later only touches `.nvmrc` and `engines`                                                          |
-| TypeScript 6.0.x instead of 7.0                                     | typescript-eslint only supports `<6.1.0`, and TS 7 has no stable programmatic API yet                                                |
-| No Corepack                                                         | Node 25+ no longer bundles Corepack                                                                                                  |
-| Internal package scope `@repo/*`                                    | Turborepo convention; keeps the repo usable as a template                                                                            |
-| `@eslint-react` instead of `eslint-plugin-react`                    | `eslint-plugin-react` does not support ESLint 10 yet                                                                                 |
-| React ESLint preset `strict-type-checked`                           | Matches the strict TypeScript preset; `recommended` misses rules such as `dom-no-missing-button-type`                                |
-| No `eslint-plugin-react-hooks`                                      | `@eslint-react` already ships the hooks rules; using both reports every issue twice                                                  |
-| Prettier `printWidth: 100`, other options default                   | The default of 80 wraps JSX too aggressively                                                                                         |
-| Conventions enforced twice: husky hook locally and commitlint in CI | Hooks can be skipped (`--no-verify`) or missing on a fresh clone; CI cannot                                                          |
-| PostgreSQL `postgres:18` (Debian), port bound to `127.0.0.1`        | Latest stable major; Debian matches typical glibc production hosts; the database is not exposed to the local network                 |
-| GitHub Actions pinned to commit SHAs (with a `# vX.Y.Z` comment)    | A tag can be moved to point at different code; a SHA cannot. Dependabot keeps the SHAs current                                       |
-| MIT license                                                         | A public repo without a license is all rights reserved; MIT lets others reuse the template with attribution                          |
-| `@repo/ui` built with Vite library mode, `tsc` for declarations     | Vite empties `dist/` before each build, so stale files from renamed sources never ship; one module per file keeps apps tree-shakable |
-| `@next/eslint-plugin-next` directly, not `eslint-config-next`       | The plugins bundled with `eslint-config-next` do not support ESLint 10 yet                                                           |
-| commitlint ignores Dependabot commits                               | Their bodies carry release notes with lines over the 100-character limit; headers already follow the configured prefixes             |
-| No Co-Authored-By trailer in commits                                | Maintainer's preference                                                                                                              |
-| Dependabot ignores TypeScript ≥6.1 and @types/node majors           | typescript-eslint supports TypeScript <6.1.0; Node types must match the Node 24 runtime                                              |
+| Decision                                                          | Reason                                                                                                                      |
+| ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| WHO data by day of age                                            | `anthro` publishes LMS values for every day from 0 to 1826, so no interpolation between monthly rows is needed              |
+| Restricted extrapolation beyond ±3 SD for weight-based indicators | As WHO specifies; length/height and head circumference use the plain LMS formula                                            |
+| Vaccine data is not typed by hand                                 | The engine ships with fixture schedules; the real schedule comes from a generator once an official source is reachable      |
+| Appointments over schedules                                       | Real records show the clinic books every next dose, so the app reminds from appointments; `planDoses` stays for suggestions |
+| Doses per product, shown per disease                              | One product can cover several diseases (Infanrix Hexa covers six)                                                           |
+| Approximate values flagged per value                              | A record can have an approximate weight and an exact length                                                                 |
+| PGlite next to PostgreSQL                                         | The same Drizzle code runs on both; tests, E2E and Docker-free local runs use PGlite                                        |
+| Seed is for the first load only                                   | It refuses to overwrite a child that already has records unless `--replace` is passed, so data entered in the app is kept   |
+| A fictional demo child in the repository                          | E2E and demos need data; real records stay outside the repository                                                           |
+| Calendar titles stay generic ("Lịch tiêm cho bé")                 | Calendars sync to other services and show on lock screens                                                                   |
+| Server-rendered SVG chart                                         | No chart library and no client JavaScript; the table repeats the data                                                       |
+| Material Design 3                                                 | A widely known system with published guidance for color, type, shape and layout; familiar to phone users                    |
+| Lotus palette generated with Material Color Utilities             | Colors come from four seed colors, light and dark, with contrast built in; a unit test checks AA for every pairing          |
+| Sen UI tokens mapped to M3 color roles                            | Sen UI components follow the scheme without forking them; the same token approach restyles the portfolio                    |
+| Forms moved to Sen UI with the design system                      | One switch for every control; the first forms used native inputs behind one module so the swap touched only that module     |
+| Deleting asks in an `alertdialog`                                 | A single tap never deletes; Cancel keeps focus where it was                                                                 |
+| `@material/material-color-utilities` 0.3.x                        | 0.4.0 imports its own files without extensions, which Node's ESM loader rejects                                             |
+| E2E on a fresh PGlite database, flows on desktop only             | Tests are independent of any local data; flows change data, so they run once while accessibility runs on desktop and mobile |
+| Browser checks with the runner's Chrome                           | No browser download and no apt packages in CI; Playwright's Chromium stays the fallback                                     |
+| No Co-Authored-By trailer in commits                              | Maintainer's preference                                                                                                     |
 
 ## Follow-ups
 
-- [ ] Upgrade to **Node 26** once it becomes LTS
-- [ ] Upgrade to **TypeScript 7** once typescript-eslint supports it
-- [ ] Extract the shared setup steps (checkout, pnpm, Node, install) of the workflows into a composite action
+- [ ] When recording a dose, update the suggested next dose number when the dose number changes
+- [ ] Licence of the bundled WHO tables: `anthro` code is GPL-3; the tables are WHO reference data. Confirm the attribution before a wider release
+- [ ] Growth chart on phones opens at the latest measurements; the y-axis labels need a swipe back
 
 ## Issue log
 
-- **2026-10-22:** the two React plugins reported every hooks rule twice. Fixed by dropping `eslint-plugin-react-hooks`.
-- **2026-10-22:** the `recommended-type-checked` React preset did not flag a `<button>` without `type`. Switched to `strict-type-checked`.
-- **2026-10-22:** Turbo warned that `test` produced no files for `outputs: ["coverage/**"]`. Set `test` outputs to `[]`; coverage has its own task.
-- **2026-10-23:** `git@github.com` authenticates as a different default account, not the repo owner `ductmOfficial`. The remote uses the SSH alias `github-ductmofficial`.
-- **2026-10-23:** pushing the head of an open PR straight to `main` was accepted as a command-line merge, because the PR already met every rule. A commit outside any PR is rejected (`Changes must be made through a pull request`).
-- **2026-11-09:** Dependabot commit bodies would fail the same rule. Added an `ignores` entry for commits signed off by `dependabot[bot]`.
+- **2026-11-12:** PGlite creates only the last folder of its path, so `pglite:.data/pglite` failed on a fresh clone. `createDb` now creates the parent folders.
+- **2026-11-12:** axe flagged the sideways-scrolling growth chart on phones (`scrollable-region-focusable`). The scroll container is now a focusable, labelled region.
+- **2026-11-12:** the "next appointment" fieldset of the dose form overflowed its card: a fieldset's minimum width is its content. Fixed with `min-width: 0`.
+- **2026-11-12:** Material Color Utilities does not export its `Variant` enum at runtime; the generator passes the tonal spot value directly.
