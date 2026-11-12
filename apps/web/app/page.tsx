@@ -3,9 +3,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { AppointmentBadge } from "../components/AppointmentBadge";
-import type { CardLotusProps } from "../components/CardLotus";
+import { type CardFlowerProps, FlowerMark } from "../components/Flowers";
 import { Icon } from "../components/icons";
-import { LotusMark } from "../components/LotusMark";
 import { Card, NoChild, NoDatabase } from "../components/ui";
 import { getCurrentChild } from "../lib/child";
 import { getDb } from "../lib/db";
@@ -14,9 +13,9 @@ import { formatAge, formatDate, formatNumber, formatZ, todayInVietnam, zBand } f
 import { chartPoints, INDICATORS } from "../lib/growth-chart";
 import { buildVaccinationView, dueLabel, productName } from "../lib/vaccines-view";
 
-const TODAY_LOTUS: Record<"weight" | "length", CardLotusProps> = {
+const TODAY_FLOWERS: Record<"weight" | "length", CardFlowerProps> = {
   weight: { motif: "bud", place: "topRight", tilt: 14 },
-  length: { motif: "pad", place: "bottomRight", tilt: -20 },
+  length: { motif: "leaf", place: "bottomRight", tilt: -20 },
 };
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -107,7 +106,7 @@ export default async function TodayPage({ searchParams }: Props) {
             </>
           ) : (
             <p className="body-large flex items-center gap-3">
-              <LotusMark size={32} />
+              <FlowerMark size={32} />
               {t("today.noAppointments")}
             </p>
           )}
@@ -125,7 +124,7 @@ export default async function TodayPage({ searchParams }: Props) {
           return (
             <Card
               key={indicator}
-              lotus={TODAY_LOTUS[indicator]}
+              flower={TODAY_FLOWERS[indicator]}
               tone="filled"
               className="flex flex-col gap-2 p-5"
             >
@@ -149,7 +148,7 @@ export default async function TodayPage({ searchParams }: Props) {
         })}
 
         <Card
-          lotus={{ motif: "budOnPad", place: "right", tilt: -6 }}
+          flower={{ motif: "budOnLeaf", place: "right", tilt: -6 }}
           tone="outlined"
           className="flex flex-col gap-2 p-5 md:col-span-2"
         >
@@ -161,7 +160,7 @@ export default async function TodayPage({ searchParams }: Props) {
         </Card>
 
         <Card
-          lotus={{ motif: "pod", place: "topRight", tilt: 15 }}
+          flower={{ motif: "heart", place: "topRight", tilt: 15 }}
           tone="outlined"
           className="flex flex-col justify-between gap-2 p-5"
         >

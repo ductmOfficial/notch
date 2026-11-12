@@ -100,9 +100,15 @@
   --chart-grid: var(--md-sys-color-surface-container-highest);
 }
 
-/* The lotus behind the content stays a watermark in both schemes. */
-.lotus-backdrop {
+/* The flower behind the content stays a watermark in both schemes. */
+.flower-backdrop {
   opacity: 0.2;
+}
+
+/* Flower drawings come in both palettes; only the current one shows. */
+:root:not([data-palette="daylily"]) .flower-daylily,
+[data-palette="daylily"] .flower-lotus {
+  display: none;
 }
 
 @layer base {

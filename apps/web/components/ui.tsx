@@ -1,8 +1,7 @@
 import type { ReactNode } from "react";
 
 import { getI18n } from "../lib/i18n/server";
-import { CardLotus, type CardLotusProps } from "./CardLotus";
-import { LotusMark } from "./LotusMark";
+import { CardFlower, type CardFlowerProps, FlowerMark } from "./Flowers";
 
 const CARD = {
   /** M3 filled card: the default container for a block of content. */
@@ -17,23 +16,23 @@ const CARD = {
   outlined: "border border-outline-variant bg-surface text-on-surface",
 } as const;
 
-/** A card; `lotus` adds a faint lotus drawing, for cards with room to spare. */
+/** A card; `flower` adds a faint flower drawing, for cards with room to spare. */
 export function Card({
   children,
   tone = "low",
   className = "",
-  lotus,
+  flower,
 }: {
   children: ReactNode;
   tone?: keyof typeof CARD;
   className?: string;
-  lotus?: CardLotusProps;
+  flower?: CardFlowerProps;
 }) {
   return (
     <section
-      className={`rounded-m3-md p-4 ${CARD[tone]} ${lotus ? "relative isolate overflow-hidden" : ""} ${className}`}
+      className={`rounded-m3-md p-4 ${CARD[tone]} ${flower ? "relative isolate overflow-hidden" : ""} ${className}`}
     >
-      {lotus && <CardLotus {...lotus} />}
+      {flower && <CardFlower {...flower} />}
       {children}
     </section>
   );
@@ -42,7 +41,7 @@ export function Card({
 export function Notice({ title, children }: { title: string; children: ReactNode }) {
   return (
     <Card tone="outlined" className="p-6">
-      <LotusMark size={48} className="mb-4" />
+      <FlowerMark size={48} className="mb-4" />
       <h1 className="title-large mb-2">{title}</h1>
       <p className="body-medium text-on-surface-variant">{children}</p>
     </Card>

@@ -4,13 +4,12 @@ import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { LotusBackdrop } from "../components/LotusBackdrop";
-import { LotusMark } from "../components/LotusMark";
+import { FlowerBackdrop, FlowerMark } from "../components/Flowers";
 import { NavLinks } from "../components/NavLinks";
 import { QuickAdd } from "../components/QuickAdd";
 import { I18nProvider } from "../lib/i18n/client";
 import { getI18n } from "../lib/i18n/server";
-import { getTheme } from "../lib/preferences";
+import { getPalette, getTheme } from "../lib/preferences";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getI18n();
@@ -32,14 +31,18 @@ export const viewport: Viewport = {
  * a bottom navigation bar and a floating FAB.
  */
 export default async function RootLayout({ children }: { children: ReactNode }) {
-  // The theme chosen in Settings is rendered on the server, so the page never flashes.
-  const theme = await getTheme();
+  // Theme and palette chosen in Settings are rendered on the server, so the page never flashes.
+  const [theme, palette] = await Promise.all([getTheme(), getPalette()]);
   const { t, locale } = await getI18n();
   return (
-    <html lang={locale} data-theme={theme === "system" ? undefined : theme}>
+    <html
+      lang={locale}
+      data-theme={theme === "system" ? undefined : theme}
+      data-palette={palette === "lotus" ? undefined : palette}
+    >
       <body className="min-h-dvh bg-surface antialiased">
         <I18nProvider locale={locale}>
-          <LotusBackdrop />
+          <FlowerBackdrop />
           <a
             href="#main"
             className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-m3-sm focus:bg-inverse-surface focus:px-4 focus:py-2 focus:text-inverse-on-surface"
@@ -52,7 +55,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             className="fixed inset-y-0 left-0 z-10 hidden w-20 flex-col items-center gap-10 bg-surface pt-4 md:flex"
           >
             <Link href="/" className="label-large flex flex-col items-center gap-1 text-primary">
-              <LotusMark size={32} />
+              <FlowerMark size={32} />
               Notch
             </Link>
             <QuickAdd placement="rail" />
@@ -61,7 +64,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
 
           <header className="flex h-16 items-center px-4 md:hidden">
             <Link href="/" className="title-large flex items-center gap-2 text-primary">
-              <LotusMark size={28} />
+              <FlowerMark size={28} />
               Notch
             </Link>
           </header>

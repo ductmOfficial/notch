@@ -129,6 +129,27 @@ test("the theme chosen in settings applies at once and survives a reload", async
   await expect(html).not.toHaveAttribute("data-theme");
 });
 
+test("the daylily palette applies at once and survives a reload", async ({ page }) => {
+  await page.goto("/settings");
+  const html = page.locator("html");
+  await expect(html).not.toHaveAttribute("data-palette");
+
+  await page.locator("label").filter({ hasText: "Huyên thảo" }).click();
+  await expect(html).toHaveAttribute("data-palette", "daylily");
+  await page.reload();
+  await expect(html).toHaveAttribute("data-palette", "daylily");
+  await expect(page.getByRole("radio", { name: "Huyên thảo" })).toBeChecked();
+  // Only the daylily drawings show.
+  await expect(page.locator(".flower-lotus").filter({ visible: true })).toHaveCount(0);
+  await expect(page.locator(".flower-daylily").filter({ visible: true }).first()).toBeVisible();
+
+  await page.locator("label").filter({ hasText: "Sen" }).click();
+  await expect(html).not.toHaveAttribute("data-palette");
+  await page.reload();
+  await expect(html).not.toHaveAttribute("data-palette");
+  await expect(page.locator(".flower-daylily").filter({ visible: true })).toHaveCount(0);
+});
+
 test("the language follows the browser and can be changed in settings", async ({ browser }) => {
   const context = await browser.newContext({ locale: "en-US" });
   const page = await context.newPage();
