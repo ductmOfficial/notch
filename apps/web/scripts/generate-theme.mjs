@@ -20,7 +20,10 @@ import {
   MaterialDynamicColors,
   TonalPalette,
   argbFromHex,
+  differenceDegrees,
   hexFromArgb,
+  rotationDirection,
+  sanitizeDegreesDouble,
 } from "@material/material-color-utilities";
 
 const flower = (petal, leaf, heart) => ({
@@ -84,6 +87,18 @@ const ROLES = [
 const hue = (hex) => Hct.fromInt(argbFromHex(hex)).hue;
 const kebab = (s) => s.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
 
+/**
+ * M3 harmonization (Blend.harmonize) with a smaller reach: the hue turns toward the primary by
+ * half the difference, at most 8° instead of 15°. At 15° the lotus's "done" green turned olive.
+ */
+function harmonize(hex, primary) {
+  const from = Hct.fromInt(argbFromHex(hex));
+  const to = Hct.fromInt(argbFromHex(primary));
+  const rotation = Math.min(differenceDegrees(from.hue, to.hue) * 0.5, 8);
+  const hueOut = sanitizeDegreesDouble(from.hue + rotation * rotationDirection(from.hue, to.hue));
+  return Hct.from(hueOut, from.chroma, from.tone).toInt();
+}
+
 function makeScheme({ primary, tertiary, neutral }, dark) {
   return new DynamicScheme({
     sourceColorArgb: argbFromHex(primary),
@@ -106,14 +121,16 @@ function block(palette, dark) {
       `  --md-sys-color-${kebab(role)}: ${hexFromArgb(MaterialDynamicColors[role].getArgb(scheme))};`,
   );
   // Status colors as M3 custom color groups: tones 40/100/90/10 light, 80/20/30/90 dark.
+  // Harmonized toward the primary color, as M3 does for custom colors: "done" stays green and
+  // "upcoming" stays yellow, but each leans a little toward the palette.
   for (const [name, hex] of Object.entries({ success, warning })) {
-    const palette = TonalPalette.fromInt(argbFromHex(hex));
+    const tones = TonalPalette.fromInt(harmonize(hex, palette.primary));
     const [c, on, container, onContainer] = dark ? [80, 20, 30, 90] : [40, 100, 90, 10];
     lines.push(
-      `  --md-sys-color-${name}: ${hexFromArgb(palette.tone(c))};`,
-      `  --md-sys-color-on-${name}: ${hexFromArgb(palette.tone(on))};`,
-      `  --md-sys-color-${name}-container: ${hexFromArgb(palette.tone(container))};`,
-      `  --md-sys-color-on-${name}-container: ${hexFromArgb(palette.tone(onContainer))};`,
+      `  --md-sys-color-${name}: ${hexFromArgb(tones.tone(c))};`,
+      `  --md-sys-color-on-${name}: ${hexFromArgb(tones.tone(on))};`,
+      `  --md-sys-color-${name}-container: ${hexFromArgb(tones.tone(container))};`,
+      `  --md-sys-color-on-${name}-container: ${hexFromArgb(tones.tone(onContainer))};`,
     );
   }
   return lines.join("\n");
