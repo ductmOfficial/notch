@@ -119,7 +119,7 @@ Vercel for the app, [Neon](https://neon.tech) for PostgreSQL (region `aws-ap-sou
 
 - The Vercel project's root directory is `apps/web`. `apps/web/vercel.json` builds the workspace with Turborepo, then applies pending migrations to the database of that environment, so a deployment never runs against an older schema.
 - Production and Preview use different Neon branches. The preview branch holds only the fictional demo child, never a copy of production.
-- Environment variables, per Vercel environment: `DATABASE_URL` (Neon's pooled connection string), `BETTER_AUTH_SECRET` (a different one per environment), `NOTCH_ALLOWED_EMAILS`, `RESEND_API_KEY`, `MAIL_FROM`. `BETTER_AUTH_URL` is optional: without it, sign-in links point at the production domain in production and at the deployment itself in previews (see `lib/site-url.ts`).
+- Environment variables, per Vercel environment: `DATABASE_URL` (Neon's pooled connection string), `BETTER_AUTH_SECRET` (a different one per environment), `NOTCH_ALLOWED_EMAILS`, `RESEND_API_KEY`, `MAIL_FROM`. `BETTER_AUTH_URL` is optional: without it, sign-in links point at the production domain in production and at the branch URL in previews (see `lib/site-url.ts`).
 
 ## Contributing workflow
 

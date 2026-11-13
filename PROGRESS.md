@@ -122,3 +122,4 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 - **2026-11-13:** Turborepo warned that the project's environment variables were missing from `turbo.json`. The build does not read them (the app reads them at run time); they are now listed as pass-through for the build task.
 - **2026-11-13:** the first sign-in email from `onboarding@resend.dev` went to Gmail's Spam. Marked as not spam; a verified domain will help.
 - **2026-11-13:** Dependabot proposed `@material/material-color-utilities` 0.4.0, whose ESM imports Node rejects. The 0.4.x range is now ignored.
+- **2026-11-13:** on a preview, the sign-in link failed with `[query.token] Invalid input`: it pointed at the deployment's own address, Vercel's preview protection asked to sign in there again, and its redirect dropped the query string. Preview links now point at the branch URL, which people open and where the protection already let them in.
