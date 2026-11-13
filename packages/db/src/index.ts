@@ -1,6 +1,8 @@
 export { syncCatalog } from "./catalog.js";
 export type { Db, DbHandle, Schema } from "./client.js";
 export { createDb, resolveDatabaseUrl } from "./client.js";
+export type { Backup, RestoreResult } from "./backup.js";
+export { BackupFormatError, backupSchema, exportBackup, restoreBackup } from "./backup.js";
 export type { CalendarLinkInfo } from "./calendar-tokens.js";
 export {
   calendarLinkInfo,

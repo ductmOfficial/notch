@@ -235,3 +235,47 @@ test("the calendar link works without a session, once per family, until revoked"
   expect((await calendarApp.get(url.pathname)).status()).toBe(404);
   await calendarApp.dispose();
 });
+
+test("a backup downloads and restores the same records", async ({ page }) => {
+  const download = await page.request.get("/backup.json");
+  expect(download.status()).toBe(200);
+  expect(download.headers()["content-disposition"]).toMatch(/notch-backup-\d{4}-\d{2}-\d{2}\.json/);
+  const backup = (await download.json()) as {
+    format: string;
+    children: { name: string; measurements: unknown[]; vaccinations: unknown[] }[];
+  };
+  expect(backup.format).toBe("notch-backup");
+  expect(backup.children.map((c) => c.name)).toEqual(["Mây"]);
+
+  await page.goto("/settings");
+  const fileInput = page.getByLabel("Khôi phục từ file…");
+
+  // Not a backup: refused before anything is sent.
+  await fileInput.setInputFiles({
+    name: "other.json",
+    mimeType: "application/json",
+    buffer: Buffer.from('{"hello":"world"}'),
+  });
+  await expect(page.getByRole("alert").filter({ hasText: "không phải bản sao lưu" })).toBeVisible();
+
+  await fileInput.setInputFiles({
+    name: "notch-backup.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(JSON.stringify(backup)),
+  });
+  const [child] = backup.children;
+  await expect(
+    page.getByText(
+      `1 bé, ${String(child?.measurements.length)} lần đo, ${String(child?.vaccinations.length)} mũi tiêm`,
+    ),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Khôi phục", exact: true }).click();
+  await page.getByRole("alertdialog").getByRole("button", { name: "Khôi phục" }).click();
+  await expect(page.getByRole("status").filter({ hasText: "Đã khôi phục: 1 bé" })).toBeVisible();
+
+  // The same records come back.
+  const again = (await (await page.request.get("/backup.json")).json()) as typeof backup;
+  expect({ ...again, exportedAt: "" }).toEqual({ ...backup, exportedAt: "" });
+  await page.goto("/");
+  await expect(page.locator("main h1")).toContainText("Mây");
+});

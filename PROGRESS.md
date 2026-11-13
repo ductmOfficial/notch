@@ -44,6 +44,7 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 | 23  | Ready for Vercel and Neon: build with migrations, sign-in URLs on Vercel | `chore/vercel`         | ✅     |
 | 24  | Calendar subscription link with a secret token                           | `feat/calendar-feed`   | ✅     |
 | 25  | Build log and dependency housekeeping after the first deployment         | `chore/build-hygiene`  | ✅     |
+| 26  | Backup and restore as a JSON file                                        | `feat/backup`          | ✅     |
 
 Each step is a pull request with green checks (`Browser` from step 9), merged with rebase.
 
@@ -100,6 +101,8 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 | Sign-in URL from Vercel's variables when BETTER_AUTH_URL is unset | Preview URLs change with every deployment; the deployment, branch and production hosts are trusted                                                                                 |
 | Calendar subscription by secret token, stored hashed              | Calendar apps cannot sign in; a 256-bit token in the URL is the usual way. A hash means a database leak does not leak working links; the price is that the link is shown only once |
 | One calendar link per family, covering every child                | Fewer links to manage and revoke; events stay generic, so mixing children reveals nothing                                                                                          |
+| Backups in stored units, without ids                              | Grams and millimetres restore without rounding; fresh ids avoid clashes with rows another family or an older restore created                                                       |
+| A restore replaces the family's data in one transaction           | Merging would need rules for conflicts; a full replace after a confirmation is predictable, and a failure changes nothing                                                          |
 | No Co-Authored-By trailer in commits                              | Maintainer's preference                                                                                                                                                            |
 
 ## Follow-ups

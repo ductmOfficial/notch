@@ -109,6 +109,10 @@ With PostgreSQL and your own records instead: `cp .env.example .env`, set `NOTCH
 - **Subscription** (Settings): a link `/calendar/<token>.ics` that calendar apps poll, so appointments stay current. It covers every child of the family. The 256-bit token is the credential: calendar apps have no session, so the proxy lets this path through and the route checks the token. Only its SHA-256 hash is stored, so the link is shown once; creating a new one revokes the old one, and it can be revoked outright. Settings shows when the link was made and last read.
 - **Privacy.** Events only say "Vaccine appointment", with reminders a week and a day before. No child's name or vaccine, since calendars sync to other services and show on lock screens.
 
+## Backup
+
+Settings downloads the family's records as `notch-backup-<date>.json` and restores such a file. The format (version 1, `packages/db/src/backup.ts`) keeps values as stored (grams, millimetres, product codes), so a backup restores exactly. A restore shows what the file holds, asks for confirmation, checks the whole file (schema, known vaccines, one row per dose), then replaces the family's children and records in one transaction: everything or nothing. The file holds health data; nothing is uploaded anywhere except on restore.
+
 ## Deployment
 
 Vercel for the app, [Neon](https://neon.tech) for PostgreSQL (region `aws-ap-southeast-1`), Resend for the sign-in email.
