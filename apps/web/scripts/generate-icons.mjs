@@ -30,6 +30,7 @@ const ICONS = {
   download: "download",
   copy: "content_copy",
   upload: "upload",
+  pending: "radio_button_unchecked",
   calendarAdd: "calendar_add_on",
   linkOff: "link_off",
   refresh: "refresh",

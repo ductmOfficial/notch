@@ -46,6 +46,7 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 | 25  | Build log and dependency housekeeping after the first deployment         | `chore/build-hygiene`  | ✅     |
 | 26  | Backup and restore as a JSON file                                        | `feat/backup`          | ✅     |
 | 27  | PDF report of a child                                                    | `feat/pdf`             | ✅     |
+| 28  | National schedule (TCMR) by age on the Vaccines screen                   | `feat/tcmr`            | ✅     |
 
 Each step is a pull request with green checks (`Browser` from step 9), merged with rebase.
 
@@ -55,7 +56,7 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 - [x] Onboarding: the first child after the first sign-in
 - [x] Vercel and Neon deploys (production with an empty family, preview with the demo child)
 - [x] `.ics` subscription URL
-- [ ] Vietnamese EPI (TCMR) schedule data, generated from an official source
+- [x] Vietnamese EPI (TCMR) schedule data, from Thông tư 52/2025/TT-BYT
 
 ## Decisions
 
@@ -63,7 +64,7 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | WHO data by day of age                                            | `anthro` publishes LMS values for every day from 0 to 1826, so no interpolation between monthly rows is needed                                                                     |
 | Restricted extrapolation beyond ±3 SD for weight-based indicators | As WHO specifies; length/height and head circumference use the plain LMS formula                                                                                                   |
-| Vaccine data is not typed by hand                                 | The engine ships with fixture schedules; the real schedule comes from a generator once an official source is reachable                                                             |
+| TCMR data typed from the circular, checked by a test              | No machine-readable source exists; Article 1 of Thông tư 52/2025/TT-BYT was transcribed dose by dose and a test pins every disease's ages to it                                    |
 | Appointments over schedules                                       | Real records show the clinic books every next dose, so the app reminds from appointments; `planDoses` stays for suggestions                                                        |
 | Doses per product, shown per disease                              | One product can cover several diseases (Infanrix Hexa covers six)                                                                                                                  |
 | Approximate values flagged per value                              | A record can have an approximate weight and an exact length                                                                                                                        |
@@ -106,6 +107,7 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 | A restore replaces the family's data in one transaction           | Merging would need rules for conflicts; a full replace after a confirmation is predictable, and a failure changes nothing                                                          |
 | PDF with react-pdf on the server                                  | Pure JavaScript, so it runs on Vercel without a headless browser; the charts are drawn again as PDF vector paths from the same chart model                                         |
 | Fonts in the repository, print colors fixed                       | The PDF must render the same everywhere and cover Vietnamese; the lotus colors read well on paper whatever the chosen palette                                                      |
+| TCMR shown as a reference per disease, not as a plan              | A service vaccine can cover a disease on another schedule; counting doses per disease and saying so avoids false alarms, and the app does not diagnose                             |
 | No Co-Authored-By trailer in commits                              | Maintainer's preference                                                                                                                                                            |
 
 ## Follow-ups
