@@ -29,6 +29,7 @@ const ICONS = {
   contrast: "contrast",
   download: "download",
   copy: "content_copy",
+  upload: "upload",
   calendarAdd: "calendar_add_on",
   linkOff: "link_off",
   refresh: "refresh",

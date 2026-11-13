@@ -1,6 +1,7 @@
 import { calendarLinkInfo } from "@notch/db";
 import type { Metadata } from "next";
 
+import { BackupCard } from "../../components/BackupCard";
 import { CalendarLink, type CalendarLinkSummary } from "../../components/CalendarLink";
 import { LanguagePicker } from "../../components/LanguagePicker";
 import { PalettePicker } from "../../components/PalettePicker";
@@ -42,6 +43,10 @@ export default async function SettingsPage() {
       <Card className="space-y-4 p-5">
         <h2 className="title-small">{t("settings.calendar")}</h2>
         <CalendarLink summary={calendar} />
+      </Card>
+      <Card className="space-y-4 p-5">
+        <h2 className="title-small">{t("settings.backup")}</h2>
+        <BackupCard />
       </Card>
       <Card className="space-y-4 p-5">
         <h2 className="title-small">{t("settings.account")}</h2>

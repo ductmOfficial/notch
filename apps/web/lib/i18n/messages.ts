@@ -222,6 +222,22 @@ export const vi = {
   "settings.calendarRevokeConfirm":
     "Lịch đang đăng ký bằng link này sẽ không cập nhật nữa. Bạn có thể tạo link mới bất cứ lúc nào.",
   "settings.calendarWorking": "Đang xử lý…",
+  "settings.backup": "Sao lưu dữ liệu",
+  "settings.backupIntro":
+    "Tải toàn bộ hồ sơ bé, số đo, mũi tiêm và lịch hẹn về một file JSON. File chứa dữ liệu sức khoẻ của bé: hãy cất ở nơi an toàn.",
+  "settings.backupDownload": "Tải bản sao lưu",
+  "settings.restoreChoose": "Khôi phục từ file…",
+  "settings.restoreSummary":
+    "Bản sao lưu ngày {date}: {children} bé, {measurements} lần đo, {vaccinations} mũi tiêm, {appointments} lịch hẹn.",
+  "settings.restoreConfirmTitle": "Khôi phục từ file này?",
+  "settings.restoreConfirm":
+    "Mọi dữ liệu hiện có của gia đình sẽ được thay bằng nội dung file và không thể hoàn tác. Nên tải bản sao lưu hiện tại trước.",
+  "settings.restore": "Khôi phục",
+  "settings.restoreDone":
+    "Đã khôi phục: {children} bé, {measurements} lần đo, {vaccinations} mũi tiêm, {appointments} lịch hẹn.",
+  "settings.restoreInvalid": "File này không phải bản sao lưu của Notch, hoặc đã bị sửa.",
+  "settings.restoreTooLarge": "File quá lớn (tối đa 1 MB).",
+  "settings.restoreUnknownProduct": "File có vaccine không có trong danh mục: {product}.",
   "signIn.title": "Đăng nhập",
   "signIn.intro": "Nhập email, Notch sẽ gửi cho bạn một link để đăng nhập.",
   "signIn.email": "Email",
@@ -481,6 +497,22 @@ export const en: Messages = {
   "settings.calendarRevokeConfirm":
     "Calendars subscribed to this link no longer update. You can create a new link at any time.",
   "settings.calendarWorking": "Working…",
+  "settings.backup": "Backup",
+  "settings.backupIntro":
+    "Download every profile, measurement, dose and appointment as a JSON file. It holds your child's health data: keep it somewhere safe.",
+  "settings.backupDownload": "Download backup",
+  "settings.restoreChoose": "Restore from a file…",
+  "settings.restoreSummary":
+    "Backup of {date}: {children} children, {measurements} measurements, {vaccinations} doses, {appointments} appointments.",
+  "settings.restoreConfirmTitle": "Restore from this file?",
+  "settings.restoreConfirm":
+    "All of the family's current data is replaced by the file's content, and this cannot be undone. Download a backup of the current data first.",
+  "settings.restore": "Restore",
+  "settings.restoreDone":
+    "Restored: {children} children, {measurements} measurements, {vaccinations} doses, {appointments} appointments.",
+  "settings.restoreInvalid": "This file is not a Notch backup, or it was changed.",
+  "settings.restoreTooLarge": "The file is too large (1 MB at most).",
+  "settings.restoreUnknownProduct": "The file has a vaccine that is not in the catalog: {product}.",
   "signIn.title": "Sign in",
   "signIn.intro": "Enter your email and Notch will send you a link to sign in.",
   "signIn.email": "Email",

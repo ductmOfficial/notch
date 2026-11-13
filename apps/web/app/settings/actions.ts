@@ -1,10 +1,16 @@
 "use server";
 
-import { createCalendarToken, revokeCalendarToken } from "@notch/db";
+import {
+  BackupFormatError,
+  createCalendarToken,
+  restoreBackup,
+  revokeCalendarToken,
+} from "@notch/db";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
 import { getDb } from "../../lib/db";
+import { getI18n } from "../../lib/i18n/server";
 import { isLocale } from "../../lib/i18n/messages";
 import { LOCALE_COOKIE } from "../../lib/i18n/server";
 import { isPalette, isTheme, PALETTE_COOKIE, THEME_COOKIE } from "../../lib/preferences";
@@ -55,4 +61,42 @@ export async function revokeCalendarLinkAction(): Promise<void> {
   const { familyId } = await requireViewer();
   await revokeCalendarToken(database(), familyId);
   revalidatePath("/settings");
+}
+
+/** Largest backup accepted; a family's records are a few kilobytes. */
+const MAX_BACKUP_BYTES = 1024 * 1024;
+
+export type RestoreState =
+  | { readonly ok: true; readonly message: string }
+  | { readonly ok: false; readonly message: string };
+
+/** Replaces the family's data with a backup file, after the confirmation on the page. */
+export async function restoreBackupAction(form: FormData): Promise<RestoreState> {
+  const { familyId } = await requireViewer();
+  const { t } = await getI18n();
+  const file = form.get("file");
+  if (!(file instanceof File)) return { ok: false, message: t("settings.restoreInvalid") };
+  if (file.size > MAX_BACKUP_BYTES) return { ok: false, message: t("settings.restoreTooLarge") };
+  let data: unknown;
+  try {
+    data = JSON.parse(await file.text());
+  } catch {
+    return { ok: false, message: t("settings.restoreInvalid") };
+  }
+  try {
+    const result = await restoreBackup(database(), familyId, data);
+    revalidatePath("/", "layout");
+    return { ok: true, message: t("settings.restoreDone", { ...result }) };
+  } catch (error) {
+    if (error instanceof BackupFormatError) {
+      return {
+        ok: false,
+        message:
+          error.reason === "product"
+            ? t("settings.restoreUnknownProduct", { product: error.detail })
+            : t("settings.restoreInvalid"),
+      };
+    }
+    throw error;
+  }
 }
