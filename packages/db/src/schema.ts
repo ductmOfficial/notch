@@ -240,3 +240,18 @@ export const appointment = pgTable(
     check("appointment_dose_positive", sql`${t.doseNo} > 0`),
   ],
 );
+
+/**
+ * A family's calendar subscription link. Only a SHA-256 hash of the secret token is stored,
+ * so the link is shown once, when created. One link per family; a new one replaces it.
+ */
+export const calendarToken = pgTable("calendar_token", {
+  id: id(),
+  familyId: uuid()
+    .notNull()
+    .unique()
+    .references(() => family.id, { onDelete: "cascade" }),
+  tokenHash: text().notNull().unique(),
+  createdAt: createdAt(),
+  lastUsedAt: timestamp({ withTimezone: true }),
+});

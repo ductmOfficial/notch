@@ -11,6 +11,7 @@ export function proxy(request: NextRequest): NextResponse {
 }
 
 export const config = {
-  // Everything except the sign-in page, Better Auth's endpoints, Next.js files and the icon.
-  matcher: ["/((?!sign-in|api/auth|_next/|icon\\.svg|favicon\\.ico).*)"],
+  // Everything except the sign-in page, Better Auth's endpoints, the calendar subscription
+  // (its secret token is the credential), Next.js files and the icon.
+  matcher: ["/((?!sign-in|api/auth|calendar/|_next/|icon\\.svg|favicon\\.ico).*)"],
 };
