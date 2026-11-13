@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { AppointmentBadge } from "../components/AppointmentBadge";
+import { BUTTON } from "../components/button-styles";
 import { type CardMotifProps, MotifMark } from "../components/Motifs";
 import { Icon } from "../components/icons";
 import { Card, NoChild, NoDatabase } from "../components/ui";
@@ -54,13 +55,22 @@ export default async function TodayPage({ searchParams }: Props) {
 
   return (
     <div className="space-y-6">
-      <header className="pt-2">
-        <p className="body-medium text-on-surface-variant">
-          {t("today.date", { date: formatDate(today, locale) })}
-        </p>
-        <h1 className="headline-medium mt-1">
-          {t("today.heading", { name: child.name, age: formatAge(child.birthDate, today, locale) })}
-        </h1>
+      <header className="flex flex-wrap items-end justify-between gap-4 pt-2">
+        <div>
+          <p className="body-medium text-on-surface-variant">
+            {t("today.date", { date: formatDate(today, locale) })}
+          </p>
+          <h1 className="headline-medium mt-1">
+            {t("today.heading", {
+              name: child.name,
+              age: formatAge(child.birthDate, today, locale),
+            })}
+          </h1>
+        </div>
+        <a className={BUTTON.tonal} href={`/report.pdf?child=${child.id}`} download>
+          <Icon name="download" size={18} />
+          {t("report.export")}
+        </a>
       </header>
 
       <div className="grid gap-3 md:grid-cols-3">

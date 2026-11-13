@@ -21,6 +21,7 @@
     "@notch/db": "workspace:*",
     "@notch/growth": "workspace:*",
     "@notch/vaccines": "workspace:*",
+    "@react-pdf/renderer": "4.9.0",
     "better-auth": "1.7.18",
     "next": "16.4.5",
     "react": "^19.3.1",

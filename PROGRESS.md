@@ -12,7 +12,7 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 | ----- | --------------------------------------------------------------------------- | ------ |
 | P0    | Foundation: growth and vaccines engines, database, app skeleton             | 🔄     |
 | P1    | Today, Growth and Vaccinations screens, forms, `.ics` calendar, design, E2E | 🔄     |
-| P2    | Health log, post-vaccination follow-up, PDF, family sharing                 | ⬜     |
+| P2    | Health log, post-vaccination follow-up, family sharing (PDF done in P1)     | ⬜     |
 | P3    | PWA, demo mode, deployment                                                  | ⬜     |
 
 ## Steps
@@ -45,6 +45,7 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 | 24  | Calendar subscription link with a secret token                           | `feat/calendar-feed`   | ✅     |
 | 25  | Build log and dependency housekeeping after the first deployment         | `chore/build-hygiene`  | ✅     |
 | 26  | Backup and restore as a JSON file                                        | `feat/backup`          | ✅     |
+| 27  | PDF report of a child                                                    | `feat/pdf`             | ✅     |
 
 Each step is a pull request with green checks (`Browser` from step 9), merged with rebase.
 
@@ -103,6 +104,8 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 | One calendar link per family, covering every child                | Fewer links to manage and revoke; events stay generic, so mixing children reveals nothing                                                                                          |
 | Backups in stored units, without ids                              | Grams and millimetres restore without rounding; fresh ids avoid clashes with rows another family or an older restore created                                                       |
 | A restore replaces the family's data in one transaction           | Merging would need rules for conflicts; a full replace after a confirmation is predictable, and a failure changes nothing                                                          |
+| PDF with react-pdf on the server                                  | Pure JavaScript, so it runs on Vercel without a headless browser; the charts are drawn again as PDF vector paths from the same chart model                                         |
+| Fonts in the repository, print colors fixed                       | The PDF must render the same everywhere and cover Vietnamese; the lotus colors read well on paper whatever the chosen palette                                                      |
 | No Co-Authored-By trailer in commits                              | Maintainer's preference                                                                                                                                                            |
 
 ## Follow-ups

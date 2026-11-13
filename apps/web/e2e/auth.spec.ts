@@ -7,13 +7,14 @@ import { sentTo, signInLink } from "./mail";
 // These tests start signed out.
 test.use({ storageState: { cookies: [], origins: [] } });
 
-test("every page and the calendar need a session", async ({ page, request }) => {
+test("every page and every file need a session", async ({ page, request }) => {
   for (const path of ["/", "/growth", "/vaccines", "/settings", "/growth/new"]) {
     await page.goto(path);
     await expect(page).toHaveURL(/\/sign-in$/);
   }
-  const calendar = await request.get("/calendar.ics", { maxRedirects: 0 });
-  expect(calendar.status()).toBe(307);
+  for (const file of ["/calendar.ics", "/report.pdf", "/backup.json"]) {
+    expect((await request.get(file, { maxRedirects: 0 })).status()).toBe(307);
+  }
   // No navigation to pages that would only send the visitor back here.
   await expect(page.getByRole("navigation")).toHaveCount(0);
 });
