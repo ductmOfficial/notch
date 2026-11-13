@@ -279,3 +279,19 @@ test("a backup downloads and restores the same records", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator("main h1")).toContainText("Mây");
 });
+
+test("the PDF report downloads from Today, with a generic file name", async ({ page }) => {
+  await page.goto("/");
+  const [download] = await Promise.all([
+    page.waitForEvent("download"),
+    page.getByRole("link", { name: "Xuất PDF" }).click(),
+  ]);
+  expect(download.suggestedFilename()).toMatch(/^notch-report-\d{4}-\d{2}-\d{2}\.pdf$/);
+  const response = await page.request.get(
+    new URL(download.url()).pathname + new URL(download.url()).search,
+  );
+  expect(response.headers()["content-type"]).toBe("application/pdf");
+  const body = await response.body();
+  expect(body.subarray(0, 5).toString()).toBe("%PDF-");
+  expect(body.length).toBeGreaterThan(20_000);
+});

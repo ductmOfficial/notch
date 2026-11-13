@@ -10,7 +10,9 @@ try {
 
 const nextConfig: NextConfig = {
   // Database drivers load native or WebAssembly code; keep them out of the bundle.
-  serverExternalPackages: ["@electric-sql/pglite", "pg"],
+  serverExternalPackages: ["@electric-sql/pglite", "pg", "@react-pdf/renderer"],
+  // The PDF report reads its fonts from disk; ship them with that route.
+  outputFileTracingIncludes: { "/report.pdf": ["./assets/fonts/*.ttf"] },
 };
 
 export default nextConfig;

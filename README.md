@@ -113,6 +113,10 @@ With PostgreSQL and your own records instead: `cp .env.example .env`, set `NOTCH
 
 Settings downloads the family's records as `notch-backup-<date>.json` and restores such a file. The format (version 1, `packages/db/src/backup.ts`) keeps values as stored (grams, millimetres, product codes), so a backup restores exactly. A restore shows what the file holds, asks for confirmation, checks the whole file (schema, known vaccines, one row per dose), then replaces the family's children and records in one transaction: everything or nothing. The file holds health data; nothing is uploaded anywhere except on restore.
 
+## PDF report
+
+Today has an **Export PDF** button: an A4 record of the selected child for a doctor's visit or to print. Page one holds the profile, the latest weight, length, head circumference and BMI with percentile and z-score, and the WHO weight-for-age and length-for-age charts; the next pages list doses by disease, every dose given (date, vaccine, dose, place, lot) and the appointments. Every page carries a short disclaimer. It is rendered on the server with [react-pdf](https://react-pdf.org) in the page's language, with Roboto (SIL OFL 1.1, `apps/web/assets/fonts/`) for Vietnamese. The file name is generic (`notch-report-<date>.pdf`).
+
 ## Deployment
 
 Vercel for the app, [Neon](https://neon.tech) for PostgreSQL (region `aws-ap-southeast-1`), Resend for the sign-in email.
