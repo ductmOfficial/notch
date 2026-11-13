@@ -23,6 +23,16 @@ const plural = (n: number, one: string, many: string) => `${String(n)} ${n === 1
  * Calendar age, e.g. "7 tháng 24 ngày" / "7 months 24 days", "1 tuổi 2 tháng" / "1 year
  * 2 months": the number of whole months whose anniversary has passed, then the days since.
  */
+/** Whole months of age on a date (0 before the first month, and before birth). */
+export function ageInMonths(birthDate: string, onDate: string): number {
+  const birth = parts(birthDate);
+  const [y, m, d] = parts(onDate);
+  const on = Date.UTC(y, m - 1, d);
+  let months = (y - birth[0]) * 12 + (m - birth[1]);
+  while (months > 0 && addMonths(birth, months) > on) months -= 1;
+  return Math.max(0, months);
+}
+
 export function formatAge(birthDate: string, onDate: string, locale: Locale = "vi"): string {
   const birth = parts(birthDate);
   const [y, m, d] = parts(onDate);

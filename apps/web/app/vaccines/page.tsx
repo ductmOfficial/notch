@@ -7,6 +7,7 @@ import { AppointmentBadge } from "../../components/AppointmentBadge";
 import { BUTTON } from "../../components/button-styles";
 import { DeleteForm } from "../../components/form/DeleteForm";
 import { Icon } from "../../components/icons";
+import { TcmrCard } from "../../components/TcmrCard";
 import { Card, NoChild, NoDatabase } from "../../components/ui";
 import { getCurrentChild } from "../../lib/child";
 import { getDb } from "../../lib/db";
@@ -175,6 +176,14 @@ export default async function VaccinesPage({ searchParams }: Props) {
           </details>
         )}
       </Card>
+
+      <TcmrCard
+        dosesPerDisease={new Map(view.covered.map((row) => [row.code, row.doses.length]))}
+        birthDate={child.birthDate}
+        today={today}
+        t={t}
+        locale={locale}
+      />
 
       <Card className="p-0">
         <h2 id="history-title" className="title-medium px-4 pt-4 pb-2">

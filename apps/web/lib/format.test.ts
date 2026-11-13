@@ -1,6 +1,14 @@
 import { describe, expect, it } from "vitest";
 
-import { formatAge, formatDate, formatNumber, formatZ, todayInVietnam, zBand } from "./format";
+import {
+  ageInMonths,
+  formatAge,
+  formatDate,
+  formatNumber,
+  formatZ,
+  todayInVietnam,
+  zBand,
+} from "./format";
 
 describe("formatAge", () => {
   it.each([
@@ -60,5 +68,15 @@ describe("todayInVietnam", () => {
   it("uses the Vietnam calendar day", () => {
     expect(todayInVietnam(new Date("2030-11-08T18:30:00Z"))).toBe("2030-11-09");
     expect(todayInVietnam(new Date("2030-11-08T16:00:00Z"))).toBe("2030-11-08");
+  });
+});
+
+describe("ageInMonths", () => {
+  it("counts whole months, clamping to the end of short months", () => {
+    expect(ageInMonths("2030-01-31", "2030-02-27")).toBe(0);
+    expect(ageInMonths("2030-01-31", "2030-02-28")).toBe(1);
+    expect(ageInMonths("2030-01-15", "2031-07-14")).toBe(17);
+    expect(ageInMonths("2030-01-15", "2031-07-15")).toBe(18);
+    expect(ageInMonths("2030-01-15", "2029-12-01")).toBe(0);
   });
 });

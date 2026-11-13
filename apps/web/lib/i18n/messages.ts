@@ -222,6 +222,18 @@ export const vi = {
   "settings.calendarRevokeConfirm":
     "Lịch đang đăng ký bằng link này sẽ không cập nhật nữa. Bạn có thể tạo link mới bất cứ lúc nào.",
   "settings.calendarWorking": "Đang xử lý…",
+  "tcmr.title": "Lịch tiêm chủng mở rộng (TCMR)",
+  "tcmr.intro":
+    "Lịch tiêm miễn phí của Bộ Y tế theo tuổi, đối chiếu với số mũi đã ghi cho từng bệnh (từ bất kỳ vaccine nào). Vaccine dịch vụ có thể theo lịch khác, ví dụ bại liệt tiêm thay vì uống: nếu thấy thiếu, hỏi nhân viên y tế.",
+  "tcmr.summary": "Đến tuổi bé: đã ghi {done}/{due} mũi theo lịch. Xem lịch theo tuổi",
+  "tcmr.atBirth": "Sơ sinh",
+  "tcmr.months": "{n} tháng tuổi",
+  "tcmr.years": "{n} tuổi",
+  "tcmr.reached": "đã đến tuổi",
+  "tcmr.recorded": "Đã ghi",
+  "tcmr.notRecorded": "Chưa ghi",
+  "tcmr.source":
+    "Nguồn: {document} của {issuer}, hiệu lực từ {date}. Lịch đúng hạn, chưa gồm các trường hợp tiêm muộn.",
   "report.export": "Xuất PDF",
   "report.title": "Sổ sức khoẻ của {name}",
   "report.exported": "Xuất ngày {date}",
@@ -516,6 +528,19 @@ export const en: Messages = {
   "settings.calendarRevokeConfirm":
     "Calendars subscribed to this link no longer update. You can create a new link at any time.",
   "settings.calendarWorking": "Working…",
+  "tcmr.title": "National immunization schedule (TCMR)",
+  "tcmr.intro":
+    "The Ministry of Health's free schedule by age, next to the doses recorded for each disease (from any vaccine). Service vaccines can follow another schedule, such as injected instead of oral polio: if something looks missing, ask a health worker.",
+  "tcmr.summary":
+    "Up to your child's age: {done} of {due} scheduled doses recorded. See the schedule by age",
+  "tcmr.atBirth": "At birth",
+  "tcmr.months": "{n} months",
+  "tcmr.years": "{n} years",
+  "tcmr.reached": "age reached",
+  "tcmr.recorded": "Recorded",
+  "tcmr.notRecorded": "Not recorded",
+  "tcmr.source":
+    "Source: {document} ({issuer}, Ministry of Health of Viet Nam), in force from {date}. On-time schedule; late doses are not covered.",
   "report.export": "Export PDF",
   "report.title": "{name}'s health record",
   "report.exported": "Exported on {date}",

@@ -295,3 +295,14 @@ test("the PDF report downloads from Today, with a generic file name", async ({ p
   expect(body.subarray(0, 5).toString()).toBe("%PDF-");
   expect(body.length).toBeGreaterThan(20_000);
 });
+
+test("the TCMR schedule lists every dose by age, next to what is recorded", async ({ page }) => {
+  await page.goto("/vaccines");
+  const card = page.locator("section").filter({
+    has: page.getByRole("heading", { name: "Lịch tiêm chủng mở rộng (TCMR)" }),
+  });
+  await card.getByText(/Đến tuổi bé: đã ghi \d+\/\d+ mũi theo lịch/).click();
+  await expect(card.getByRole("img", { name: /^(Đã ghi|Chưa ghi)$/ })).toHaveCount(37);
+  await expect(card.getByText(/^Sơ sinh/)).toBeVisible();
+  await expect(card.getByText(/Thông tư 52\/2025\/TT-BYT/)).toBeVisible();
+});

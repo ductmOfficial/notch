@@ -18,4 +18,6 @@ export type {
   Vaccination,
   Vaccine,
 } from "./types.js";
+export type { TcmrDose, TcmrGroup, TcmrRow, TcmrSource } from "./tcmr.js";
+export { TCMR_DOSES, TCMR_SOURCE, tcmrOverview } from "./tcmr.js";
 export { validateSchedule } from "./validate.js";
