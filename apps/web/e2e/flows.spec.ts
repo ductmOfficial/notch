@@ -197,3 +197,41 @@ test("form errors come in the page's language", async ({ browser }) => {
   await expect(page.getByText("The weight must be a number, for example 8.6.")).toBeVisible();
   await context.close();
 });
+
+test("the calendar link works without a session, once per family, until revoked", async ({
+  page,
+  playwright,
+  baseURL,
+}) => {
+  await page.goto("/settings");
+  await page.getByRole("button", { name: "Tạo link lịch" }).click();
+  const field = page.getByLabel("Link đăng ký lịch");
+  await expect(field).toHaveValue(/\/calendar\/[\w-]{43}\.ics$/);
+  const url = new URL(await field.inputValue());
+  await expect(page.getByRole("link", { name: "Thêm vào Lịch" })).toHaveAttribute(
+    "href",
+    `webcal://${url.host}${url.pathname}`,
+  );
+
+  // A calendar app has no session: the token alone opens the feed.
+  const calendarApp = await playwright.request.newContext({ baseURL });
+  const feed = await calendarApp.get(url.pathname, { maxRedirects: 0 });
+  expect(feed.status()).toBe(200);
+  expect(feed.headers()["content-type"]).toContain("text/calendar");
+  const body = await feed.text();
+  expect(body).toContain("BEGIN:VCALENDAR");
+  expect(body).toContain("SUMMARY:Lịch tiêm cho bé");
+  expect(body).not.toContain("Mây");
+  expect((await calendarApp.get("/calendar/not-a-token.ics")).status()).toBe(404);
+
+  // The link is shown once; afterwards only its dates.
+  await page.reload();
+  await expect(page.getByLabel("Link đăng ký lịch")).toHaveCount(0);
+  await expect(page.getByText(/Lịch đọc lần cuối ngày/)).toBeVisible();
+
+  await page.getByRole("button", { name: "Thu hồi link" }).click();
+  await page.getByRole("alertdialog").getByRole("button", { name: "Thu hồi link" }).click();
+  await expect(page.getByRole("button", { name: "Tạo link lịch" })).toBeVisible();
+  expect((await calendarApp.get(url.pathname)).status()).toBe(404);
+  await calendarApp.dispose();
+});

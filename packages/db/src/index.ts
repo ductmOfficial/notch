@@ -1,6 +1,13 @@
 export { syncCatalog } from "./catalog.js";
 export type { Db, DbHandle, Schema } from "./client.js";
 export { createDb, resolveDatabaseUrl } from "./client.js";
+export type { CalendarLinkInfo } from "./calendar-tokens.js";
+export {
+  calendarLinkInfo,
+  createCalendarToken,
+  familyIdForCalendarToken,
+  revokeCalendarToken,
+} from "./calendar-tokens.js";
 export { familyIdForUser } from "./families.js";
 export type { AppointmentRow, Child, Measurement, Vaccination } from "./queries.js";
 export {
