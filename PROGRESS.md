@@ -43,6 +43,7 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 | 22  | Welcome page for the first child                                         | `feat/onboarding`      | ✅     |
 | 23  | Ready for Vercel and Neon: build with migrations, sign-in URLs on Vercel | `chore/vercel`         | ✅     |
 | 24  | Calendar subscription link with a secret token                           | `feat/calendar-feed`   | ✅     |
+| 25  | Build log and dependency housekeeping after the first deployment         | `chore/build-hygiene`  | ✅     |
 
 Each step is a pull request with green checks (`Browser` from step 9), merged with rebase.
 
@@ -50,7 +51,7 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 
 - [x] Sign-in (Better Auth, magic link, allowlist)
 - [x] Onboarding: the first child after the first sign-in
-- [ ] Vercel and Neon deploys (code ready; accounts to set up)
+- [x] Vercel and Neon deploys (production with an empty family, preview with the demo child)
 - [x] `.ics` subscription URL
 - [ ] Vietnamese EPI (TCMR) schedule data, generated from an official source
 
@@ -114,3 +115,7 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 - **2026-11-12:** the "next appointment" fieldset of the dose form overflowed its card: a fieldset's minimum width is its content. Fixed with `min-width: 0`.
 - **2026-11-12:** Material Color Utilities does not export its `Variant` enum at runtime; the generator passes the tonal spot value directly.
 - **2026-11-12:** the quick-add accessibility test failed now and then on the mobile project in CI with low contrast on every line of the dialog: axe scanned it while the overlay was fading in. Two fixes: the app had forced a 150ms transition on Sen UI, overriding its reduced-motion rule, so that duration now applies only without a reduced-motion preference; and the test opens the dialog with reduced motion and waits until it is painted fully opaque.
+- **2026-11-13:** the first Vercel build stopped at `pnpm install` with `ERR_PNPM_UNSUPPORTED_ENGINE`: a new Vercel project defaults to Node 26, the repo asks for 24. Fixed in the project settings (Node.js Version 24.x).
+- **2026-11-13:** Turborepo warned that the project's environment variables were missing from `turbo.json`. The build does not read them (the app reads them at run time); they are now listed as pass-through for the build task.
+- **2026-11-13:** the first sign-in email from `onboarding@resend.dev` went to Gmail's Spam. Marked as not spam; a verified domain will help.
+- **2026-11-13:** Dependabot proposed `@material/material-color-utilities` 0.4.0, whose ESM imports Node rejects. The 0.4.x range is now ignored.

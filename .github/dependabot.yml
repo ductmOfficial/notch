@@ -29,3 +29,7 @@ updates:
       # Types follow the Node runtime (engines: ^24); lift when moving to Node 26.
       - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]
+      # 0.4.x imports its own files without extensions, which Node's ESM loader rejects
+      # (scripts/generate-theme.mjs fails). Check a later release before lifting.
+      - dependency-name: "@material/material-color-utilities"
+        versions: [">=0.4.0 <0.5.0"]

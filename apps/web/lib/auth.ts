@@ -50,7 +50,13 @@ function createAuth(db: NonNullable<ReturnType<typeof getDb>>) {
         storeToken: "hashed",
         sendMagicLink: async ({ email, url }) => {
           // The answer is the same either way, so the form does not reveal who may sign in.
-          if (!isAllowed(email, allowedEmails())) return;
+          if (!isAllowed(email, allowedEmails())) {
+            // For the server log only, and without the address: the visitor sees "sent".
+            console.info(
+              "[auth] No sign-in link sent: the address is not on NOTCH_ALLOWED_EMAILS.",
+            );
+            return;
+          }
           const { locale } = await getI18n();
           await sendMail({ to: email, ...signInMail(url, locale, LINK_MINUTES) });
         },
