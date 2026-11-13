@@ -23,15 +23,19 @@ describe("siteUrls", () => {
     ]);
   });
 
-  it("points preview links at the deployment and trusts its branch URL", () => {
+  it("points preview links at the branch URL and trusts the deployment's own", () => {
     const urls = siteUrls({
       VERCEL_ENV: "preview",
       VERCEL_URL: "notch-def456.vercel.app",
       VERCEL_BRANCH_URL: "notch-git-feat-x.vercel.app",
       VERCEL_PROJECT_PRODUCTION_URL: "notch.vercel.app",
     });
-    expect(urls.baseURL).toBe("https://notch-def456.vercel.app");
-    expect(urls.trustedOrigins).toContain("https://notch-git-feat-x.vercel.app");
+    expect(urls.baseURL).toBe("https://notch-git-feat-x.vercel.app");
+    expect(urls.trustedOrigins).toContain("https://notch-def456.vercel.app");
+    // Without a branch URL (a deployment made from the CLI), the deployment itself.
+    expect(siteUrls({ VERCEL_ENV: "preview", VERCEL_URL: "notch-def456.vercel.app" }).baseURL).toBe(
+      "https://notch-def456.vercel.app",
+    );
   });
 
   it("leaves the base URL to Better Auth when nothing is known", () => {
