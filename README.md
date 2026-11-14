@@ -4,7 +4,7 @@
 
 **Notch · Sổ lớn khôn của bé.** A web app for parents to track a child's growth against the WHO Child Growth Standards, the vaccination schedule, and health history. The name comes from the marks parents make on a door frame each time they measure their child's height.
 
-> Status: runs locally. Today, Growth and Vaccinations screens, forms for measurements, doses and appointments, a calendar download and a Settings page, in Vietnamese and English. Sign-in by email link, limited to an allowlist. **Not deployed yet.** See [PROGRESS.md](PROGRESS.md).
+> Live at [notch-mauve-eight.vercel.app](https://notch-mauve-eight.vercel.app), with sign-in limited to an allowlist. Today, Growth and Vaccinations screens, forms for measurements, doses and appointments, the national vaccination schedule, calendar download and subscription, a PDF report, backup and restore, and a Settings page, in Vietnamese and English. Sign-in by email link. See [PROGRESS.md](PROGRESS.md).
 
 ## Principles
 
@@ -44,40 +44,132 @@
 
 The domain packages never import React or Next.js, so a future React Native app can reuse them unchanged.
 
-## Requirements
+## Setup
 
-- Node.js 24 (`.nvmrc`)
-- pnpm 12 (pinned in `packageManager`)
-- Docker with Compose v2, only for PostgreSQL (PGlite needs nothing)
+### 1. Prerequisites
 
-## Getting started
+| Tool                      | Version                    | Needed for                 | Install                                                                                |
+| ------------------------- | -------------------------- | -------------------------- | -------------------------------------------------------------------------------------- |
+| Node.js                   | 24 (`.nvmrc`)              | everything                 | `nvm install && nvm use` (or `fnm use`)                                                |
+| pnpm                      | 12.14.0 (`packageManager`) | everything                 | `corepack enable` (or `npm install -g pnpm@12.14.0`)                                   |
+| Git                       | any recent                 | everything                 |                                                                                        |
+| Docker with Compose v2    | any recent                 | PostgreSQL only            | [Docker Desktop](https://docs.docker.com/desktop/) or OrbStack; PGlite needs nothing   |
+| Chromium or Google Chrome | any recent                 | browser tests (`e2e`) only | `pnpm --filter web exec playwright install chromium`, or point `CHROME_PATH` at Chrome |
 
-Try it with the fictional demo child, without Docker:
+`pnpm install` refuses other Node.js majors (`engineStrict`). Corepack ships with Node.js 24: after `corepack enable`, the first `pnpm` command downloads the exact version from `packageManager` (answer `Y` if it asks).
+
+### 2. Clone and install
 
 ```bash
-pnpm install
-pnpm build
+git clone https://github.com/ductmOfficial/notch.git
+cd notch
+nvm use
+corepack enable
+pnpm install          # also installs the commit-msg hook
+pnpm build            # the db scripts and the app use the packages' build output
+```
+
+### 3. Configure
+
+```bash
+cp .env.example .env
+```
+
+One `.env` at the repository root serves everything: the db scripts read it (`--env-file-if-exists`) and `apps/web/next.config.ts` loads it for the app. It is ignored by git. Variables set in the shell win, so a one-off value can also be passed inline.
+
+| Variable                                                             | Required                | Example                                                              | What it does                                                                                       |
+| -------------------------------------------------------------------- | ----------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`                                                       | yes                     | `pglite:.data/pglite` or `postgresql://user:pass@localhost:5433/app` | PGlite folder (relative to the repository root) or a PostgreSQL connection string                  |
+| `NOTCH_ALLOWED_EMAILS`                                               | yes, to sign in         | `you@example.com,partner@example.com`                                | Who may sign in, comma-separated. Empty means nobody                                               |
+| `BETTER_AUTH_SECRET`                                                 | for `start`, production | output of `openssl rand -base64 32`                                  | Signs sessions. Use a different value per environment                                              |
+| `BETTER_AUTH_URL`                                                    | no                      | `http://localhost:3000`                                              | Where sign-in links point. On Vercel, leave it unset (see Deployment)                              |
+| `RESEND_API_KEY`                                                     | in production           | `re_xxxxxxxx`                                                        | Sends the sign-in email through Resend. Without it, the link is printed in the `dev` terminal      |
+| `MAIL_FROM`                                                          | no                      | `Notch <onboarding@resend.dev>`                                      | Sender of the sign-in email                                                                        |
+| `MAIL_OUTBOX`                                                        | no                      | `/tmp/notch-outbox.jsonl`                                            | Append emails to this file instead of sending them (the browser tests use it)                      |
+| `NOTCH_SEED_FILE`                                                    | for `seed`              | `packages/db/fixtures/demo-child.json`                               | Records to load. Real records stay in a file **outside the repository**                            |
+| `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`, `POSTGRES_PORT` | no                      | `postgres`, `postgres`, `app`, `5433`                                | The local PostgreSQL container (`compose.yaml` has the same defaults); keep `DATABASE_URL` in sync |
+| `CHROME_PATH`                                                        | no                      | `/usr/bin/google-chrome`                                             | A local Chrome for the browser tests instead of Playwright's Chromium                              |
+
+## Running
+
+### Quick try: PGlite and the demo child
+
+No Docker and no `.env` needed. Mây, the demo child in `packages/db/fixtures/demo-child.json`, is fictional:
+
+```bash
 export DATABASE_URL=pglite:.data/pglite
 pnpm --filter @notch/db migrate
 NOTCH_SEED_FILE=packages/db/fixtures/demo-child.json pnpm --filter @notch/db seed
 NOTCH_ALLOWED_EMAILS=you@example.com pnpm --filter web dev   # http://localhost:3000
 ```
 
-Sign in with that address: without a mail service, the sign-in link is printed in the terminal running `dev`. Skip the seed to start from the welcome page instead.
+Open http://localhost:3000 and sign in with that address: without a mail service, the sign-in link is printed in the terminal running `dev`. Skip the seed to start from the welcome page instead.
 
-With PostgreSQL and your own records instead: `cp .env.example .env`, set `NOTCH_SEED_FILE` to a file **outside the repository**, then `pnpm db:up` and the same `migrate`, `seed` and `dev` commands. PostgreSQL listens on port 5433, so it can run next to other local databases on 5432.
+### With PostgreSQL
 
-| Script                    | What it does                                                                           |
-| ------------------------- | -------------------------------------------------------------------------------------- |
-| `pnpm build`              | Build every package and app                                                            |
-| `pnpm lint`               | ESLint everywhere; warnings fail the run                                               |
-| `pnpm typecheck`          | `tsc --noEmit` everywhere                                                              |
-| `pnpm test`               | Vitest everywhere                                                                      |
-| `pnpm --filter web e2e`   | Playwright and axe on a fresh PGlite database with the demo child (after `pnpm build`) |
-| `pnpm --filter web theme` | Regenerate the color scheme (`apps/web/app/theme.css`)                                 |
-| `pnpm db:up` / `db:psql`  | Start local PostgreSQL / open `psql` in the container                                  |
+```bash
+pnpm db:up                         # PostgreSQL 18 on port 5433, waits until healthy
+pnpm --filter @notch/db migrate    # apply migrations
+pnpm --filter @notch/db seed       # migrate, sync the vaccine catalog, load NOTCH_SEED_FILE
+pnpm --filter web dev              # http://localhost:3000
+```
 
-`e2e` uses Playwright's Chromium (`pnpm --filter web exec playwright install chromium`), or the browser in `CHROME_PATH`.
+This uses the values in `.env`: set `NOTCH_ALLOWED_EMAILS`, and point `NOTCH_SEED_FILE` at the demo file or at your own records outside the repository. PostgreSQL listens on port 5433, so it can run next to another local database on 5432. `pnpm db:psql` opens `psql` in the container; `pnpm db:down` stops it and keeps the data, `pnpm db:reset` deletes the data.
+
+### Production build
+
+```bash
+pnpm build
+BETTER_AUTH_SECRET="$(openssl rand -base64 32)" pnpm --filter web start   # http://localhost:3000
+```
+
+`next start` runs in production mode, where Better Auth refuses its default secret: without `BETTER_AUTH_SECRET` (in `.env` or inline as above) every page answers 500. It also needs `DATABASE_URL` and `NOTCH_ALLOWED_EMAILS`, like `dev`, and sends the sign-in email only through Resend or `MAIL_OUTBOX`.
+
+## Testing
+
+| Command                             | What it runs                                                                                 |
+| ----------------------------------- | -------------------------------------------------------------------------------------------- |
+| `pnpm test`                         | Vitest everywhere: WHO z-scores, vaccine schedule, db queries on in-memory PGlite, app logic |
+| `pnpm lint` / `pnpm typecheck`      | ESLint (warnings fail) and `tsc --noEmit` everywhere                                         |
+| `pnpm format:check` / `pnpm format` | Prettier check / write                                                                       |
+| `pnpm build`                        | Build every package and the app                                                              |
+| `pnpm --filter web e2e`             | Playwright and axe (WCAG 2.2 AA), light and dark, desktop and mobile, after `pnpm build`     |
+
+The browser tests need no `.env` and no Docker. Each run starts two `next start` servers on ports 3200 and 3201 with fresh PGlite databases (`apps/web/.e2e-db` with the demo child, `apps/web/.e2e-db-empty` without), signs in through the real email-link flow from a file outbox, and uses Playwright's Chromium or the browser in `CHROME_PATH`:
+
+```bash
+pnpm --filter web exec playwright install chromium
+pnpm build
+pnpm --filter web e2e
+```
+
+To run what CI runs before opening a pull request (`Verify`, then `Browser`):
+
+```bash
+pnpm install --frozen-lockfile
+pnpm format:check
+pnpm turbo run lint typecheck test build
+pnpm --filter web e2e
+```
+
+### All scripts
+
+| Script                                | What it does                                                                                         |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `pnpm build`                          | Build every package and app                                                                          |
+| `pnpm dev`                            | Every package's `dev` task (the app's `next dev`)                                                    |
+| `pnpm lint`                           | ESLint everywhere; warnings fail the run                                                             |
+| `pnpm typecheck`                      | `tsc --noEmit` everywhere                                                                            |
+| `pnpm test` / `test:coverage`         | Vitest everywhere / with coverage thresholds (not run by CI; `web` is below its 90% threshold today) |
+| `pnpm format` / `format:check`        | Prettier write / check                                                                               |
+| `pnpm db:up` / `db:down` / `db:reset` | Start / stop / stop and delete local PostgreSQL                                                      |
+| `pnpm db:logs` / `db:psql`            | Follow its logs / open `psql` in the container                                                       |
+| `pnpm --filter @notch/db migrate`     | Apply migrations to `DATABASE_URL`                                                                   |
+| `pnpm --filter @notch/db seed`        | Migrate, sync the catalog, load `NOTCH_SEED_FILE` (`--replace` to overwrite)                         |
+| `pnpm --filter @notch/db generate`    | Write a new migration after editing `packages/db/src/schema.ts`                                      |
+| `pnpm --filter web e2e`               | Playwright and axe (after `pnpm build`)                                                              |
+| `pnpm --filter web theme`             | Regenerate the color schemes (`apps/web/app/theme.css`)                                              |
+| `pnpm --filter web icons`             | Regenerate the inline icons (`components/icons.tsx`)                                                 |
 
 ## Sign-in
 
@@ -125,9 +217,42 @@ Today has an **Export PDF** button: an A4 record of the selected child for a doc
 
 Vercel for the app, [Neon](https://neon.tech) for PostgreSQL (region `aws-ap-southeast-1`), Resend for the sign-in email.
 
-- The Vercel project's root directory is `apps/web`. `apps/web/vercel.json` builds the workspace with Turborepo, then applies pending migrations to the database of that environment, so a deployment never runs against an older schema.
-- Production and Preview use different Neon branches. The preview branch holds only the fictional demo child, never a copy of production.
-- Environment variables, per Vercel environment: `DATABASE_URL` (Neon's pooled connection string), `BETTER_AUTH_SECRET` (a different one per environment), `NOTCH_ALLOWED_EMAILS`, `RESEND_API_KEY`, `MAIL_FROM`. `BETTER_AUTH_URL` is optional: without it, sign-in links point at the production domain in production and at the branch URL in previews (see `lib/site-url.ts`).
+- **Project settings.** Root directory `apps/web`, framework Next.js, **Node.js 24.x** (a new project defaults to a newer Node, and `pnpm install` then stops with `ERR_PNPM_UNSUPPORTED_ENGINE`).
+- **Build and migrate.** `apps/web/vercel.json` sets the build command: `cd ../.. && pnpm exec turbo run build --filter=web && pnpm --filter @notch/db migrate`. It builds the workspace with Turborepo, then applies pending migrations to the database of that environment, so a deployment never runs against an older schema.
+- **Databases.** Production and Preview use different Neon branches. The preview branch holds only the fictional demo child, never a copy of production.
+- **Variables**, per Vercel environment (names only; values live in Vercel):
+
+| Variable               | Production                    | Preview                     |
+| ---------------------- | ----------------------------- | --------------------------- |
+| `DATABASE_URL`         | Neon pooled connection string | the preview branch's string |
+| `BETTER_AUTH_SECRET`   | its own value                 | a different value           |
+| `NOTCH_ALLOWED_EMAILS` | the parents' addresses        | the addresses that may test |
+| `RESEND_API_KEY`       | set                           | set                         |
+| `MAIL_FROM`            | set                           | set                         |
+| `BETTER_AUTH_URL`      | unset, or a custom domain     | unset                       |
+
+Without `BETTER_AUTH_URL`, sign-in links point at the production domain in production and at the branch URL in previews (see `lib/site-url.ts`). `turbo.json` passes these variables through to the build.
+
+## Troubleshooting
+
+| Symptom                                                                                                     | Fix                                                                                                                                                             |
+| ----------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm install` fails with `ERR_PNPM_UNSUPPORTED_ENGINE`                                                     | Wrong Node.js major: `nvm use` (Node.js 24), then install again. On Vercel, set Node.js 24.x in the project settings                                            |
+| `pnpm: command not found`, or a different pnpm version runs                                                 | `corepack enable`, then open a new terminal; `pnpm -v` should print `12.14.0`                                                                                   |
+| "DATABASE_URL is not set. Copy .env.example to .env, or pass it inline."                                    | Create `.env` from `.env.example`, or `export DATABASE_URL=pglite:.data/pglite`                                                                                 |
+| `migrate` or `seed` cannot find its script                                                                  | Run `pnpm build` first: the db scripts run from `packages/db/dist`                                                                                              |
+| `seed` cannot read the seed file                                                                            | `NOTCH_SEED_FILE` is resolved from the repository root; for a try, use `packages/db/fixtures/demo-child.json`                                                   |
+| `pnpm db:up` fails with "port is already allocated"                                                         | Something already uses 5433: set `POSTGRES_PORT` in `.env` and the same port in `DATABASE_URL`                                                                  |
+| Port 3000 is taken                                                                                          | `pnpm --filter web dev --port 3001`, and set `BETTER_AUTH_URL=http://localhost:3001` so the sign-in link matches                                                |
+| `e2e` cannot start its servers                                                                              | Ports 3200 and 3201 must be free, and `pnpm build` must have run                                                                                                |
+| The browser tests cannot find a browser                                                                     | `pnpm --filter web exec playwright install chromium`, or set `CHROME_PATH`                                                                                      |
+| Every page answers 500 after `pnpm --filter web start`, and the log says "You are using the default secret" | Set `BETTER_AUTH_SECRET` (`openssl rand -base64 32`) in `.env` or inline                                                                                        |
+| No sign-in email arrives                                                                                    | Check that the address is in `NOTCH_ALLOWED_EMAILS` (the form answers the same either way). Locally without `RESEND_API_KEY`, the link is in the `dev` terminal |
+| The sign-in email is in Spam                                                                                | Mail sent from `onboarding@resend.dev` can land in Gmail's Spam: mark it as not spam once. A verified domain on Resend avoids it                                |
+| A Vercel preview opens a Vercel sign-in page                                                                | Previews have Deployment Protection: sign in to Vercel with an account on the team first, or check the commit locally                                           |
+| The sign-in link from a preview asks for Vercel sign-in again and fails                                     | Open the preview through its branch URL and leave `BETTER_AUTH_URL` unset in Preview, so the link points at the branch URL                                      |
+| A machine with little memory kills the run (exit code 137)                                                  | Run fewer tasks at once: `pnpm turbo run lint typecheck test build --concurrency=2`                                                                             |
+| The commit is rejected                                                                                      | The hook enforces [Conventional Commits](https://www.conventionalcommits.org): `feat(web): …`, `fix(db): …`, `docs: …`                                          |
 
 ## Contributing workflow
 
