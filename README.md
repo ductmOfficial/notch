@@ -4,7 +4,7 @@
 
 **Notch · Sổ lớn khôn của bé.** A web app for parents to track a child's growth against the WHO Child Growth Standards, the vaccination schedule, and health history. The name comes from the marks parents make on a door frame each time they measure their child's height.
 
-> Live at [notch-mauve-eight.vercel.app](https://notch-mauve-eight.vercel.app), with sign-in limited to an allowlist. Today, Growth and Vaccinations screens, forms for measurements, doses and appointments, the national vaccination schedule, calendar download and subscription, a PDF report, backup and restore, and a Settings page, in Vietnamese and English. Sign-in by email link. See [PROGRESS.md](PROGRESS.md).
+> Live at [notch-tmd.vercel.app](https://notch-tmd.vercel.app), with sign-in limited to an allowlist. Today, Growth and Vaccinations screens, forms for measurements, doses and appointments, the national vaccination schedule, calendar download and subscription, a PDF report, backup and restore, and a Settings page, in Vietnamese and English. Sign-in by email link. See [PROGRESS.md](PROGRESS.md).
 
 ## Principles
 
