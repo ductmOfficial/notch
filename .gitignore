@@ -34,3 +34,6 @@ apps/web/e2e/.auth/
 .e2e-outbox.jsonl
 .e2e-db-empty/
 .e2e-outbox-empty.jsonl
+
+# Local-only Vietnamese README
+README.vi.md
