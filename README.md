@@ -109,8 +109,8 @@ Open http://localhost:3000 and sign in with that address: without a mail service
 
 ```bash
 pnpm db:up                         # PostgreSQL 18 on port 5433, waits until healthy
-pnpm --filter @notch/db migrate    # apply migrations
-pnpm --filter @notch/db seed       # migrate, sync the vaccine catalog, load NOTCH_SEED_FILE
+pnpm --filter @notch/db migrate    # apply migrations, load the vaccine catalog
+pnpm --filter @notch/db seed       # add the child in NOTCH_SEED_FILE
 pnpm --filter web dev              # http://localhost:3000
 ```
 
@@ -164,8 +164,8 @@ pnpm --filter web e2e
 | `pnpm format` / `format:check`        | Prettier write / check                                                                               |
 | `pnpm db:up` / `db:down` / `db:reset` | Start / stop / stop and delete local PostgreSQL                                                      |
 | `pnpm db:logs` / `db:psql`            | Follow its logs / open `psql` in the container                                                       |
-| `pnpm --filter @notch/db migrate`     | Apply migrations to `DATABASE_URL`                                                                   |
-| `pnpm --filter @notch/db seed`        | Migrate, sync the catalog, load `NOTCH_SEED_FILE` (`--replace` to overwrite)                         |
+| `pnpm --filter @notch/db migrate`     | Apply migrations to `DATABASE_URL` and load the vaccine catalog                                      |
+| `pnpm --filter @notch/db seed`        | Only adds the child in `NOTCH_SEED_FILE` (`--replace` to overwrite); migrate loads the catalog       |
 | `pnpm --filter @notch/db generate`    | Write a new migration after editing `packages/db/src/schema.ts`                                      |
 | `pnpm --filter web e2e`               | Playwright and axe (after `pnpm build`)                                                              |
 | `pnpm --filter web theme`             | Regenerate the color schemes (`apps/web/app/theme.css`)                                              |
@@ -218,7 +218,7 @@ Today has an **Export PDF** button: an A4 record of the selected child for a doc
 Vercel for the app, [Neon](https://neon.tech) for PostgreSQL (region `aws-ap-southeast-1`), Resend for the sign-in email.
 
 - **Project settings.** Root directory `apps/web`, framework Next.js, **Node.js 24.x** (a new project defaults to a newer Node, and `pnpm install` then stops with `ERR_PNPM_UNSUPPORTED_ENGINE`).
-- **Build and migrate.** `apps/web/vercel.json` sets the build command: `cd ../.. && pnpm exec turbo run build --filter=web && pnpm --filter @notch/db migrate`. It builds the workspace with Turborepo, then applies pending migrations to the database of that environment, so a deployment never runs against an older schema.
+- **Build and migrate.** `apps/web/vercel.json` sets the build command: `cd ../.. && pnpm exec turbo run build --filter=web && pnpm --filter @notch/db migrate`. It builds the workspace with Turborepo, then applies pending migrations to the database of that environment, so a deployment never runs against an older schema. The same step loads the vaccine catalog (the build log shows `Vaccine catalog synced: …`); deployments are never seeded.
 - **Databases.** Production and Preview use different Neon branches. The preview branch holds only the fictional demo child, never a copy of production.
 - **Variables**, per Vercel environment (names only; values live in Vercel):
 
