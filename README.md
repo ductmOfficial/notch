@@ -207,7 +207,7 @@ The Vaccines screen shows the national expanded programme (Tiêm chủng mở r�
 
 ## Backup
 
-Settings downloads the family's records as `notch-backup-<date>.json` and restores such a file. The format (version 1, `packages/db/src/backup.ts`) keeps values as stored (grams, millimetres, product codes), so a backup restores exactly. A restore shows what the file holds, asks for confirmation, checks the whole file (schema, known vaccines, one row per dose), then replaces the family's children and records in one transaction: everything or nothing. The file holds health data; nothing is uploaded anywhere except on restore.
+Settings downloads the family's records as `notch-backup-<date>.json` and restores such a file. The format (version 2, `packages/db/src/backup.ts`) keeps values as stored (grams, millimetres, tenths of a degree, product codes), so a backup restores exactly. Version 2 adds the health log; files of version 1 still restore, with no health entries. A restore shows what the file holds, asks for confirmation, checks the whole file (schema, known vaccines, one row per dose), then replaces the family's children and records in one transaction: everything or nothing. The file holds health data; nothing is uploaded anywhere except on restore.
 
 ## PDF report
 

@@ -1,6 +1,6 @@
 # Progress
 
-> Last updated: 2026-11-12
+> Last updated: 2026-11-20
 >
 > Legend: ✅ done · 🔄 in progress · ⬜ not started
 
@@ -10,9 +10,9 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 
 | Phase | Scope                                                                       | Status |
 | ----- | --------------------------------------------------------------------------- | ------ |
-| P0    | Foundation: growth and vaccines engines, database, app skeleton             | 🔄     |
-| P1    | Today, Growth and Vaccinations screens, forms, `.ics` calendar, design, E2E | 🔄     |
-| P2    | Health log, post-vaccination follow-up, family sharing (PDF done in P1)     | ⬜     |
+| P0    | Foundation: growth and vaccines engines, database, app skeleton             | ✅     |
+| P1    | Today, Growth and Vaccinations screens, forms, `.ics` calendar, design, E2E | ✅     |
+| P2    | Health log, post-vaccination follow-up, family sharing (PDF done in P1)     | 🔄     |
 | P3    | PWA, demo mode, deployment                                                  | ⬜     |
 
 ## Steps
@@ -47,6 +47,7 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 | 26  | Backup and restore as a JSON file                                        | `feat/backup`          | ✅     |
 | 27  | PDF report of a child                                                    | `feat/pdf`             | ✅     |
 | 28  | National schedule (TCMR) by age on the Vaccines screen                   | `feat/tcmr`            | ✅     |
+| 29  | Health log data: tables, queries, backup version 2                       | `feat/health-log-db`   | ✅     |
 
 Each step is a pull request with green checks (`Browser` from step 9), merged with rebase.
 
@@ -108,6 +109,11 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 | PDF with react-pdf on the server                                  | Pure JavaScript, so it runs on Vercel without a headless browser; the charts are drawn again as PDF vector paths from the same chart model                                         |
 | Fonts in the repository, print colors fixed                       | The PDF must render the same everywhere and cover Vietnamese; the lotus colors read well on paper whatever the chosen palette                                                      |
 | TCMR shown as a reference per disease, not as a plan              | A service vaccine can cover a disease on another schedule; counting doses per disease and saying so avoids false alarms, and the app does not diagnose                             |
+| Health log data before its screens                                | The tables ship empty and unused, so the migration reaches production on its own; the screens follow in the next step                                                              |
+| Temperatures in tenths of a degree, as integers                   | Like grams and millimetres: no float rounding; 34.0 to 43.0 °C is checked by Zod and by the database                                                                               |
+| A temperature may belong to a health entry of the same child      | A fever's readings read together; the link is optional, and deleting the entry keeps the readings                                                                                  |
+| Backup version 2 keeps reading version 1                          | Files saved before the health log stay usable; a temperature points at its entry by position, since backups hold no ids                                                            |
+| Each migration tested over existing records                       | Production migrates on every deployment; the test applies the latest migration to a database with records and compares every row                                                   |
 | No Co-Authored-By trailer in commits                              | Maintainer's preference                                                                                                                                                            |
 
 ## Follow-ups
@@ -115,6 +121,7 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 - [ ] When recording a dose, update the suggested next dose number when the dose number changes
 - [ ] Licence of the bundled WHO tables: `anthro` code is GPL-3; the tables are WHO reference data. Confirm the attribution before a wider release
 - [ ] Growth chart on phones opens at the latest measurements; the y-axis labels need a swipe back
+- [ ] Health log screens: the restore summary should count health entries and temperatures, and warn that a version 1 file brings back no health log
 
 ## Issue log
 
@@ -128,3 +135,4 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 - **2026-11-13:** the first sign-in email from `onboarding@resend.dev` went to Gmail's Spam. Marked as not spam; a verified domain will help.
 - **2026-11-13:** Dependabot proposed `@material/material-color-utilities` 0.4.0, whose ESM imports Node rejects. The 0.4.x range is now ignored.
 - **2026-11-13:** on a preview, the sign-in link failed with `[query.token] Invalid input`: it pointed at the deployment's own address, Vercel's preview protection asked to sign in there again, and its redirect dropped the query string. Preview links now point at the branch URL, which people open and where the protection already let them in.
+- **2026-11-19:** production had no vaccine catalog: deployments only migrate, and the catalog was loaded by the seed alone, so restoring a backup failed on the first product (`bcg`). `migrate` now loads the catalog too, and a test checks it.

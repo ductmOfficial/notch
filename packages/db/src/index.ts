@@ -11,6 +11,23 @@ export {
   revokeCalendarToken,
 } from "./calendar-tokens.js";
 export { familyIdForUser } from "./families.js";
+export type { HealthEntry, HealthEntryInput, Temperature, TemperatureInput } from "./health.js";
+export {
+  addHealthEntry,
+  addTemperature,
+  deleteHealthEntry,
+  deleteTemperature,
+  getHealthEntry,
+  getTemperature,
+  healthEntryInputSchema,
+  listHealthEntries,
+  listTemperatures,
+  TEMPERATURE_RANGE,
+  temperatureInputSchema,
+  UnknownHealthEntryError,
+  updateHealthEntry,
+  updateTemperature,
+} from "./health.js";
 export type { AppointmentRow, Child, Measurement, Vaccination } from "./queries.js";
 export {
   getChild,

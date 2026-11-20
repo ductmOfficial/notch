@@ -4,6 +4,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { BackupFormatError, exportBackup, restoreBackup } from "./backup.js";
 import { syncCatalog } from "./catalog.js";
 import { createDb } from "./client.js";
+import { addHealthEntry, addTemperature, listHealthEntries, listTemperatures } from "./health.js";
 import { addChild, addMeasurement, recordDose, saveAppointment } from "./mutations.js";
 import { listChildren } from "./queries.js";
 import { family } from "./schema.js";
@@ -49,6 +50,31 @@ beforeAll(async () => {
     dueOn: null,
     note: "after 1",
   });
+  const fever = await addHealthEntry(db, {
+    childId: c.id,
+    kind: "illness",
+    title: "Fever",
+    startedOn: "2030-03-02",
+    endedOn: "2030-03-03",
+  });
+  await addHealthEntry(db, {
+    childId: c.id,
+    kind: "visit",
+    title: "Check-up",
+    startedOn: "2030-01-15",
+  });
+  await addTemperature(db, {
+    childId: c.id,
+    measuredAt: "2030-03-02T21:00:00+07:00",
+    tenthsC: 384,
+    healthEntryId: fever.id,
+    note: "after the dose",
+  });
+  await addTemperature(db, {
+    childId: c.id,
+    measuredAt: "2030-02-01T08:00:00+07:00",
+    tenthsC: 368,
+  });
   await addChild(db, {
     familyId: otherFamilyId,
     name: "Other",
@@ -66,7 +92,7 @@ describe("backup", () => {
     const backup = await exportBackup(db, familyId, new Date("2030-05-01T00:00:00Z"));
     expect(backup).toMatchObject({
       format: "notch-backup",
-      version: 1,
+      version: 2,
       exportedAt: "2030-05-01T00:00:00.000Z",
     });
     expect(backup.children.map((c) => c.name)).toEqual(["Test"]);
@@ -77,13 +103,38 @@ describe("backup", () => {
     });
     expect(backup.children[0]?.vaccinations[0]).toMatchObject({ lot: "A123", place: "Clinic" });
     expect(backup.children[0]?.appointments).toHaveLength(2);
+    // Entries oldest first; a temperature points at its entry by position, not by id.
+    expect(backup.children[0]?.healthEntries.map((e) => e.title)).toEqual(["Check-up", "Fever"]);
+    expect(backup.children[0]?.temperatures).toEqual([
+      { measuredAt: "2030-02-01T01:00:00.000Z", tenthsC: 368, healthEntry: null, note: null },
+      {
+        measuredAt: "2030-03-02T14:00:00.000Z",
+        tenthsC: 384,
+        healthEntry: 1,
+        note: "after the dose",
+      },
+    ]);
   });
 
   it("restores a backup exactly, replacing the family's data and nothing else", async () => {
     const before = await exportBackup(db, familyId, new Date(0));
     const result = await restoreBackup(db, familyId, JSON.parse(JSON.stringify(before)));
-    expect(result).toEqual({ children: 1, measurements: 1, vaccinations: 1, appointments: 2 });
+    expect(result).toEqual({
+      children: 1,
+      measurements: 1,
+      vaccinations: 1,
+      appointments: 2,
+      healthEntries: 2,
+      temperatures: 2,
+    });
     expect(await exportBackup(db, familyId, new Date(0))).toEqual(before);
+    // The reading still belongs to the restored fever, under its new id.
+    const [restored] = await listChildren(db, familyId);
+    const entries = await listHealthEntries(db, restored?.id ?? "");
+    const fever = entries.find((e) => e.title === "Fever");
+    expect(fever).toBeDefined();
+    const readings = await listTemperatures(db, restored?.id ?? "", fever?.id);
+    expect(readings.map((t) => t.tenthsC)).toEqual([384]);
     expect((await listChildren(db, otherFamilyId)).map((c) => c.name)).toEqual(["Other"]);
   });
 
@@ -100,7 +151,7 @@ describe("backup", () => {
     const bad = [
       null,
       { format: "something", version: 1, exportedAt: saved.exportedAt, children: [] },
-      { ...saved, version: 2 },
+      { ...saved, version: 3 },
       { ...saved, children: [{ ...saved.children[0], sex: "other" }] },
     ];
     for (const input of bad) {
@@ -116,6 +167,39 @@ describe("backup", () => {
     const c = duplicate.children[0];
     if (c?.vaccinations[0]) c.vaccinations.push({ ...c.vaccinations[0] });
     await expect(restoreBackup(db, familyId, duplicate)).rejects.toBeInstanceOf(BackupFormatError);
+    const dangling = structuredClone(saved);
+    const reading = dangling.children[0]?.temperatures[0];
+    if (reading) reading.healthEntry = 9;
+    await expect(restoreBackup(db, familyId, dangling)).rejects.toBeInstanceOf(BackupFormatError);
+    const hot = structuredClone(saved);
+    const t = hot.children[0]?.temperatures[0];
+    if (t) t.tenthsC = 500;
+    await expect(restoreBackup(db, familyId, hot)).rejects.toBeInstanceOf(BackupFormatError);
+    expect(await exportBackup(db, familyId, new Date(0))).toEqual(saved);
+  });
+
+  it("still restores a version 1 file, written before the health log", async () => {
+    const saved = await exportBackup(db, familyId, new Date(0));
+    const v1 = {
+      ...saved,
+      version: 1,
+      children: saved.children.map(({ healthEntries, temperatures, ...c }) => {
+        expect(healthEntries.length + temperatures.length).toBeGreaterThan(0);
+        return c;
+      }),
+    };
+    const result = await restoreBackup(db, familyId, JSON.parse(JSON.stringify(v1)));
+    expect(result).toMatchObject({
+      children: 1,
+      measurements: 1,
+      healthEntries: 0,
+      temperatures: 0,
+    });
+    const after = await exportBackup(db, familyId, new Date(0));
+    expect(after.version).toBe(2);
+    expect(after.children[0]).toEqual({ ...v1.children[0], healthEntries: [], temperatures: [] });
+    // A version 1 file replaces everything, so it holds no health log to bring back.
+    await restoreBackup(db, familyId, saved);
     expect(await exportBackup(db, familyId, new Date(0))).toEqual(saved);
   });
 });
