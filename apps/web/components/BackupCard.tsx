@@ -6,6 +6,7 @@ import { useId, useRef, useState, useTransition } from "react";
 import { restoreBackupAction, type RestoreState } from "../app/settings/actions";
 import { formatDate, todayInVietnam } from "../lib/format";
 import { useI18n } from "../lib/i18n/client";
+import { useHydrated } from "../lib/use-hydrated";
 import { BUTTON } from "./button-styles";
 import { ConfirmButton } from "./ConfirmButton";
 import { Icon } from "./icons";
@@ -45,6 +46,8 @@ export function BackupCard() {
   const [file, setFile] = useState<{ file: File; summary: Summary } | null>(null);
   const [result, setResult] = useState<RestoreState | null>(null);
   const [pending, startTransition] = useTransition();
+  // A file picked before hydration would be ignored: the change handler is not attached yet.
+  const hydrated = useHydrated();
 
   const choose = async (chosen: File | undefined) => {
     setResult(null);
@@ -94,6 +97,7 @@ export function BackupCard() {
             type="file"
             accept="application/json,.json"
             className="sr-only"
+            disabled={!hydrated}
             onChange={(e) => void choose(e.target.files?.[0])}
           />
         </label>

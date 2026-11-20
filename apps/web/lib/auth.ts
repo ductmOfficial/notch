@@ -16,6 +16,9 @@ import { siteUrls } from "./site-url";
 /** Sign-in links last ten minutes and work once. */
 export const LINK_MINUTES = 10;
 
+/** How long the signed session cookie stands in for the session query. */
+export const SESSION_CACHE_SECONDS = 5 * 60;
+
 function createAuth(db: NonNullable<ReturnType<typeof getDb>>) {
   return betterAuth({
     appName: "Notch",
@@ -34,7 +37,14 @@ function createAuth(db: NonNullable<ReturnType<typeof getDb>>) {
     // On in production (Better Auth's default); kept in the database so the limit holds
     // across serverless instances. The magic-link plugin allows 5 requests a minute.
     rateLimit: { storage: "database" },
-    session: { expiresIn: 60 * 60 * 24 * 30, updateAge: 60 * 60 * 24 },
+    session: {
+      expiresIn: 60 * 60 * 24 * 30,
+      updateAge: 60 * 60 * 24,
+      // A signed cookie holds the session for five minutes, so most requests skip the
+      // session query. The allowlist is still checked on every request (lib/session.ts);
+      // a session revoked in the database ends within these five minutes.
+      cookieCache: { enabled: true, maxAge: SESSION_CACHE_SECONDS },
+    },
     telemetry: { enabled: false },
     databaseHooks: {
       user: {

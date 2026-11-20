@@ -249,6 +249,7 @@ test("a backup downloads and restores the same records", async ({ page }) => {
 
   await page.goto("/settings");
   const fileInput = page.getByLabel("Khôi phục từ file…");
+  await expect(fileInput).toBeEnabled();
 
   // Not a backup: refused before anything is sent.
   await fileInput.setInputFiles({

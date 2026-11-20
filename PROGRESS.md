@@ -17,37 +17,38 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 
 ## Steps
 
-| #   | Step                                                                     | Branch                 | Status |
-| --- | ------------------------------------------------------------------------ | ---------------------- | ------ |
-| 1   | Repository from the `ductran-starter` template                           | `main`                 | ✅     |
-| 2   | Rename to `notch`, drop the sample package, PostgreSQL on port 5433      | `chore/setup`          | ✅     |
-| 3   | `@notch/growth`: WHO LMS z-scores and percentiles, generated data        | `feat/growth`          | ✅     |
-| 4   | `@notch/vaccines`: catalog, appointments, schedule engine                | `feat/vaccines`        | ✅     |
-| 5   | `@notch/db`: schema, migrations, queries, mutations, seed, demo data     | `feat/db`              | ✅     |
-| 6   | Today, Growth and Vaccinations screens                                   | `feat/web`             | ✅     |
-| 7   | Forms for measurements, doses and appointments; `.ics` download          | `feat/forms`           | ✅     |
-| 8   | Material Design 3 with a lotus palette, on Sen UI                        | `feat/theme`           | ✅     |
-| 9   | Playwright and axe tests, `Browser` job in CI                            | `test/e2e`             | ✅     |
-| 10  | README and this progress log                                             | `docs/readme`          | ✅     |
-| 11  | Settings page with a light, dark or system theme                         | `feat/theme-setting`   | ✅     |
-| 12  | Vietnamese and English, chosen in Settings                               | `feat/i18n`            | ✅     |
-| 13  | Lotus watermark behind the content                                       | `feat/lotus-backdrop`  | ✅     |
-| 14  | Add button flat in the navigation rail                                   | `fix/rail-fab-flat`    | ✅     |
-| 15  | Lotus mark next to the name, on empty states, as the favicon             | `feat/lotus-mark`      | ✅     |
-| 16  | Lotus drawings on the summary cards                                      | `feat/card-lotus`      | ✅     |
-| 17  | Daylily (huyên thảo) palette and drawings, chosen in Settings            | `feat/daylily-palette` | ✅     |
-| 18  | Cloud (mây) palette and drawings                                         | `feat/cloud-palette`   | ✅     |
-| 19  | Quiet chips for given doses; status colors harmonized                    | `feat/quiet-done`      | ✅     |
-| 20  | Reload settings only once the choice is saved (test)                     | `test/settings-cookie` | ✅     |
-| 21  | Sign-in by email link with an allowlist; data limited to the family      | `feat/auth`            | ✅     |
-| 22  | Welcome page for the first child                                         | `feat/onboarding`      | ✅     |
-| 23  | Ready for Vercel and Neon: build with migrations, sign-in URLs on Vercel | `chore/vercel`         | ✅     |
-| 24  | Calendar subscription link with a secret token                           | `feat/calendar-feed`   | ✅     |
-| 25  | Build log and dependency housekeeping after the first deployment         | `chore/build-hygiene`  | ✅     |
-| 26  | Backup and restore as a JSON file                                        | `feat/backup`          | ✅     |
-| 27  | PDF report of a child                                                    | `feat/pdf`             | ✅     |
-| 28  | National schedule (TCMR) by age on the Vaccines screen                   | `feat/tcmr`            | ✅     |
-| 29  | Health log data: tables, queries, backup version 2                       | `feat/health-log-db`   | ✅     |
+| #   | Step                                                                     | Branch                   | Status |
+| --- | ------------------------------------------------------------------------ | ------------------------ | ------ |
+| 1   | Repository from the `ductran-starter` template                           | `main`                   | ✅     |
+| 2   | Rename to `notch`, drop the sample package, PostgreSQL on port 5433      | `chore/setup`            | ✅     |
+| 3   | `@notch/growth`: WHO LMS z-scores and percentiles, generated data        | `feat/growth`            | ✅     |
+| 4   | `@notch/vaccines`: catalog, appointments, schedule engine                | `feat/vaccines`          | ✅     |
+| 5   | `@notch/db`: schema, migrations, queries, mutations, seed, demo data     | `feat/db`                | ✅     |
+| 6   | Today, Growth and Vaccinations screens                                   | `feat/web`               | ✅     |
+| 7   | Forms for measurements, doses and appointments; `.ics` download          | `feat/forms`             | ✅     |
+| 8   | Material Design 3 with a lotus palette, on Sen UI                        | `feat/theme`             | ✅     |
+| 9   | Playwright and axe tests, `Browser` job in CI                            | `test/e2e`               | ✅     |
+| 10  | README and this progress log                                             | `docs/readme`            | ✅     |
+| 11  | Settings page with a light, dark or system theme                         | `feat/theme-setting`     | ✅     |
+| 12  | Vietnamese and English, chosen in Settings                               | `feat/i18n`              | ✅     |
+| 13  | Lotus watermark behind the content                                       | `feat/lotus-backdrop`    | ✅     |
+| 14  | Add button flat in the navigation rail                                   | `fix/rail-fab-flat`      | ✅     |
+| 15  | Lotus mark next to the name, on empty states, as the favicon             | `feat/lotus-mark`        | ✅     |
+| 16  | Lotus drawings on the summary cards                                      | `feat/card-lotus`        | ✅     |
+| 17  | Daylily (huyên thảo) palette and drawings, chosen in Settings            | `feat/daylily-palette`   | ✅     |
+| 18  | Cloud (mây) palette and drawings                                         | `feat/cloud-palette`     | ✅     |
+| 19  | Quiet chips for given doses; status colors harmonized                    | `feat/quiet-done`        | ✅     |
+| 20  | Reload settings only once the choice is saved (test)                     | `test/settings-cookie`   | ✅     |
+| 21  | Sign-in by email link with an allowlist; data limited to the family      | `feat/auth`              | ✅     |
+| 22  | Welcome page for the first child                                         | `feat/onboarding`        | ✅     |
+| 23  | Ready for Vercel and Neon: build with migrations, sign-in URLs on Vercel | `chore/vercel`           | ✅     |
+| 24  | Calendar subscription link with a secret token                           | `feat/calendar-feed`     | ✅     |
+| 25  | Build log and dependency housekeeping after the first deployment         | `chore/build-hygiene`    | ✅     |
+| 26  | Backup and restore as a JSON file                                        | `feat/backup`            | ✅     |
+| 27  | PDF report of a child                                                    | `feat/pdf`               | ✅     |
+| 28  | National schedule (TCMR) by age on the Vaccines screen                   | `feat/tcmr`              | ✅     |
+| 29  | Health log data: tables, queries, backup version 2                       | `feat/health-log-db`     | ✅     |
+| 30  | Faster navigation: loading state, session cookie cache, one family query | `perf/faster-navigation` | ✅     |
 
 Each step is a pull request with green checks (`Browser` from step 9), merged with rebase.
 
@@ -114,6 +115,10 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 | A temperature may belong to a health entry of the same child      | A fever's readings read together; the link is optional, and deleting the entry keeps the readings                                                                                  |
 | Backup version 2 keeps reading version 1                          | Files saved before the health log stay usable; a temperature points at its entry by position, since backups hold no ids                                                            |
 | Each migration tested over existing records                       | Production migrates on every deployment; the test applies the latest migration to a database with records and compares every row                                                   |
+| Functions in Singapore (`sin1`), next to the database             | Every query crossed from the default US region to Neon in Singapore, about a quarter of a second each, several in a row per page                                                   |
+| A loading state at the root                                       | Navigation answers at once with a placeholder, and Next.js can prefetch the layout down to it                                                                                      |
+| Session cookie cache for five minutes                             | Most requests skip the session query; the allowlist is still checked on every request, and a revoked session ends within five minutes                                              |
+| Family and children in one query                                  | Every page needs both; one round trip instead of two                                                                                                                               |
 | No Co-Authored-By trailer in commits                              | Maintainer's preference                                                                                                                                                            |
 
 ## Follow-ups
@@ -136,3 +141,5 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 - **2026-11-13:** Dependabot proposed `@material/material-color-utilities` 0.4.0, whose ESM imports Node rejects. The 0.4.x range is now ignored.
 - **2026-11-13:** on a preview, the sign-in link failed with `[query.token] Invalid input`: it pointed at the deployment's own address, Vercel's preview protection asked to sign in there again, and its redirect dropped the query string. Preview links now point at the branch URL, which people open and where the protection already let them in.
 - **2026-11-19:** production had no vaccine catalog: deployments only migrate, and the catalog was loaded by the seed alone, so restoring a backup failed on the first product (`bcg`). `migrate` now loads the catalog too, and a test checks it.
+- **2026-11-20:** moving between pages took one to three seconds. The functions ran in the default US region while the database is in Singapore, and each page made several queries in a row. Fixed by running the functions in `sin1`, adding a loading state, caching the session in a signed cookie and reading the family with its children in one query.
+- **2026-11-20:** with the loading state, a backup picked right after the Settings page opened was ignored: the page streams, and the file input was there before its change handler. The input now stays disabled until the component has hydrated.
