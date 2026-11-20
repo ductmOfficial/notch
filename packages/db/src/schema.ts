@@ -255,3 +255,53 @@ export const calendarToken = pgTable("calendar_token", {
   createdAt: createdAt(),
   lastUsedAt: timestamp({ withTimezone: true }),
 });
+
+// ── Health log ───────────────────────────────────────────────────────────
+
+/** An illness, a course of medicine or a doctor's visit. Notch records; it does not diagnose or dose. */
+export const healthEntry = pgTable(
+  "health_entry",
+  {
+    id: id(),
+    childId: uuid()
+      .notNull()
+      .references(() => child.id, { onDelete: "cascade" }),
+    kind: text({ enum: ["illness", "medication", "visit"] }).notNull(),
+    /** What it was, in the parents' words ("Fever", "Paracetamol", "ENT check-up"). */
+    title: text().notNull(),
+    startedOn: date({ mode: "string" }).notNull(),
+    /** Null while it is ongoing, or for a single-day event such as a visit. */
+    endedOn: date({ mode: "string" }),
+    note: text(),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    index("health_entry_child_started_idx").on(t.childId, t.startedOn),
+    check("health_entry_kind_check", sql`${t.kind} in ('illness', 'medication', 'visit')`),
+    check("health_entry_dates_check", sql`${t.endedOn} >= ${t.startedOn}`),
+  ],
+);
+
+/**
+ * A temperature reading in tenths of a degree Celsius (385 = 38.5 °C), stored as an integer
+ * like the measurements. It can belong to a health entry, such as the illness it was taken in.
+ */
+export const temperature = pgTable(
+  "temperature",
+  {
+    id: id(),
+    childId: uuid()
+      .notNull()
+      .references(() => child.id, { onDelete: "cascade" }),
+    measuredAt: timestamp({ withTimezone: true }).notNull(),
+    tenthsC: integer().notNull(),
+    healthEntryId: uuid().references(() => healthEntry.id, { onDelete: "set null" }),
+    note: text(),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    index("temperature_child_measured_idx").on(t.childId, t.measuredAt),
+    index("temperature_health_entry_idx").on(t.healthEntryId),
+    check("temperature_range_check", sql`${t.tenthsC} between 340 and 430`),
+  ],
+);

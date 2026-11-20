@@ -10,11 +10,22 @@ PostgreSQL schema, migrations and queries with [Drizzle](https://orm.drizzle.tea
 
 ## Tables
 
-`family` → `child` → `measurement`, `vaccination`, `appointment`; and the vaccine catalog: `disease`, `vaccine_product`, `product_disease`.
+`family` → `child` → `measurement`, `vaccination`, `appointment`, `health_entry`, `temperature`; and the vaccine catalog: `disease`, `vaccine_product`, `product_disease`.
 
 - Measurements are integers (grams, millimetres), with an `estimated` flag for values written as approximate.
 - Doses are recorded per product (`vaccination`, unique per child, product and dose number); `product_disease` maps them to diseases.
 - `appointment.due_on` is nullable for bookings like "after the first birthday".
+- `health_entry` is the health log: an illness, a course of medicine or a doctor's visit (`kind`), with a title, a start date and an optional end date. It records what happened; it holds no diagnosis and no dose calculation.
+- `temperature` is in tenths of a degree Celsius (`tenths_c`, 385 = 38.5 °C, from 34.0 to 43.0), with the time it was taken. It can belong to a health entry of the same child; deleting the entry keeps the reading.
+
+## Changing the schema
+
+Every deployment migrates its database before going live, and production holds a family's real records. A migration therefore only adds: new tables, or new columns that are nullable or have a default. Renaming or dropping a column takes two releases (stop using it, then remove it).
+
+1. Edit `src/schema.ts`, then `pnpm --filter @notch/db generate --name <what>`.
+2. Read the generated SQL: it should only create tables, columns, indexes and constraints.
+3. `pnpm --filter @notch/db test`. `src/migrate.test.ts` applies every migration but the latest to a fresh database, writes the demo child, a signed-in parent and a calendar link, then applies the latest migration and checks that every existing row is unchanged.
+4. If the change adds records, add them to the backup format in `src/backup.ts` with a new version, and keep restoring the older versions.
 
 ## Scripts
 
