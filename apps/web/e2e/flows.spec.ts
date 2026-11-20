@@ -14,6 +14,9 @@ test("today shows the child, the next appointment and the latest measurements", 
   await expect(page.getByText("Cúm", { exact: true })).toBeVisible();
   await expect(page.getByText("Vaxigrip · mũi 3")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Cân nặng" })).toBeVisible();
+  // Each measurement comes with its WHO reading and the normal range at the child's age.
+  await expect(page.getByText(/^Bình thường ở .+ tuổi .+: .+ kg$/)).toBeVisible();
+  await expect(page.getByText(/^Bình thường ở .+ tuổi .+: .+ cm$/)).toBeVisible();
 });
 
 test("quick add leads to the measurement form", async ({ page }) => {

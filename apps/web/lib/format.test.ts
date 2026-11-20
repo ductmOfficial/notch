@@ -7,7 +7,6 @@ import {
   formatNumber,
   formatZ,
   todayInVietnam,
-  zBand,
 } from "./format";
 
 describe("formatAge", () => {
@@ -39,16 +38,6 @@ describe("formatting", () => {
     expect(formatZ(0.7)).toBe("+0,70");
     expect(formatZ(-1.234)).toBe("−1,23");
   });
-
-  it.each([
-    [-3.5, "dưới −3 SD"],
-    [-2.5, "từ −3 đến −2 SD"],
-    [0, "trong khoảng ±2 SD"],
-    [2.5, "từ +2 đến +3 SD"],
-    [3.5, "trên +3 SD"],
-  ])("z = %f is %s", (z, band) => {
-    expect(zBand(z)).toBe(band);
-  });
 });
 
 describe("English", () => {
@@ -60,7 +49,6 @@ describe("English", () => {
     expect(formatDate("2030-11-09", "en")).toBe("9 Nov 2030");
     expect(formatNumber(1234.5, 1, "en")).toBe("1,234.5");
     expect(formatZ(-1.234, "en")).toBe("−1.23");
-    expect(zBand(0, "en")).toBe("within ±2 SD");
   });
 });
 

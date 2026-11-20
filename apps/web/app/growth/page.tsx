@@ -5,20 +5,15 @@ import Link from "next/link";
 import { BUTTON } from "../../components/button-styles";
 import { CardMotif, type CardMotifProps } from "../../components/Motifs";
 import { GrowthChart } from "../../components/GrowthChart";
+import { GrowthReadingView } from "../../components/GrowthReading";
 import { Icon } from "../../components/icons";
 import { NoChild, NoDatabase } from "../../components/ui";
 import { getCurrentChild } from "../../lib/child";
 import { getDb } from "../../lib/db";
 import type { Locale, Translate } from "../../lib/i18n/messages";
 import { getI18n } from "../../lib/i18n/server";
-import {
-  formatAge,
-  formatDate,
-  formatNumber,
-  formatZ,
-  todayInVietnam,
-  zBand,
-} from "../../lib/format";
+import { formatAge, formatDate, formatNumber, formatZ, todayInVietnam } from "../../lib/format";
+import { readGrowth } from "../../lib/growth-assessment";
 import {
   buildChart,
   type ChartIndicator,
@@ -28,10 +23,11 @@ import {
   type MeasurementInput,
 } from "../../lib/growth-chart";
 
-const GROWTH_MOTIFS: Record<"weight" | "length" | "bmi", CardMotifProps> = {
+const GROWTH_MOTIFS: Record<"weight" | "length" | "bmi" | "head", CardMotifProps> = {
   weight: { kind: "bloom", place: "bottomRight", tilt: -8 },
   length: { kind: "bud", place: "right", tilt: 22 },
   bmi: { kind: "petals", place: "topRight" },
+  head: { kind: "leaf", place: "bottomRight", tilt: 12 },
 };
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -191,15 +187,18 @@ function Summary({
   t: Translate;
   locale: Locale;
 }) {
-  const cards = (["weight", "length", "bmi"] as const).flatMap((indicator) => {
-    const latest = chartPoints(indicator, sex, birthDate, measurements).at(-1);
-    return latest ? [{ indicator, latest }] : [];
+  const cards = (["weight", "length", "bmi", "head"] as const).flatMap((indicator) => {
+    const points = chartPoints(indicator, sex, birthDate, measurements);
+    const latest = points.at(-1);
+    return latest
+      ? [{ indicator, latest, reading: readGrowth(indicator, sex, birthDate, points, locale) }]
+      : [];
   });
   if (cards.length === 0) return null;
 
   return (
-    <dl className="grid gap-3 sm:grid-cols-3">
-      {cards.map(({ indicator, latest }) => {
+    <dl className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      {cards.map(({ indicator, latest, reading }) => {
         const info = INDICATORS[indicator];
         return (
           <div
@@ -215,14 +214,16 @@ function Summary({
               </span>{" "}
               <span className="body-medium text-on-surface-variant">{info.unit}</span>
             </dd>
+            {reading && (
+              <dd className="mt-2">
+                <GrowthReadingView reading={reading} />
+              </dd>
+            )}
             {latest.z !== undefined && latest.percentile !== undefined && (
-              <dd className="body-medium mt-1">
+              <dd className="body-small mt-1 text-on-surface-variant">
                 {t("growth.percentile")}{" "}
-                <strong className="tabular-nums">{Math.round(latest.percentile)}</strong> · z{" "}
+                <span className="tabular-nums">{Math.round(latest.percentile)}</span> · z{" "}
                 <span className="tabular-nums">{formatZ(latest.z, locale)}</span>
-                <span className="body-small block text-on-surface-variant">
-                  {zBand(latest.z, locale)}
-                </span>
               </dd>
             )}
             <dd className="body-small mt-1 text-on-surface-variant">

@@ -104,16 +104,6 @@ export function formatZ(z: number, locale: Locale = "vi"): string {
   return `${z >= 0 ? "+" : "−"}${formatNumber(Math.abs(z), 2, locale)}`;
 }
 
-/** Plain-language band for a z-score; descriptive only, not a diagnosis. */
-export function zBand(z: number, locale: Locale = "vi"): string {
-  const t = translator(locale);
-  if (z < -3) return t("z.below3");
-  if (z < -2) return t("z.from3to2");
-  if (z <= 2) return t("z.within2");
-  if (z <= 3) return t("z.from2to3");
-  return t("z.above3");
-}
-
 /** Today's date (YYYY-MM-DD) in Vietnam, independent of the server's time zone. */
 export function todayInVietnam(now: Date = new Date()): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Ho_Chi_Minh" }).format(now);

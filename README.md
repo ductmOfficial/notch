@@ -20,7 +20,7 @@
 | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
 | App           | Next.js 16 (App Router, Server Components, Server Actions), React 19                                                                         |
 | Design system | Material Design 3 with lotus, daylily and cloud palettes, on [Sen UI](https://github.com/ductmOfficial/sen-ui) components and Tailwind CSS 4 |
-| Domain        | `@notch/growth` (WHO z-scores and percentiles), `@notch/vaccines` (catalog, appointments)                                                    |
+| Domain        | `@notch/growth` (WHO z-scores, percentiles and their reading), `@notch/vaccines` (catalog, appointments)                                     |
 | Data          | PostgreSQL or PGlite with Drizzle, Zod validation                                                                                            |
 | Testing       | Vitest; Playwright with axe (WCAG 2.2 AA, light and dark, desktop and mobile)                                                                |
 | CI            | GitHub Actions (`Verify`, `Browser`), protected `main`, Conventional Commits, Dependabot                                                     |
@@ -201,6 +201,17 @@ pnpm --filter web e2e
 - **Subscription** (Settings): a link `/calendar/<token>.ics` that calendar apps poll, so appointments stay current. It covers every child of the family. The 256-bit token is the credential: calendar apps have no session, so the proxy lets this path through and the route checks the token. Only its SHA-256 hash is stored, so the link is shown once; creating a new one revokes the old one, and it can be revoked outright. Settings shows when the link was made and last read.
 - **Privacy.** Events only say "Vaccine appointment", with reminders a week and a day before. No child's name or vaccine, since calendars sync to other services and show on lock screens.
 
+## Growth reading
+
+Every latest measurement, on Today, on Growth and in the PDF, comes with what it means rather than a bare z-score:
+
+- **WHO's name for it**: normal, stunted, underweight, wasted, possible risk of overweight, overweight, obese, very tall, or a head circumference outside ±2 SD, from WHO's _Interpreting growth indicators_. Green when normal, amber to keep an eye on, red where WHO names a problem.
+- **The normal range at the child's age**, in kg or cm ("Normal at 1 year 6 months: 8.1–11.6 kg"), at the age of the measurement, computed from the WHO tables for that day of age.
+- **The change since the previous measurement**, when the z-score moved by a whole SD or more (crossing a line of the chart). A fall asks for a doctor even within the normal range; a rise matters for weight, BMI and head circumference. Approximate values are not compared.
+- **Advice that never diagnoses**: keep measuring, watch the next measurements, or take the chart (Export PDF) to a paediatrician.
+
+The rules live in `packages/growth/src/assessment.ts` and the wording in `apps/web/lib/growth-assessment.ts`. Percentile and z-score stay in small print.
+
 ## Vaccination schedule (TCMR)
 
 The Vaccines screen shows the national expanded programme (Tiêm chủng mở rộng) by age, from Article 1 of **Thông tư 52/2025/TT-BYT** (Ministry of Health, 31 December 2025, in force from 15 February 2026; it replaces Thông tư 10/2024/TT-BYT). Only child doses are included, on the on-time schedule; catch-up rules for late doses are not modelled. Each dose is marked recorded when the child has at least that many doses for the disease from any product, so a service vaccine counts too. This is a reference next to the clinic's own appointments, not a medical assessment. The data lives in `packages/vaccines/src/tcmr.ts`, and a test checks every disease's ages against the circular.
@@ -213,7 +224,7 @@ Settings downloads the family's records as `notch-backup-<date>.json` and restor
 
 ## PDF report
 
-Today has an **Export PDF** button: an A4 record of the selected child for a doctor's visit or to print. Page one holds the profile, the latest weight, length, head circumference and BMI with percentile and z-score, and the WHO weight-for-age and length-for-age charts; the next pages list doses by disease, every dose given (date, vaccine, dose, maker and country, place, lot) and the appointments. Every page carries a short disclaimer. It is rendered on the server with [react-pdf](https://react-pdf.org) in the page's language, with Roboto (SIL OFL 1.1, `apps/web/assets/fonts/`) for Vietnamese. The file name is generic (`notch-report-<date>.pdf`).
+Today has an **Export PDF** button: an A4 record of the selected child for a doctor's visit or to print. Page one holds the profile, the latest weight, length, head circumference and BMI with their WHO reading, normal range, percentile and z-score, and the WHO weight-for-age and length-for-age charts; the next pages list doses by disease, every dose given (date, vaccine, dose, maker and country, place, lot) and the appointments. Every page carries a short disclaimer. It is rendered on the server with [react-pdf](https://react-pdf.org) in the page's language, with Roboto (SIL OFL 1.1, `apps/web/assets/fonts/`) for Vietnamese. The file name is generic (`notch-report-<date>.pdf`).
 
 ## Deployment
 

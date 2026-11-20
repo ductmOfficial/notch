@@ -16,7 +16,8 @@ import {
   View,
 } from "@react-pdf/renderer";
 
-import { formatAge, formatDate, formatNumber, formatZ, todayInVietnam, zBand } from "./format";
+import { formatAge, formatDate, formatNumber, formatZ, todayInVietnam } from "./format";
+import { readGrowth } from "./growth-assessment";
 import {
   buildChart,
   type ChartIndicator,
@@ -44,6 +45,8 @@ const MUTED = "#524346";
 const LINE = "#d6c2c5";
 const PRIMARY = "#99405e";
 const CURVE = { median: "#3d692f", sd2: "#795900", sd3: "#9c8d90", grid: "#ece0e2" };
+/** Reading labels: green for normal, amber to watch, red to see a doctor. */
+const LEVEL_COLOR = { normal: "#3d692f", watch: "#795900", doctor: "#ba1a1a" } as const;
 
 const styles = StyleSheet.create({
   page: { fontFamily: "Roboto", fontSize: 10, color: INK, padding: 36, paddingBottom: 56 },
@@ -219,8 +222,17 @@ function Report({
   const latest = (
     ["weight", "length", "head", "bmi"] as const satisfies readonly ChartIndicator[]
   ).flatMap((indicator) => {
-    const point = chartPoints(indicator, child.sex, child.birthDate, measurements).at(-1);
-    return point ? [{ indicator, point }] : [];
+    const points = chartPoints(indicator, child.sex, child.birthDate, measurements);
+    const point = points.at(-1);
+    return point
+      ? [
+          {
+            indicator,
+            point,
+            reading: readGrowth(indicator, child.sex, child.birthDate, points, locale),
+          },
+        ]
+      : [];
   });
   const charts = (["weight", "length"] as const).map((indicator) =>
     buildChart(indicator, child.sex, child.birthDate, measurements),
@@ -256,7 +268,7 @@ function Report({
           <Text style={styles.muted}>{t("today.noMeasurements")}</Text>
         ) : (
           <View style={styles.row}>
-            {latest.map(({ indicator, point }) => {
+            {latest.map(({ indicator, point, reading }) => {
               const info = INDICATORS[indicator];
               return (
                 <View key={indicator} style={styles.card}>
@@ -265,14 +277,23 @@ function Report({
                     {point.estimated ? "≈" : ""}
                     {formatNumber(point.value, info.digits, locale)} {info.unit}
                   </Text>
+                  {reading && (
+                    <>
+                      <Text style={{ fontWeight: 700, color: LEVEL_COLOR[reading.statusLevel] }}>
+                        {reading.label}
+                      </Text>
+                      {reading.range && (
+                        <Text style={[styles.muted, { fontSize: 8 }]}>{reading.range}</Text>
+                      )}
+                      {reading.change && <Text style={{ fontSize: 8 }}>{reading.change}</Text>}
+                      <Text style={{ fontSize: 8, marginTop: 2 }}>{reading.advice}</Text>
+                    </>
+                  )}
                   {point.z !== undefined && point.percentile !== undefined && (
-                    <Text>
+                    <Text style={[styles.muted, { fontSize: 8, marginTop: 2 }]}>
                       {t("growth.percentile")} {String(Math.round(point.percentile))} · z{" "}
                       {formatZ(point.z, locale)}
                     </Text>
-                  )}
-                  {point.z !== undefined && (
-                    <Text style={styles.muted}>{zBand(point.z, locale)}</Text>
                   )}
                   <Text style={[styles.muted, { fontSize: 8, marginTop: 2 }]}>
                     {t("growth.measuredOn", { date: date(point.date) })}
