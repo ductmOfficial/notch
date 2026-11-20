@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { AppointmentBadge } from "../components/AppointmentBadge";
+import { GrowthReadingView } from "../components/GrowthReading";
 import { BUTTON } from "../components/button-styles";
 import { type CardMotifProps, MotifMark } from "../components/Motifs";
 import { Icon } from "../components/icons";
@@ -10,7 +11,8 @@ import { Card, NoChild, NoDatabase } from "../components/ui";
 import { getCurrentChild } from "../lib/child";
 import { getDb } from "../lib/db";
 import { getI18n } from "../lib/i18n/server";
-import { formatAge, formatDate, formatNumber, formatZ, todayInVietnam, zBand } from "../lib/format";
+import { formatAge, formatDate, formatNumber, formatZ, todayInVietnam } from "../lib/format";
+import { readGrowth } from "../lib/growth-assessment";
 import { chartPoints, INDICATORS } from "../lib/growth-chart";
 import { buildVaccinationView, dueLabel, productDiseases, productName } from "../lib/vaccines-view";
 
@@ -48,8 +50,17 @@ export default async function TodayPage({ searchParams }: Props) {
   const later = view.open.filter((a) => a !== next).slice(0, 3);
   const overdue = view.open.filter((a) => a.status === "overdue").length;
   const latest = (["weight", "length"] as const).flatMap((indicator) => {
-    const point = chartPoints(indicator, child.sex, child.birthDate, measurements).at(-1);
-    return point ? [{ indicator, point }] : [];
+    const points = chartPoints(indicator, child.sex, child.birthDate, measurements);
+    const point = points.at(-1);
+    return point
+      ? [
+          {
+            indicator,
+            point,
+            reading: readGrowth(indicator, child.sex, child.birthDate, points, locale),
+          },
+        ]
+      : [];
   });
   const lastDate = measurements.at(-1)?.measuredOn;
 
@@ -129,7 +140,7 @@ export default async function TodayPage({ searchParams }: Props) {
           </Link>
         </Card>
 
-        {latest.map(({ indicator, point }) => {
+        {latest.map(({ indicator, point, reading }) => {
           const info = INDICATORS[indicator];
           return (
             <Card
@@ -147,10 +158,10 @@ export default async function TodayPage({ searchParams }: Props) {
                 {formatNumber(point.value, info.digits, locale)}
                 <span className="title-medium text-on-surface-variant"> {info.unit}</span>
               </p>
+              {reading && <GrowthReadingView reading={reading} />}
               {point.z !== undefined && point.percentile !== undefined && (
-                <p className="body-medium text-on-surface-variant">
-                  P{Math.round(point.percentile)} · z {formatZ(point.z, locale)} ·{" "}
-                  {zBand(point.z, locale)}
+                <p className="body-small tabular-nums text-on-surface-variant">
+                  P{Math.round(point.percentile)} · z {formatZ(point.z, locale)}
                 </p>
               )}
             </Card>

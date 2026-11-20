@@ -51,6 +51,7 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 | 30  | Faster navigation: loading state, session cookie cache, one family query | `perf/faster-navigation`    | ✅     |
 | 31  | Maker and country of each vaccine, on the Vaccines screen and in the PDF | `feat/vaccine-origin`       | ✅     |
 | 32  | Appointments lead with the diseases, then the vaccine and dose           | `feat/appointment-diseases` | ✅     |
+| 33  | Growth reading: WHO classification, normal range, change, advice         | `feat/growth-assessment`    | ✅     |
 
 Each step is a pull request with green checks (`Browser` from step 9), merged with rebase.
 
@@ -124,6 +125,9 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 | Vaccine origin kept in the catalog, not the database              | The screens read the catalog directly, so no migration is needed; the box label stays the reference for each lot, as the app says                                                  |
 | Country names written in Vietnamese and English, not from `Intl`  | `Intl.DisplayNames` gives "Italy" and "Hoa Kỳ" in Vietnamese and varies between engines; parents say "Ý" and "Mỹ"                                                                  |
 | Appointments name the diseases first                              | Parents think in diseases ("flu", "meningococcal B"); the vaccine and dose stay on the next line, as the clinic books them                                                         |
+| Growth readings use WHO's names for each band                     | Parents asked whether a value is fine and where the limits are; WHO's published reading is the reference, shown with its source and a note that it is not a diagnosis              |
+| Advice only points to a doctor                                    | The app keeps measuring and comparing; it never names a cause or a treatment                                                                                                       |
+| A fall of 1 SD between two measurements asks for a doctor         | Crossing a line of the chart is what WHO asks to look into, even within the normal range; approximate values are left out of the comparison                                        |
 | No Co-Authored-By trailer in commits                              | Maintainer's preference                                                                                                                                                            |
 
 ## Follow-ups

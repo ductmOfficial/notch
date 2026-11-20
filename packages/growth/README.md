@@ -25,6 +25,29 @@ const minus2 = curveValue("weight-for-age", "female", age, -2); // ≈ 7.0 kg
 - **Length vs height.** WHO measures children lying down before 731 days and standing after. `adjustLengthHeight` adds or subtracts 0.7 cm when the position does not match the age.
 - **Percentiles** come from the standard normal CDF.
 
+## Reading a z-score
+
+`assess(indicator, z)` names a z-score as WHO's [Interpreting growth indicators](https://www.who.int/publications/i/item/9789241595070) does (Training Course on Child Growth Assessment, 2008), with a level for what it asks of the parents:
+
+| Indicator          | below −3             | −3 to −2    | −2 to +1 | +1 to +2           | +2 to +3   | above +3  |
+| ------------------ | -------------------- | ----------- | -------- | ------------------ | ---------- | --------- |
+| Length/height      | severely stunted     | stunted     | normal   | normal             | normal     | very tall |
+| Weight             | severely underweight | underweight | normal   | check BMI          | check BMI  | check BMI |
+| BMI                | severely wasted      | wasted      | normal   | risk of overweight | overweight | obese     |
+| Head circumference | small                | small       | normal   | normal             | large      | large     |
+
+"Below −2" means z < −2 and "above +2" means z > 2, so −2 and +2 read as normal. Problems WHO names are level `doctor`; "very tall", "check BMI" and "risk of overweight" are `watch`. Head circumference has no named problem in that table; outside ±2 SD it is flagged for a doctor.
+
+```ts
+import { assess, normalRange, trend } from "@notch/growth";
+
+assess("bmi-for-age", 1.4); // { status: "risk-of-overweight", level: "watch" }
+normalRange("weight-for-age", "female", 549); // { low: 8.1, median: 10.2, high: 11.6 } (kg)
+trend(0.8, -0.4); // "falling": a change of 1 SD or more crosses a line of the chart
+```
+
+The package says what the numbers are; it does not diagnose. The app adds advice that only points to a doctor.
+
 ## Data
 
 `src/data/*.ts` is generated, not written by hand:
