@@ -207,6 +207,11 @@ export default async function VaccinesPage({ searchParams }: Props) {
                 <span className="body-small block text-on-surface-variant">
                   {h.diseases.join(", ")}
                 </span>
+                {h.origin && (
+                  <span className="body-small block text-on-surface-variant">
+                    {t("vaccines.origin", { origin: h.origin })}
+                  </span>
+                )}
               </span>
               <span className="-ml-3 sm:ml-0">
                 <DeleteForm
@@ -224,6 +229,7 @@ export default async function VaccinesPage({ searchParams }: Props) {
       </Card>
 
       <p className="body-small text-on-surface-variant">{t("vaccines.footnote")}</p>
+      <p className="body-small text-on-surface-variant">{t("vaccines.originNote")}</p>
     </div>
   );
 }

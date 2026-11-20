@@ -35,6 +35,7 @@ const next = nextAppointment(states); // overdue first, then the soonest
 ```
 
 - `CATALOG` lists 22 diseases (the rows of a Vietnamese vaccination book) and the products recorded so far; `validateCatalog` checks it.
+- Each product can carry its `origin`: the manufacturer and the country (an ISO 3166-1 alpha-2 code from `COUNTRIES`, which names it in Vietnamese and English). It is the usual supply in Vietnam, gathered from vaccination centres' published lists; a given lot can come from another plant, and the label on the box is the reference.
 - An appointment is `fulfilled` once a dose with the same product and dose number is recorded; its date can be `null` for bookings like "after the first birthday" (`undated`).
 - `planDoses` (below) stays useful for suggestions and minimum-interval checks when there is no appointment.
 

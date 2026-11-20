@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { CATALOG, DISEASE_CODES, DISEASES, validateCatalog } from "./catalog.js";
+import { CATALOG, COUNTRIES, DISEASE_CODES, DISEASES, validateCatalog } from "./catalog.js";
 
 describe("CATALOG", () => {
   it("is valid", () => {
@@ -15,6 +15,25 @@ describe("CATALOG", () => {
 
   it("maps Infanrix Hexa to six diseases", () => {
     expect(CATALOG.products.find((p) => p.code === "infanrix-hexa")?.diseases).toHaveLength(6);
+  });
+
+  it("says who makes every product and where", () => {
+    for (const p of CATALOG.products) {
+      expect(p.origin?.manufacturer, p.code).toMatch(/\S/);
+      expect(Object.keys(COUNTRIES), p.code).toContain(p.origin?.country);
+    }
+    expect(CATALOG.products.find((p) => p.code === "infanrix-hexa")?.origin).toEqual({
+      manufacturer: "GSK",
+      country: "BE",
+    });
+  });
+
+  it("names every country in Vietnamese and English", () => {
+    for (const [code, name] of Object.entries(COUNTRIES)) {
+      expect(code).toMatch(/^[A-Z]{2}$/);
+      expect(name.vi.trim(), code).not.toBe("");
+      expect(name.en.trim(), code).not.toBe("");
+    }
   });
 });
 

@@ -4,6 +4,7 @@ import {
   appointmentStates,
   CATALOG,
   type Catalog,
+  COUNTRIES,
   type DiseaseCode,
   type DiseaseDose,
   dosesByDisease,
@@ -23,6 +24,8 @@ export interface DiseaseRow {
 export interface HistoryEntry extends DoseRecord {
   readonly productName: string;
   readonly diseases: readonly string[];
+  /** Maker and country, such as "GSK, Bỉ"; undefined when the catalog does not say. */
+  readonly origin: string | undefined;
 }
 
 export interface VaccinationView {
@@ -42,6 +45,16 @@ export interface VaccinationView {
 
 export function productName(code: string, catalog: Catalog = CATALOG): string {
   return catalog.products.find((p) => p.code === code)?.name ?? code;
+}
+
+/** Who makes a product and where, in the page's language: "GSK, Bỉ" or "GSK, Belgium". */
+export function productOrigin(
+  code: string,
+  locale: Locale = "vi",
+  catalog: Catalog = CATALOG,
+): string | undefined {
+  const origin = catalog.products.find((p) => p.code === code)?.origin;
+  return origin && `${origin.manufacturer}, ${COUNTRIES[origin.country][locale]}`;
 }
 
 /** "Hôm nay", "Ngày mai", "Còn 14 ngày", "Quá hạn 3 ngày", "Chưa có ngày", "Đã tiêm 12/10/2026". */
@@ -86,6 +99,7 @@ export function buildVaccinationView(
       ...r,
       productName: productName(r.productCode, catalog),
       diseases: productDiseases.get(r.productCode) ?? [],
+      origin: productOrigin(r.productCode, locale, catalog),
     }))
     .toSorted(
       (a, b) => b.givenOn.localeCompare(a.givenOn) || a.productName.localeCompare(b.productName),
