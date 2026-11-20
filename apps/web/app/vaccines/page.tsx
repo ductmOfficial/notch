@@ -13,7 +13,7 @@ import { getCurrentChild } from "../../lib/child";
 import { getDb } from "../../lib/db";
 import { getI18n } from "../../lib/i18n/server";
 import { formatAge, formatDate, todayInVietnam } from "../../lib/format";
-import { buildVaccinationView, productName } from "../../lib/vaccines-view";
+import { buildVaccinationView, productDiseases, productName } from "../../lib/vaccines-view";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getI18n();
@@ -90,7 +90,8 @@ export default async function VaccinesPage({ searchParams }: Props) {
                 className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3"
               >
                 <span className="min-w-44">
-                  <span className="body-large block">
+                  <span className="body-large block">{productDiseases(a.productCode, locale)}</span>
+                  <span className="body-medium block">
                     {productName(a.productCode)}
                     <span className="text-on-surface-variant">
                       {" "}

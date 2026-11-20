@@ -47,6 +47,17 @@ export function productName(code: string, catalog: Catalog = CATALOG): string {
   return catalog.products.find((p) => p.code === code)?.name ?? code;
 }
 
+/** The diseases a product protects against, in the page's language: "Bạch hầu, Uốn ván, …". */
+export function productDiseases(
+  code: string,
+  locale: Locale = "vi",
+  catalog: Catalog = CATALOG,
+): string {
+  const names = new Map(catalog.diseases.map((d) => [d.code, d.name[locale]]));
+  const diseases = catalog.products.find((p) => p.code === code)?.diseases ?? [];
+  return diseases.map((d) => names.get(d) ?? d).join(", ");
+}
+
 /** Who makes a product and where, in the page's language: "GSK, Bỉ" or "GSK, Belgium". */
 export function productOrigin(
   code: string,
