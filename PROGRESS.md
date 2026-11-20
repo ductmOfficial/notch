@@ -17,39 +17,40 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 
 ## Steps
 
-| #   | Step                                                                     | Branch                   | Status |
-| --- | ------------------------------------------------------------------------ | ------------------------ | ------ |
-| 1   | Repository from the `ductran-starter` template                           | `main`                   | ✅     |
-| 2   | Rename to `notch`, drop the sample package, PostgreSQL on port 5433      | `chore/setup`            | ✅     |
-| 3   | `@notch/growth`: WHO LMS z-scores and percentiles, generated data        | `feat/growth`            | ✅     |
-| 4   | `@notch/vaccines`: catalog, appointments, schedule engine                | `feat/vaccines`          | ✅     |
-| 5   | `@notch/db`: schema, migrations, queries, mutations, seed, demo data     | `feat/db`                | ✅     |
-| 6   | Today, Growth and Vaccinations screens                                   | `feat/web`               | ✅     |
-| 7   | Forms for measurements, doses and appointments; `.ics` download          | `feat/forms`             | ✅     |
-| 8   | Material Design 3 with a lotus palette, on Sen UI                        | `feat/theme`             | ✅     |
-| 9   | Playwright and axe tests, `Browser` job in CI                            | `test/e2e`               | ✅     |
-| 10  | README and this progress log                                             | `docs/readme`            | ✅     |
-| 11  | Settings page with a light, dark or system theme                         | `feat/theme-setting`     | ✅     |
-| 12  | Vietnamese and English, chosen in Settings                               | `feat/i18n`              | ✅     |
-| 13  | Lotus watermark behind the content                                       | `feat/lotus-backdrop`    | ✅     |
-| 14  | Add button flat in the navigation rail                                   | `fix/rail-fab-flat`      | ✅     |
-| 15  | Lotus mark next to the name, on empty states, as the favicon             | `feat/lotus-mark`        | ✅     |
-| 16  | Lotus drawings on the summary cards                                      | `feat/card-lotus`        | ✅     |
-| 17  | Daylily (huyên thảo) palette and drawings, chosen in Settings            | `feat/daylily-palette`   | ✅     |
-| 18  | Cloud (mây) palette and drawings                                         | `feat/cloud-palette`     | ✅     |
-| 19  | Quiet chips for given doses; status colors harmonized                    | `feat/quiet-done`        | ✅     |
-| 20  | Reload settings only once the choice is saved (test)                     | `test/settings-cookie`   | ✅     |
-| 21  | Sign-in by email link with an allowlist; data limited to the family      | `feat/auth`              | ✅     |
-| 22  | Welcome page for the first child                                         | `feat/onboarding`        | ✅     |
-| 23  | Ready for Vercel and Neon: build with migrations, sign-in URLs on Vercel | `chore/vercel`           | ✅     |
-| 24  | Calendar subscription link with a secret token                           | `feat/calendar-feed`     | ✅     |
-| 25  | Build log and dependency housekeeping after the first deployment         | `chore/build-hygiene`    | ✅     |
-| 26  | Backup and restore as a JSON file                                        | `feat/backup`            | ✅     |
-| 27  | PDF report of a child                                                    | `feat/pdf`               | ✅     |
-| 28  | National schedule (TCMR) by age on the Vaccines screen                   | `feat/tcmr`              | ✅     |
-| 29  | Health log data: tables, queries, backup version 2                       | `feat/health-log-db`     | ✅     |
-| 30  | Faster navigation: loading state, session cookie cache, one family query | `perf/faster-navigation` | ✅     |
-| 31  | Maker and country of each vaccine, on the Vaccines screen and in the PDF | `feat/vaccine-origin`    | ✅     |
+| #   | Step                                                                     | Branch                      | Status |
+| --- | ------------------------------------------------------------------------ | --------------------------- | ------ |
+| 1   | Repository from the `ductran-starter` template                           | `main`                      | ✅     |
+| 2   | Rename to `notch`, drop the sample package, PostgreSQL on port 5433      | `chore/setup`               | ✅     |
+| 3   | `@notch/growth`: WHO LMS z-scores and percentiles, generated data        | `feat/growth`               | ✅     |
+| 4   | `@notch/vaccines`: catalog, appointments, schedule engine                | `feat/vaccines`             | ✅     |
+| 5   | `@notch/db`: schema, migrations, queries, mutations, seed, demo data     | `feat/db`                   | ✅     |
+| 6   | Today, Growth and Vaccinations screens                                   | `feat/web`                  | ✅     |
+| 7   | Forms for measurements, doses and appointments; `.ics` download          | `feat/forms`                | ✅     |
+| 8   | Material Design 3 with a lotus palette, on Sen UI                        | `feat/theme`                | ✅     |
+| 9   | Playwright and axe tests, `Browser` job in CI                            | `test/e2e`                  | ✅     |
+| 10  | README and this progress log                                             | `docs/readme`               | ✅     |
+| 11  | Settings page with a light, dark or system theme                         | `feat/theme-setting`        | ✅     |
+| 12  | Vietnamese and English, chosen in Settings                               | `feat/i18n`                 | ✅     |
+| 13  | Lotus watermark behind the content                                       | `feat/lotus-backdrop`       | ✅     |
+| 14  | Add button flat in the navigation rail                                   | `fix/rail-fab-flat`         | ✅     |
+| 15  | Lotus mark next to the name, on empty states, as the favicon             | `feat/lotus-mark`           | ✅     |
+| 16  | Lotus drawings on the summary cards                                      | `feat/card-lotus`           | ✅     |
+| 17  | Daylily (huyên thảo) palette and drawings, chosen in Settings            | `feat/daylily-palette`      | ✅     |
+| 18  | Cloud (mây) palette and drawings                                         | `feat/cloud-palette`        | ✅     |
+| 19  | Quiet chips for given doses; status colors harmonized                    | `feat/quiet-done`           | ✅     |
+| 20  | Reload settings only once the choice is saved (test)                     | `test/settings-cookie`      | ✅     |
+| 21  | Sign-in by email link with an allowlist; data limited to the family      | `feat/auth`                 | ✅     |
+| 22  | Welcome page for the first child                                         | `feat/onboarding`           | ✅     |
+| 23  | Ready for Vercel and Neon: build with migrations, sign-in URLs on Vercel | `chore/vercel`              | ✅     |
+| 24  | Calendar subscription link with a secret token                           | `feat/calendar-feed`        | ✅     |
+| 25  | Build log and dependency housekeeping after the first deployment         | `chore/build-hygiene`       | ✅     |
+| 26  | Backup and restore as a JSON file                                        | `feat/backup`               | ✅     |
+| 27  | PDF report of a child                                                    | `feat/pdf`                  | ✅     |
+| 28  | National schedule (TCMR) by age on the Vaccines screen                   | `feat/tcmr`                 | ✅     |
+| 29  | Health log data: tables, queries, backup version 2                       | `feat/health-log-db`        | ✅     |
+| 30  | Faster navigation: loading state, session cookie cache, one family query | `perf/faster-navigation`    | ✅     |
+| 31  | Maker and country of each vaccine, on the Vaccines screen and in the PDF | `feat/vaccine-origin`       | ✅     |
+| 32  | Appointments lead with the diseases, then the vaccine and dose           | `feat/appointment-diseases` | ✅     |
 
 Each step is a pull request with green checks (`Browser` from step 9), merged with rebase.
 
@@ -122,6 +123,7 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 | Family and children in one query                                  | Every page needs both; one round trip instead of two                                                                                                                               |
 | Vaccine origin kept in the catalog, not the database              | The screens read the catalog directly, so no migration is needed; the box label stays the reference for each lot, as the app says                                                  |
 | Country names written in Vietnamese and English, not from `Intl`  | `Intl.DisplayNames` gives "Italy" and "Hoa Kỳ" in Vietnamese and varies between engines; parents say "Ý" and "Mỹ"                                                                  |
+| Appointments name the diseases first                              | Parents think in diseases ("flu", "meningococcal B"); the vaccine and dose stay on the next line, as the clinic books them                                                         |
 | No Co-Authored-By trailer in commits                              | Maintainer's preference                                                                                                                                                            |
 
 ## Follow-ups

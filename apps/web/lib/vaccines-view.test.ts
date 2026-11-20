@@ -1,7 +1,13 @@
 import type { AppointmentState } from "@notch/vaccines";
 import { describe, expect, it } from "vitest";
 
-import { buildVaccinationView, dueLabel, productName, productOrigin } from "./vaccines-view";
+import {
+  buildVaccinationView,
+  dueLabel,
+  productDiseases,
+  productName,
+  productOrigin,
+} from "./vaccines-view";
 
 // Fixture only; not anyone's real record.
 const RECORDS = [
@@ -96,6 +102,17 @@ describe("buildVaccinationView", () => {
     expect(custom.history[0]?.origin).toBeUndefined();
     expect(productName("unknown")).toBe("unknown");
     expect(productOrigin("unknown")).toBeUndefined();
+    expect(productDiseases("unknown")).toBe("");
+  });
+});
+
+describe("productDiseases", () => {
+  it("names the diseases a product covers, in the page's language", () => {
+    expect(productDiseases("bexsero")).toBe("Não mô cầu nhóm B");
+    expect(productDiseases("bexsero", "en")).toBe("Meningococcal B");
+    expect(productDiseases("infanrix-hexa")).toBe(
+      "Bạch hầu, Uốn ván, Ho gà, Hib, Bại liệt, Viêm gan B",
+    );
   });
 });
 

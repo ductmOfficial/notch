@@ -12,7 +12,7 @@ import { getDb } from "../lib/db";
 import { getI18n } from "../lib/i18n/server";
 import { formatAge, formatDate, formatNumber, formatZ, todayInVietnam, zBand } from "../lib/format";
 import { chartPoints, INDICATORS } from "../lib/growth-chart";
-import { buildVaccinationView, dueLabel, productName } from "../lib/vaccines-view";
+import { buildVaccinationView, dueLabel, productDiseases, productName } from "../lib/vaccines-view";
 
 const TODAY_MOTIFS: Record<"weight" | "length", CardMotifProps> = {
   weight: { kind: "bud", place: "topRight", tilt: 14 },
@@ -85,7 +85,8 @@ export default async function TodayPage({ searchParams }: Props) {
           {next ? (
             <>
               <div>
-                <p className="headline-small">
+                <p className="headline-small">{productDiseases(next.productCode, locale)}</p>
+                <p className="title-medium mt-1">
                   {productName(next.productCode)}
                   <span className="opacity-80"> · {t("common.dose", { n: next.doseNo })}</span>
                 </p>
@@ -102,10 +103,9 @@ export default async function TodayPage({ searchParams }: Props) {
                       className="body-medium flex items-center justify-between gap-3 px-4 py-3"
                     >
                       <span>
-                        {productName(a.productCode)}
-                        <span className="text-on-surface-variant">
-                          {" "}
-                          · {t("common.dose", { n: a.doseNo })}
+                        <span className="block">{productDiseases(a.productCode, locale)}</span>
+                        <span className="body-small block text-on-surface-variant">
+                          {productName(a.productCode)} · {t("common.dose", { n: a.doseNo })}
                         </span>
                       </span>
                       <AppointmentBadge state={a} locale={locale} />

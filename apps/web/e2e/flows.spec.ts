@@ -10,6 +10,9 @@ test("today shows the child, the next appointment and the latest measurements", 
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Mây được");
   await expect(page.getByText("Lịch hẹn tiêm tiếp theo")).toBeVisible();
+  // The demo child's flu dose is overdue, so it comes first: the disease, then the vaccine.
+  await expect(page.getByText("Cúm", { exact: true })).toBeVisible();
+  await expect(page.getByText("Vaxigrip · mũi 3")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Cân nặng" })).toBeVisible();
 });
 
@@ -80,6 +83,9 @@ test("recording a dose picks the vaccine from the list and books the next one", 
   const appointments = page.getByRole("list", { name: "Lịch hẹn" });
   await expect(appointments.getByRole("listitem").filter({ hasText: "04/01/2027" })).toContainText(
     "Rotarix · mũi 4",
+  );
+  await expect(appointments.getByRole("listitem").filter({ hasText: "04/01/2027" })).toContainText(
+    "Tiêu chảy do rotavirus",
   );
 });
 
