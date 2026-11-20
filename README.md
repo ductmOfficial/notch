@@ -205,13 +205,15 @@ pnpm --filter web e2e
 
 The Vaccines screen shows the national expanded programme (Tiêm chủng mở rộng) by age, from Article 1 of **Thông tư 52/2025/TT-BYT** (Ministry of Health, 31 December 2025, in force from 15 February 2026; it replaces Thông tư 10/2024/TT-BYT). Only child doses are included, on the on-time schedule; catch-up rules for late doses are not modelled. Each dose is marked recorded when the child has at least that many doses for the disease from any product, so a service vaccine counts too. This is a reference next to the clinic's own appointments, not a medical assessment. The data lives in `packages/vaccines/src/tcmr.ts`, and a test checks every disease's ages against the circular.
 
+Each dose in the history, on screen and in the PDF, also shows who makes the vaccine and in which country ("GSK, Bỉ"), from the catalog in `packages/vaccines/src/catalog.ts`. It is the usual supply in Vietnam; the label on the box is the reference for a given lot, as a note under the list says.
+
 ## Backup
 
 Settings downloads the family's records as `notch-backup-<date>.json` and restores such a file. The format (version 2, `packages/db/src/backup.ts`) keeps values as stored (grams, millimetres, tenths of a degree, product codes), so a backup restores exactly. Version 2 adds the health log; files of version 1 still restore, with no health entries. A restore shows what the file holds, asks for confirmation, checks the whole file (schema, known vaccines, one row per dose), then replaces the family's children and records in one transaction: everything or nothing. The file holds health data; nothing is uploaded anywhere except on restore.
 
 ## PDF report
 
-Today has an **Export PDF** button: an A4 record of the selected child for a doctor's visit or to print. Page one holds the profile, the latest weight, length, head circumference and BMI with percentile and z-score, and the WHO weight-for-age and length-for-age charts; the next pages list doses by disease, every dose given (date, vaccine, dose, place, lot) and the appointments. Every page carries a short disclaimer. It is rendered on the server with [react-pdf](https://react-pdf.org) in the page's language, with Roboto (SIL OFL 1.1, `apps/web/assets/fonts/`) for Vietnamese. The file name is generic (`notch-report-<date>.pdf`).
+Today has an **Export PDF** button: an A4 record of the selected child for a doctor's visit or to print. Page one holds the profile, the latest weight, length, head circumference and BMI with percentile and z-score, and the WHO weight-for-age and length-for-age charts; the next pages list doses by disease, every dose given (date, vaccine, dose, maker and country, place, lot) and the appointments. Every page carries a short disclaimer. It is rendered on the server with [react-pdf](https://react-pdf.org) in the page's language, with Roboto (SIL OFL 1.1, `apps/web/assets/fonts/`) for Vietnamese. The file name is generic (`notch-report-<date>.pdf`).
 
 ## Deployment
 

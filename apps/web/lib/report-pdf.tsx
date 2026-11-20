@@ -25,7 +25,7 @@ import {
   INDICATORS,
 } from "./growth-chart";
 import { type Locale, translator } from "./i18n/messages";
-import { buildVaccinationView, productName } from "./vaccines-view";
+import { buildVaccinationView, productName, productOrigin } from "./vaccines-view";
 
 // Roboto covers Vietnamese; the files ship with the app (assets/fonts, SIL OFL 1.1).
 Font.register({
@@ -328,7 +328,8 @@ function Report({
               <Text style={[styles.th, { width: 70 }]}>{t("report.colDate")}</Text>
               <Text style={[styles.th, { flex: 1 }]}>{t("report.colVaccine")}</Text>
               <Text style={[styles.th, { width: 36 }]}>{t("report.colDose")}</Text>
-              <Text style={[styles.th, { width: 120 }]}>{t("report.colPlace")}</Text>
+              <Text style={[styles.th, { width: 90 }]}>{t("report.colOrigin")}</Text>
+              <Text style={[styles.th, { width: 100 }]}>{t("report.colPlace")}</Text>
               <Text style={[styles.th, { width: 70 }]}>{t("report.colLot")}</Text>
             </View>
             {vaccinations.map((v) => (
@@ -336,10 +337,14 @@ function Report({
                 <Text style={{ width: 70 }}>{date(v.givenOn)}</Text>
                 <Text style={{ flex: 1 }}>{productName(v.productCode)}</Text>
                 <Text style={{ width: 36 }}>{String(v.doseNo)}</Text>
-                <Text style={{ width: 120 }}>{v.place ?? ""}</Text>
+                <Text style={{ width: 90 }}>{productOrigin(v.productCode, locale) ?? ""}</Text>
+                <Text style={{ width: 100 }}>{v.place ?? ""}</Text>
                 <Text style={{ width: 70 }}>{v.lot ?? ""}</Text>
               </View>
             ))}
+            <Text style={[styles.muted, { marginTop: 4, fontSize: 8 }]}>
+              {t("vaccines.originNote")}
+            </Text>
           </View>
         )}
 

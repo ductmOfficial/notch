@@ -35,12 +35,35 @@ export interface Disease {
   readonly name: { readonly vi: string; readonly en: string };
 }
 
+/** Countries where the products are made, named in both languages of the app. */
+export const COUNTRIES = {
+  BE: { vi: "Bỉ", en: "Belgium" },
+  FR: { vi: "Pháp", en: "France" },
+  IT: { vi: "Ý", en: "Italy" },
+  TW: { vi: "Đài Loan", en: "Taiwan" },
+  US: { vi: "Mỹ", en: "United States" },
+  VN: { vi: "Việt Nam", en: "Vietnam" },
+} as const satisfies Record<string, { readonly vi: string; readonly en: string }>;
+
+/** ISO 3166-1 alpha-2 code of a country in `COUNTRIES`. */
+export type CountryCode = keyof typeof COUNTRIES;
+
+/**
+ * Who makes a product and where, as supplied in Vietnam. A given lot can come from
+ * another plant: the label on the box is the reference.
+ */
+export interface Origin {
+  readonly manufacturer: string;
+  readonly country: CountryCode;
+}
+
 export interface VaccineProduct {
   /** Stable identifier, e.g. "infanrix-hexa". */
   readonly code: string;
   /** Brand name as printed on the vaccination record. */
   readonly name: string;
   readonly diseases: readonly DiseaseCode[];
+  readonly origin?: Origin;
 }
 
 export interface Catalog {
@@ -81,19 +104,60 @@ export const DISEASES: readonly Disease[] = [
 
 /** Products recorded so far. Add a product when a child first receives it. */
 export const PRODUCTS: readonly VaccineProduct[] = [
-  { code: "bcg", name: "BCG", diseases: ["tuberculosis"] },
-  { code: "gene-hbvax", name: "Gene-HBvax", diseases: ["hepatitis-b"] },
+  {
+    code: "bcg",
+    name: "BCG",
+    diseases: ["tuberculosis"],
+    origin: { manufacturer: "IVAC", country: "VN" },
+  },
+  {
+    code: "gene-hbvax",
+    name: "Gene-HBvax",
+    diseases: ["hepatitis-b"],
+    origin: { manufacturer: "VABIOTECH", country: "VN" },
+  },
   {
     code: "infanrix-hexa",
     name: "Infanrix Hexa",
     diseases: ["diphtheria", "tetanus", "pertussis", "hib", "polio", "hepatitis-b"],
+    origin: { manufacturer: "GSK", country: "BE" },
   },
-  { code: "rotarix", name: "Rotarix", diseases: ["rotavirus"] },
-  { code: "prevenar-20", name: "Prevenar 20", diseases: ["pneumococcal"] },
-  { code: "bexsero", name: "Bexsero", diseases: ["meningococcal-b"] },
-  { code: "envacgen", name: "Envacgen", diseases: ["hand-foot-mouth-ev71"] },
-  { code: "vaxigrip", name: "Vaxigrip", diseases: ["influenza"] },
-  { code: "menquadfi", name: "MenQuadfi", diseases: ["meningococcal-acwy"] },
+  {
+    code: "rotarix",
+    name: "Rotarix",
+    diseases: ["rotavirus"],
+    origin: { manufacturer: "GSK", country: "BE" },
+  },
+  {
+    code: "prevenar-20",
+    name: "Prevenar 20",
+    diseases: ["pneumococcal"],
+    origin: { manufacturer: "Pfizer", country: "BE" },
+  },
+  {
+    code: "bexsero",
+    name: "Bexsero",
+    diseases: ["meningococcal-b"],
+    origin: { manufacturer: "GSK", country: "IT" },
+  },
+  {
+    code: "envacgen",
+    name: "Envacgen",
+    diseases: ["hand-foot-mouth-ev71"],
+    origin: { manufacturer: "Medigen", country: "TW" },
+  },
+  {
+    code: "vaxigrip",
+    name: "Vaxigrip",
+    diseases: ["influenza"],
+    origin: { manufacturer: "Sanofi", country: "FR" },
+  },
+  {
+    code: "menquadfi",
+    name: "MenQuadfi",
+    diseases: ["meningococcal-acwy"],
+    origin: { manufacturer: "Sanofi", country: "US" },
+  },
 ];
 
 export const CATALOG: Catalog = { diseases: DISEASES, products: PRODUCTS };

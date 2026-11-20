@@ -74,6 +74,9 @@ test("recording a dose picks the vaccine from the list and books the next one", 
   await expect(history.getByRole("listitem").filter({ hasText: "02/11/2026" })).toContainText(
     "Rotarix · mũi 3",
   );
+  await expect(history.getByRole("listitem").filter({ hasText: "02/11/2026" })).toContainText(
+    "Sản xuất: GSK, Bỉ",
+  );
   const appointments = page.getByRole("list", { name: "Lịch hẹn" });
   await expect(appointments.getByRole("listitem").filter({ hasText: "04/01/2027" })).toContainText(
     "Rotarix · mũi 4",

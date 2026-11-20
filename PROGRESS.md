@@ -49,6 +49,7 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 | 28  | National schedule (TCMR) by age on the Vaccines screen                   | `feat/tcmr`              | ✅     |
 | 29  | Health log data: tables, queries, backup version 2                       | `feat/health-log-db`     | ✅     |
 | 30  | Faster navigation: loading state, session cookie cache, one family query | `perf/faster-navigation` | ✅     |
+| 31  | Maker and country of each vaccine, on the Vaccines screen and in the PDF | `feat/vaccine-origin`    | ✅     |
 
 Each step is a pull request with green checks (`Browser` from step 9), merged with rebase.
 
@@ -119,6 +120,8 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 | A loading state at the root                                       | Navigation answers at once with a placeholder, and Next.js can prefetch the layout down to it                                                                                      |
 | Session cookie cache for five minutes                             | Most requests skip the session query; the allowlist is still checked on every request, and a revoked session ends within five minutes                                              |
 | Family and children in one query                                  | Every page needs both; one round trip instead of two                                                                                                                               |
+| Vaccine origin kept in the catalog, not the database              | The screens read the catalog directly, so no migration is needed; the box label stays the reference for each lot, as the app says                                                  |
+| Country names written in Vietnamese and English, not from `Intl`  | `Intl.DisplayNames` gives "Italy" and "Hoa Kỳ" in Vietnamese and varies between engines; parents say "Ý" and "Mỹ"                                                                  |
 | No Co-Authored-By trailer in commits                              | Maintainer's preference                                                                                                                                                            |
 
 ## Follow-ups

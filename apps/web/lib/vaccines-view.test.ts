@@ -1,7 +1,7 @@
 import type { AppointmentState } from "@notch/vaccines";
 import { describe, expect, it } from "vitest";
 
-import { buildVaccinationView, dueLabel, productName } from "./vaccines-view";
+import { buildVaccinationView, dueLabel, productName, productOrigin } from "./vaccines-view";
 
 // Fixture only; not anyone's real record.
 const RECORDS = [
@@ -59,6 +59,19 @@ describe("buildVaccinationView", () => {
       "Gene-HBvax",
     ]);
     expect(view.history[0]?.diseases).toHaveLength(6);
+    expect(view.history.map((h) => h.origin)).toEqual([
+      "GSK, Bỉ",
+      "GSK, Bỉ",
+      "VABIOTECH, Việt Nam",
+    ]);
+  });
+
+  it("names the maker's country in the page's language", () => {
+    const english = buildVaccinationView(RECORDS, [], "2030-03-20", undefined, "en");
+    expect(english.history[0]?.origin).toBe("GSK, Belgium");
+    expect(productOrigin("bexsero")).toBe("GSK, Ý");
+    expect(productOrigin("envacgen", "en")).toBe("Medigen, Taiwan");
+    expect(productOrigin("menquadfi")).toBe("Sanofi, Mỹ");
   });
 
   it("handles a child without records", () => {
@@ -80,7 +93,9 @@ describe("buildVaccinationView", () => {
       catalog,
     );
     expect(custom.history[0]?.diseases).toEqual(["influenza"]);
+    expect(custom.history[0]?.origin).toBeUndefined();
     expect(productName("unknown")).toBe("unknown");
+    expect(productOrigin("unknown")).toBeUndefined();
   });
 });
 

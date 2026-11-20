@@ -1,5 +1,19 @@
-export type { Catalog, Disease, DiseaseCode, VaccineProduct } from "./catalog.js";
-export { CATALOG, DISEASE_CODES, DISEASES, PRODUCTS, validateCatalog } from "./catalog.js";
+export type {
+  Catalog,
+  CountryCode,
+  Disease,
+  DiseaseCode,
+  Origin,
+  VaccineProduct,
+} from "./catalog.js";
+export {
+  CATALOG,
+  COUNTRIES,
+  DISEASE_CODES,
+  DISEASES,
+  PRODUCTS,
+  validateCatalog,
+} from "./catalog.js";
 export { nextDose, planDoses } from "./plan.js";
 export type {
   Appointment,

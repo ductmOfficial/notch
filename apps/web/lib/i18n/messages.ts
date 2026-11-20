@@ -103,6 +103,9 @@ export const vi = {
   "vaccines.deleteDoseConfirm": "Mũi tiêm ngày {date} sẽ bị xoá khỏi lịch sử. Không hoàn tác được.",
   "vaccines.footnote":
     "Lịch hẹn theo sổ tiêm của phòng tiêm. Hỏi bác sĩ hoặc phòng tiêm trước khi thay đổi lịch.",
+  "vaccines.origin": "Sản xuất: {origin}",
+  "vaccines.originNote":
+    "Hãng và nước sản xuất là nguồn cung thường gặp ở Việt Nam; nhãn trên hộp vaccine mới đúng cho từng lô.",
 
   "due.given": "Đã tiêm",
   "due.givenOn": "Đã tiêm {date}",
@@ -246,6 +249,7 @@ export const vi = {
   "report.colDate": "Ngày",
   "report.colVaccine": "Vaccine",
   "report.colDose": "Mũi",
+  "report.colOrigin": "Xuất xứ",
   "report.colPlace": "Nơi tiêm",
   "report.colLot": "Số lô",
   "report.colDisease": "Bệnh",
@@ -408,6 +412,9 @@ export const en: Messages = {
     "The dose given on {date} will be removed from the history. This cannot be undone.",
   "vaccines.footnote":
     "Appointments follow the clinic's vaccination book. Ask the doctor or the clinic before changing them.",
+  "vaccines.origin": "Made by {origin}",
+  "vaccines.originNote":
+    "The maker and country are the usual supply in Vietnam; the label on the box is the reference for each lot.",
 
   "due.given": "Given",
   "due.givenOn": "Given {date}",
@@ -554,6 +561,7 @@ export const en: Messages = {
   "report.colDate": "Date",
   "report.colVaccine": "Vaccine",
   "report.colDose": "Dose",
+  "report.colOrigin": "Origin",
   "report.colPlace": "Place",
   "report.colLot": "Lot",
   "report.colDisease": "Disease",
