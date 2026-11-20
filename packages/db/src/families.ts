@@ -1,7 +1,8 @@
-import { asc, eq } from "drizzle-orm";
+import { asc, eq, getTableColumns } from "drizzle-orm";
 
 import type { Db } from "./client.js";
-import { family, familyMember } from "./schema.js";
+import { type Child, listChildren } from "./queries.js";
+import { child, family, familyMember } from "./schema.js";
 
 /**
  * The family of a signed-in user, joining one on first use. Notch serves one
@@ -31,4 +32,32 @@ export async function familyIdForUser(db: Db, userId: string): Promise<string> {
     .where(eq(familyMember.userId, userId));
   if (!joined) throw new Error("Could not join the family");
   return joined.familyId;
+}
+
+export interface FamilyOfUser {
+  readonly familyId: string;
+  /** The family's children, oldest first. */
+  readonly children: Child[];
+}
+
+/**
+ * The user's family and its children in one query, since every page needs both. A user
+ * who has not joined a family yet joins one first, as in `familyIdForUser`.
+ */
+export async function familyForUser(db: Db, userId: string): Promise<FamilyOfUser> {
+  const rows = await db
+    .select({ familyId: familyMember.familyId, child: getTableColumns(child) })
+    .from(familyMember)
+    .leftJoin(child, eq(child.familyId, familyMember.familyId))
+    .where(eq(familyMember.userId, userId))
+    .orderBy(asc(child.birthDate), asc(child.createdAt));
+  const [first] = rows;
+  if (first) {
+    return {
+      familyId: first.familyId,
+      children: rows.flatMap((r) => (r.child ? [r.child] : [])),
+    };
+  }
+  const familyId = await familyIdForUser(db, userId);
+  return { familyId, children: await listChildren(db, familyId) };
 }

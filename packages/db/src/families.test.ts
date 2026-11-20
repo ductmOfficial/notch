@@ -2,7 +2,8 @@ import { count } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { createDb } from "./client.js";
-import { familyIdForUser } from "./families.js";
+import { familyForUser, familyIdForUser } from "./families.js";
+import { addChild } from "./mutations.js";
 import { family, familyMember, user } from "./schema.js";
 
 const handle = createDb("pglite:memory");
@@ -45,5 +46,24 @@ describe("familyIdForUser", () => {
     } finally {
       await other.close();
     }
+  });
+});
+
+describe("familyForUser", () => {
+  it("returns the family and its children, oldest first, in one call", async () => {
+    const familyId = await familyIdForUser(db, "u1");
+    expect(await familyForUser(db, "u1")).toEqual({ familyId, children: [] });
+    await addChild(db, { familyId, name: "Younger", sex: "male", birthDate: "2032-01-01" });
+    await addChild(db, { familyId, name: "Mây", sex: "female", birthDate: "2030-01-01" });
+    const result = await familyForUser(db, "u2");
+    expect(result.familyId).toBe(familyId);
+    expect(result.children.map((c) => c.name)).toEqual(["Mây", "Younger"]);
+  });
+
+  it("joins a family first for a new user", async () => {
+    await db.insert(user).values({ id: "u4", name: "", email: "four@example.com" });
+    const result = await familyForUser(db, "u4");
+    expect(result.familyId).toBe(await familyIdForUser(db, "u1"));
+    expect(result.children).toHaveLength(2);
   });
 });

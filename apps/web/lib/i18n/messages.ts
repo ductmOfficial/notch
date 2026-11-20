@@ -6,6 +6,7 @@ export const vi = {
   "app.description": "Sổ lớn khôn của bé: tăng trưởng, tiêm chủng và sức khỏe của con.",
   "app.skipToContent": "Bỏ qua điều hướng",
   "app.mainNav": "Chính",
+  "app.loading": "Đang tải…",
 
   "nav.today": "Hôm nay",
   "nav.growth": "Tăng trưởng",
@@ -309,6 +310,7 @@ export const en: Messages = {
   "app.description": "Your child's growth, vaccinations and health in one place.",
   "app.skipToContent": "Skip navigation",
   "app.mainNav": "Main",
+  "app.loading": "Loading…",
 
   "nav.today": "Today",
   "nav.growth": "Growth",

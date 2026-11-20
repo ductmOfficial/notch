@@ -10,7 +10,8 @@ export {
   familyIdForCalendarToken,
   revokeCalendarToken,
 } from "./calendar-tokens.js";
-export { familyIdForUser } from "./families.js";
+export type { FamilyOfUser } from "./families.js";
+export { familyForUser, familyIdForUser } from "./families.js";
 export type { HealthEntry, HealthEntryInput, Temperature, TemperatureInput } from "./health.js";
 export {
   addHealthEntry,
