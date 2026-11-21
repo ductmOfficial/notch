@@ -197,6 +197,27 @@ export default async function TodayPage({ searchParams }: Props) {
             <Icon name="chevronRight" size={18} />
           </Link>
         </Card>
+
+        {/* Just for fun, apart from the health cards: a thin row at the end, never in the PDF. */}
+        <Card
+          motif={{ kind: "petals", place: "right", tilt: 8 }}
+          tone="outlined"
+          className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-5 py-3 md:col-span-3"
+        >
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <span className="label-large inline-flex h-7 items-center rounded-m3-sm bg-tertiary-container px-3 text-on-tertiary-container">
+              {t("today.funLabel")}
+            </span>
+            <span className="body-small text-on-surface-variant">{t("today.numerologyHint")}</span>
+          </div>
+          <Link
+            href="/numerology"
+            className="state-layer label-large -mx-3 inline-flex h-10 w-fit items-center gap-1 rounded-full px-3 text-primary"
+          >
+            {t("today.numerology", { name: child.name })}
+            <Icon name="chevronRight" size={18} />
+          </Link>
+        </Card>
       </div>
     </div>
   );

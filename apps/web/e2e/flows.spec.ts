@@ -332,3 +332,19 @@ test("the TCMR schedule lists every dose by age, next to what is recorded", asyn
   await expect(card.getByText(/^Sơ sinh/)).toBeVisible();
   await expect(card.getByText(/Thông tư 52\/2025\/TT-BYT/)).toBeVisible();
 });
+
+test("numerology is reached from a card on Today, just for fun", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("link", { name: "Thần số học của Mây" }).click();
+  await expect(page).toHaveURL(/\/numerology$/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Thần số học của Mây");
+  await expect(page.getByText("không có cơ sở khoa học")).toBeVisible();
+  // Mây, born 20/05/2025: 2+0+2+5+0+5+2+0 = 16 → 1+6 = 7.
+  await expect(page.getByText("2+0+2+5+0+5+2+0 = 16 → 1+6 = 7")).toBeVisible();
+  // Not in the navigation, nor in Settings.
+  await expect(page.getByRole("navigation").getByRole("link", { name: /Thần số học/ })).toHaveCount(
+    0,
+  );
+  await page.goto("/settings");
+  await expect(page.getByRole("link", { name: /Thần số học/ })).toHaveCount(0);
+});
