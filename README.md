@@ -224,7 +224,14 @@ Each dose in the history, on screen and in the PDF, also shows who makes the vac
 
 ## Just for fun: numerology
 
-A thin card at the end of Today links to a numerology page for the selected child (`/numerology`): the life path number from the birth date, the expression number from the birth-certificate name, or the family's name until one is entered (Vietnamese marks dropped, A=1 … I=9), the number of the English name when there is one, and the birthday number, by the Pythagorean method popular in Vietnam, with master numbers 11, 22 and 33 kept. Each number shows how it was reached and a short, kind description. The page says plainly that numerology is entertainment with no scientific basis; it is not in the navigation or the PDF, its card on Today is labelled "just for fun" and kept apart from the health cards, and it reads nothing but the name and the birth date. The rules live in `apps/web/lib/numerology.ts`.
+A thin card at the end of Today links to a numerology page for the selected child (`/numerology`), by the Pythagorean method popular in Vietnam, master numbers 11, 22 and 33 kept:
+
+- **Life path**, the main number, with strengths, what to nurture and how parents can help.
+- **Other numbers**: expression (the birth-certificate name, or the family's name until one is entered; Vietnamese marks dropped, A=1 … I=9), soul urge (vowels, Y included), personality (consonants), attitude (day and month), birthday, maturity (life path + expression), the English name when there is one, and the personal year.
+- **Birth charts**: the digits of the birth date on a 3×3 grid, and a combined chart that adds the letters of the full name, each with its full and empty arrows and missing digits.
+- **Four pinnacles**: stages of life by age, the current one highlighted.
+
+Every number shows how it was reached. The page says plainly that numerology is entertainment with no scientific basis, and the descriptions are kind and practical, never about health or the future. It is not in the navigation or the PDF, and it reads nothing but the names and the birth date. The calculations live in `apps/web/lib/numerology.ts` and the texts, in Vietnamese and English, in `apps/web/lib/numerology-content.ts`.
 
 ## Backup
 
