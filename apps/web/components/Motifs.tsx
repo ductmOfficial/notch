@@ -3,16 +3,18 @@ import type { ComponentType, ReactNode } from "react";
 import type { ArtProps, MotifKind } from "./motifs/art";
 import { CLOUD_MOTIFS, CloudBackdrop, CloudMark } from "./motifs/cloud";
 import { DAYLILY_MOTIFS, DaylilyBackdrop, DaylilyMark } from "./motifs/daylily";
+import { BABY_MOTIFS, BabyBackdrop, BabyMark } from "./motifs/baby";
 import { LOTUS_MOTIFS, LotusBackdrop, LotusMark } from "./motifs/lotus";
+import { TEDDY_MOTIFS, TeddyBackdrop, TeddyMark } from "./motifs/teddy";
 
 /**
- * Drawings of each palette: lotus, daylily and cloud. Each component renders every
+ * Drawings of each palette: lotus, daylily, cloud, teddy bear and baby. Each component renders every
  * palette's version; `globals.css` shows the one of the current `data-palette`, so a
  * palette change in Settings repaints at once without a server round trip. All of
  * them are decorative: hidden from assistive technology, never under pointer events.
  */
 export type { MotifKind } from "./motifs/art";
-export const PALETTES = ["lotus", "daylily", "cloud"] as const;
+export const PALETTES = ["lotus", "daylily", "cloud", "teddy", "baby"] as const;
 export type Palette = (typeof PALETTES)[number];
 export type MotifPlace = "bottomRight" | "topRight" | "right";
 
@@ -27,6 +29,8 @@ const ART: Record<
   lotus: { Mark: LotusMark, Backdrop: LotusBackdrop, motifs: LOTUS_MOTIFS },
   daylily: { Mark: DaylilyMark, Backdrop: DaylilyBackdrop, motifs: DAYLILY_MOTIFS },
   cloud: { Mark: CloudMark, Backdrop: CloudBackdrop, motifs: CLOUD_MOTIFS },
+  teddy: { Mark: TeddyMark, Backdrop: TeddyBackdrop, motifs: TEDDY_MOTIFS },
+  baby: { Mark: BabyMark, Backdrop: BabyBackdrop, motifs: BABY_MOTIFS },
 };
 
 /** The mark next to the name and on empty states. With `palette`, only that palette's. */

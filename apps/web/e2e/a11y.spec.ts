@@ -51,7 +51,7 @@ test.describe("in English", () => {
   }
 });
 
-for (const palette of ["daylily", "cloud"] as const) {
+for (const palette of ["daylily", "cloud", "teddy", "baby"] as const) {
   test.describe(`with the ${palette} palette`, () => {
     for (const path of pages) {
       for (const scheme of ["light", "dark"] as const) {

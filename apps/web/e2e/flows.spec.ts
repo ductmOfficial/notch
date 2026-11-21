@@ -173,14 +173,27 @@ test("the palette applies at once and survives a reload", async ({ page }) => {
   await expect(page.locator(".motif-cloud").filter({ visible: true }).first()).toBeVisible();
   await expect(page.locator(".motif-daylily").filter({ visible: true })).toHaveCount(0);
 
+  for (const [label, palette] of [
+    ["Gấu bông", "teddy"],
+    ["Em bé", "baby"],
+  ] as const) {
+    await page.locator("label").filter({ hasText: label }).click();
+    await expect(html).toHaveAttribute("data-palette", palette);
+    await cookieSaved(page, "notch-palette", palette);
+    await expect(page.locator(`.motif-${palette}`).filter({ visible: true }).first()).toBeVisible();
+    await expect(page.locator(".motif-cloud").filter({ visible: true })).toHaveCount(0);
+  }
+
   await page.locator("label").filter({ hasText: "Sen" }).click();
   await expect(html).not.toHaveAttribute("data-palette");
   await cookieSaved(page, "notch-palette", undefined);
   await page.reload();
   await expect(html).not.toHaveAttribute("data-palette");
-  await expect(page.locator(".motif-daylily, .motif-cloud").filter({ visible: true })).toHaveCount(
-    0,
-  );
+  await expect(
+    page
+      .locator(".motif-daylily, .motif-cloud, .motif-teddy, .motif-baby")
+      .filter({ visible: true }),
+  ).toHaveCount(0);
   await expect(page.locator(".motif-lotus").filter({ visible: true }).first()).toBeVisible();
 });
 

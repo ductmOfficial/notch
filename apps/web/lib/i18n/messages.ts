@@ -314,6 +314,8 @@ export const vi = {
   "settings.paletteLotus": "Sen",
   "settings.paletteDaylily": "Huyên thảo",
   "settings.paletteCloud": "Mây",
+  "settings.paletteTeddy": "Gấu bông",
+  "settings.paletteBaby": "Em bé",
 
   "setup.noDatabase": "Chưa cấu hình database",
   "setup.noDatabaseHint": "Đặt DATABASE_URL trong file .env ở thư mục gốc repo.",
@@ -646,6 +648,8 @@ export const en: Messages = {
   "settings.paletteLotus": "Lotus",
   "settings.paletteDaylily": "Daylily",
   "settings.paletteCloud": "Cloud",
+  "settings.paletteTeddy": "Teddy bear",
+  "settings.paletteBaby": "Baby",
 
   "setup.noDatabase": "The database is not configured",
   "setup.noDatabaseHint": "Set DATABASE_URL in the .env file at the repository root.",
