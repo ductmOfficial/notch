@@ -70,9 +70,9 @@ export function ChildProfileForm({ child, today }: { child: Child; today: string
           error={state.errors?.birthDate}
           required
         />
+        {/* No hint line, so this field lines up with the date beside it. */}
         <TimeField
-          label={t("form.birthTime")}
-          hint={t("form.optional")}
+          label={t("form.birthTimeOptional")}
           name="birthTime"
           defaultValue={v("birthTime", child.birthTime?.slice(0, 5) ?? null)}
           error={state.errors?.birthTime}
