@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { readGrowth } from "./growth-assessment";
+import { chartSubtitle, readGrowth } from "./growth-assessment";
 import type { ChartPoint } from "./growth-chart";
 
 // Fixture only; not anyone's real record. A girl of about 18 months.
@@ -85,5 +85,42 @@ describe("readGrowth", () => {
     expect(
       readGrowth("weight", "female", BIRTH, [point(0, { ageDays: 2000 })])?.range,
     ).toBeUndefined();
+  });
+});
+
+describe("chartSubtitle", () => {
+  it("names the reading and the change since the previous measurement", () => {
+    const points = [earlier(0.1, { value: 9.7 }), point(0.2, { value: 9.9 })];
+    expect(chartSubtitle("weight", "female", BIRTH, points)).toEqual({
+      label: "Bình thường",
+      level: "normal",
+      detail: "tăng 0,20 kg so với lần đo 01/04/2030",
+    });
+    expect(chartSubtitle("weight", "female", BIRTH, points, "en").detail).toBe(
+      "up 0.20 kg since 1 Apr 2030",
+    );
+  });
+
+  it("says when a value fell or stayed the same", () => {
+    const fell = [earlier(0, { value: 80.4 }), point(-0.3, { value: 80 })];
+    expect(chartSubtitle("length", "female", BIRTH, fell).detail).toBe(
+      "giảm 0,4 cm so với lần đo 01/04/2030",
+    );
+    const same = [earlier(0, { value: 45.7 }), point(-0.2, { value: 45.72 })];
+    expect(chartSubtitle("head", "female", BIRTH, same).detail).toBe(
+      "không đổi so với lần đo 01/04/2030",
+    );
+  });
+
+  it("gives the normal range after a single measurement, or says there is none", () => {
+    expect(chartSubtitle("weight", "female", BIRTH, [point(0)]).detail).toBe(
+      "Bình thường ở 1 tuổi 6 tháng: 8,1–11,6 kg",
+    );
+    expect(chartSubtitle("head", "female", BIRTH, [])).toEqual({
+      detail: "Chưa có số đo vòng đầu.",
+    });
+    expect(chartSubtitle("weight", "female", BIRTH, [point(undefined, { ageDays: 2000 })])).toEqual(
+      { detail: "Đo ngày 01/07/2030" },
+    );
   });
 });

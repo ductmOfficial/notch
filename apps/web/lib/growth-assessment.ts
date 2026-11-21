@@ -119,3 +119,50 @@ export function readGrowth(
 
   return { status, statusLevel, level, label: t(LABELS[status]), range, change, advice };
 }
+
+export interface ChartSubtitle {
+  /** WHO's name for the latest value, and how pressing it is; absent without a z-score. */
+  readonly label?: string;
+  readonly level?: GrowthLevel;
+  /** The change since the previous measurement, the normal range, or that there is no value. */
+  readonly detail: string;
+}
+
+/**
+ * One line under each chart: the WHO reading of the latest value, then how much it moved
+ * since the previous measurement ("tăng 0,20 kg so với lần đo 27/10/2026"), or the normal
+ * range when there is only one measurement.
+ */
+export function chartSubtitle(
+  indicator: ChartIndicator,
+  sex: Sex,
+  birthDate: string,
+  points: readonly ChartPoint[],
+  locale: Locale = "vi",
+): ChartSubtitle {
+  const t = translator(locale);
+  const info = INDICATORS[indicator];
+  const latest = points.at(-1);
+  if (!latest) {
+    return { detail: t("growth.noValues", { indicator: t(info.labelKey).toLowerCase() }) };
+  }
+  const reading = readGrowth(indicator, sex, birthDate, points, locale);
+  const previous = points.at(-2);
+  let detail: string;
+  if (previous) {
+    const delta = latest.value - previous.value;
+    const amount = formatNumber(Math.abs(delta), info.digits, locale);
+    const date = formatDate(previous.date, locale);
+    detail =
+      amount === formatNumber(0, info.digits, locale)
+        ? t("growth.sameSince", { date })
+        : t(delta > 0 ? "growth.upSince" : "growth.downSince", {
+            delta: amount,
+            unit: info.unit,
+            date,
+          });
+  } else {
+    detail = reading?.range ?? t("growth.measuredOn", { date: formatDate(latest.date, locale) });
+  }
+  return reading ? { label: reading.label, level: reading.statusLevel, detail } : { detail };
+}

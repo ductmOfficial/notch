@@ -52,7 +52,7 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 | 31  | Maker and country of each vaccine, on the Vaccines screen and in the PDF | `feat/vaccine-origin`       | ✅     |
 | 32  | Appointments lead with the diseases, then the vaccine and dose           | `feat/appointment-diseases` | ✅     |
 | 33  | Growth reading: WHO classification, normal range, change, advice         | `feat/growth-assessment`    | ✅     |
-| 34  | Wider content; Growth summary cards fill their row                       | `fix/growth-cards-grid`     | ✅     |
+| 34  | Wider content; Growth shows three chart cards, each with its reading     | `fix/growth-cards-grid`     | ✅     |
 
 Each step is a pull request with green checks (`Browser` from step 9), merged with rebase.
 
@@ -129,6 +129,8 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 | Growth readings use WHO's names for each band                     | Parents asked whether a value is fine and where the limits are; WHO's published reading is the reference, shown with its source and a note that it is not a diagnosis              |
 | Advice only points to a doctor                                    | The app keeps measuring and comparing; it never names a cause or a treatment                                                                                                       |
 | A fall of 1 SD between two measurements asks for a doctor         | Crossing a line of the chart is what WHO asks to look into, even within the normal range; approximate values are left out of the comparison                                        |
+| One chart card per indicator, head circumference left to the PDF  | Weight, length and BMI side by side answer "is she growing well" at a glance; head circumference is recorded and printed, not charted on screen                                    |
+| A compact chart frame for three columns                           | SVG text scales with the frame; a narrower frame keeps labels near their size in a third of the screen, and the wide frame stays for one column                                    |
 | No Co-Authored-By trailer in commits                              | Maintainer's preference                                                                                                                                                            |
 
 ## Follow-ups

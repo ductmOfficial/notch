@@ -194,6 +194,7 @@ pnpm --filter web e2e
 - **Light, dark or system.** Settings has a theme picker. The choice is kept in a cookie and applied on the server, so the page never flashes the wrong theme; "System" follows the device.
 - **Vietnamese and English.** Every text comes from `lib/i18n/messages.ts`. The language chosen in Settings is kept in a cookie; otherwise the browser's language is used, with Vietnamese as the fallback. Dates, ages and numbers follow the language.
 - **Icons** are Material Symbols (Rounded), generated into `components/icons.tsx` as inline SVG.
+- **Growth** shows a card per indicator (weight, length/height, BMI) with its WHO reading and the change since the previous measurement, three across on wide screens. The SVG chart has a wide frame for a full-width card, scrolling sideways on phones, and a compact one for a third of the screen, so labels keep their size. Head circumference is recorded and in the PDF, not charted on screen.
 
 ## Calendar
 
