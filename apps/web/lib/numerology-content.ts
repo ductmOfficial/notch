@@ -1,5 +1,5 @@
 import type { Locale } from "./i18n/messages";
-import type { ArrowKey } from "./numerology";
+import type { ArrowKey, PlaneKey } from "./numerology";
 
 /**
  * What each number and line of the chart is said to mean, for the "just for fun" numerology
@@ -363,5 +363,208 @@ export const ARROW_MEANINGS: Record<Locale, Record<ArrowKey, ArrowMeaning>> = {
       full: "Good intuition, perceptive.",
       empty: "May trust clear reasons more than feelings.",
     },
+  },
+};
+
+/** How a digit reads by how often it appears in a chart: once, twice, three times, four or more. */
+export type CellMeanings = Record<number, Record<1 | 2 | 3 | 4, string>>;
+
+export const CELL_MEANINGS: Record<Locale, CellMeanings> = {
+  vi: {
+    1: {
+      1: "Có suy nghĩ riêng nhưng chưa dễ nói ra cảm xúc bằng lời.",
+      2: "Cân bằng: nói được điều mình nghĩ và biết lắng nghe.",
+      3: "Hoạt ngôn, vui vẻ, thích trò chuyện.",
+      4: "Nói rất nhiều, có lúc quá mức; cần học cách dừng và nghe.",
+    },
+    2: {
+      1: "Nhạy cảm, có trực giác.",
+      2: "Trực giác tốt, hiểu người khác nhanh.",
+      3: "Rất nhạy cảm, dễ bị cảm xúc cuốn theo.",
+      4: "Nhạy cảm sâu sắc, cần không gian yên tĩnh để cân bằng.",
+    },
+    3: {
+      1: "Trí nhớ tốt, có óc sáng tạo.",
+      2: "Tư duy nhanh, giàu tưởng tượng.",
+      3: "Rất giàu tưởng tượng, đôi khi hay mơ mộng.",
+      4: "Nhiều ý tưởng cùng lúc, cần được giúp tập trung vào từng việc.",
+    },
+    4: {
+      1: "Thực tế, biết sắp xếp.",
+      2: "Ngăn nắp, khéo tay.",
+      3: "Chăm chỉ, cầu toàn.",
+      4: "Dễ cứng nhắc với khuôn khổ; cần thêm thời gian vui chơi tự do.",
+    },
+    5: {
+      1: "Chủ động, yêu tự do.",
+      2: "Quyết đoán, mạnh mẽ.",
+      3: "Nhiều năng lượng, có lúc bốc đồng.",
+      4: "Năng lượng dồi dào, cần nhiều vận động và giới hạn rõ ràng.",
+    },
+    6: {
+      1: "Yêu gia đình, có óc thẩm mỹ.",
+      2: "Sáng tạo, chu đáo với người thân.",
+      3: "Hay bận tâm cho người khác, cần được trấn an.",
+      4: "Gánh nhiều trách nhiệm quá sớm; cần được nhắc rằng mình còn bé.",
+    },
+    7: {
+      1: "Học hỏi qua trải nghiệm thực tế.",
+      2: "Suy ngẫm sâu, rút ra bài học riêng.",
+      3: "Thích tự mình tìm hiểu, cần được khích lệ chia sẻ.",
+      4: "Hay tự xoay xở một mình; cần được đồng hành nhiều hơn khi gặp khó.",
+    },
+    8: {
+      1: "Tỉ mỉ, đáng tin.",
+      2: "Độc lập, có chính kiến.",
+      3: "Rất độc lập, có lúc khó chịu khi phải thay đổi.",
+      4: "Bướng bỉnh khi chưa hiểu lý do; nên giải thích thay vì ép buộc.",
+    },
+    9: {
+      1: "Tốt bụng, có lý tưởng.",
+      2: "Thông minh, giàu hoài bão.",
+      3: "Có tham vọng, đôi khi khó hài lòng với bản thân.",
+      4: "Đặt kỳ vọng cao cho mình; cần được khen nỗ lực nhiều hơn.",
+    },
+  },
+  en: {
+    1: {
+      1: "Has their own thoughts but does not easily put feelings into words.",
+      2: "Balanced: says what they think and listens well.",
+      3: "Talkative and cheerful, loves to chat.",
+      4: "Talks a lot, sometimes too much; learning to pause and listen.",
+    },
+    2: {
+      1: "Sensitive, with intuition.",
+      2: "Good intuition, reads others quickly.",
+      3: "Very sensitive, easily carried by feelings.",
+      4: "Deeply sensitive, needs quiet space to rebalance.",
+    },
+    3: {
+      1: "Good memory and creativity.",
+      2: "Quick thinking, rich imagination.",
+      3: "Very imaginative, sometimes dreamy.",
+      4: "Many ideas at once; needs help focusing on one thing.",
+    },
+    4: {
+      1: "Practical, likes order.",
+      2: "Tidy and good with hands.",
+      3: "Hard-working, a perfectionist.",
+      4: "Can hold rules too tightly; needs more free play.",
+    },
+    5: {
+      1: "Eager and freedom-loving.",
+      2: "Decisive and strong.",
+      3: "Full of energy, sometimes impulsive.",
+      4: "Abundant energy; needs plenty of movement and clear limits.",
+    },
+    6: {
+      1: "Loves family, has a sense of beauty.",
+      2: "Creative, thoughtful with loved ones.",
+      3: "Worries about others; needs reassurance.",
+      4: "Takes on too much too early; needs reminding they are still small.",
+    },
+    7: {
+      1: "Learns through real experience.",
+      2: "Reflects deeply, draws their own lessons.",
+      3: "Likes to find out alone; encourage them to share.",
+      4: "Copes alone a lot; needs more company when things are hard.",
+    },
+    8: {
+      1: "Careful and reliable.",
+      2: "Independent, with opinions.",
+      3: "Very independent, sometimes uneasy with change.",
+      4: "Stubborn until they understand why; explain rather than insist.",
+    },
+    9: {
+      1: "Kind, with ideals.",
+      2: "Bright and ambitious.",
+      3: "Ambitious, sometimes hard on themselves.",
+      4: "Sets high expectations; needs their effort praised more.",
+    },
+  },
+};
+
+/** What an empty place in the chart invites parents to nurture. */
+export const MISSING_MEANINGS: Record<Locale, Record<number, string>> = {
+  vi: {
+    1: "Thiếu số 1: khích lệ bé nói ra mong muốn và tự làm việc nhỏ.",
+    2: "Thiếu số 2: giúp bé gọi tên cảm xúc và để ý cảm xúc của bạn.",
+    3: "Thiếu số 3: cùng bé đọc, kể chuyện và chơi trò tưởng tượng.",
+    4: "Thiếu số 4: tập cho bé nếp sinh hoạt đều và sắp xếp đồ đạc.",
+    5: "Thiếu số 5: cho bé tự chọn và thử sức với việc mới.",
+    6: "Thiếu số 6: để bé phụ việc nhà và chăm sóc người thân.",
+    7: "Thiếu số 7: cho bé tự trải nghiệm, rồi cùng nói về điều học được.",
+    8: "Thiếu số 8: giao việc nhỏ để bé tự làm đến cùng.",
+    9: "Thiếu số 9: kể cho bé về lòng tốt, cùng bé giúp người khác.",
+  },
+  en: {
+    1: "No 1: encourage them to say what they want and do small things alone.",
+    2: "No 2: help them name feelings and notice how friends feel.",
+    3: "No 3: read, tell stories and play pretend together.",
+    4: "No 4: build steady routines and tidy up together.",
+    5: "No 5: let them choose and try new things.",
+    6: "No 6: let them help at home and care for family.",
+    7: "No 7: let them try things out, then talk about what they learned.",
+    8: "No 8: give small tasks they finish on their own.",
+    9: "No 9: tell them about kindness and help others together.",
+  },
+};
+
+export interface PlaneMeaning {
+  readonly name: string;
+  /** When this row or column holds the most digits. */
+  readonly strong: string;
+}
+
+export const PLANE_MEANINGS: Record<Locale, Record<PlaneKey, PlaneMeaning>> = {
+  vi: {
+    rowMind: { name: "Hàng trí não (3-6-9)", strong: "Thiên về suy nghĩ, ghi nhớ và tưởng tượng." },
+    rowHeart: { name: "Hàng cảm xúc (2-5-8)", strong: "Thiên về cảm nhận, trực giác và tình cảm." },
+    rowBody: {
+      name: "Hàng thể chất (1-4-7)",
+      strong: "Thiên về vận động, làm bằng tay và việc cụ thể.",
+    },
+    colThought: {
+      name: "Cột tư duy (1-2-3)",
+      strong: "Thích nghĩ trước, lên kế hoạch rồi mới làm.",
+    },
+    colWill: { name: "Cột ý chí (4-5-6)", strong: "Bền bỉ, đã quyết là theo đến cùng." },
+    colAction: {
+      name: "Cột hành động (7-8-9)",
+      strong: "Thích bắt tay vào làm, học qua việc làm.",
+    },
+  },
+  en: {
+    rowMind: {
+      name: "Mental row (3-6-9)",
+      strong: "Leans to thinking, remembering and imagining.",
+    },
+    rowHeart: {
+      name: "Emotional row (2-5-8)",
+      strong: "Leans to feeling, intuition and affection.",
+    },
+    rowBody: {
+      name: "Physical row (1-4-7)",
+      strong: "Leans to movement, hands-on and concrete tasks.",
+    },
+    colThought: { name: "Thought column (1-2-3)", strong: "Likes to think and plan before doing." },
+    colWill: { name: "Will column (4-5-6)", strong: "Persistent, follows through once decided." },
+    colAction: { name: "Action column (7-8-9)", strong: "Likes to get going and learn by doing." },
+  },
+};
+
+/** The 5 sits in the middle, on four arrows (4-5-6, 2-5-8, 1-5-9, 3-5-7). */
+export const CENTER_FIVE: Record<Locale, { readonly present: string; readonly absent: string }> = {
+  vi: {
+    present:
+      "Có số 5 ở ô giữa: số 5 nằm trên bốn mũi tên, như một điểm tựa giúp cảm xúc và ý chí kết nối với nhau.",
+    absent:
+      "Không có số 5 ở ô giữa: bốn mũi tên đi qua ô này đều thiếu một điểm. Có thể giúp bé bằng cách cho tự chọn, nói ra cảm xúc và theo đuổi việc mình thích.",
+  },
+  en: {
+    present:
+      "A 5 in the middle: it sits on four arrows, an anchor that helps feelings and will work together.",
+    absent:
+      "No 5 in the middle: the four arrows through it each miss a place. Help by offering choices, naming feelings and letting them pursue what they enjoy.",
   },
 };

@@ -1,7 +1,16 @@
 import { describe, expect, it } from "vitest";
 
-import { ARROWS } from "./numerology";
-import { ARROW_MEANINGS, MEANINGS, NUMBERS, YEAR_THEMES } from "./numerology-content";
+import { ARROWS, PLANES } from "./numerology";
+import {
+  ARROW_MEANINGS,
+  CELL_MEANINGS,
+  CENTER_FIVE,
+  MEANINGS,
+  MISSING_MEANINGS,
+  NUMBERS,
+  PLANE_MEANINGS,
+  YEAR_THEMES,
+} from "./numerology-content";
 
 describe("numerology content", () => {
   it.each(["vi", "en"] as const)("covers every number and line in %s", (locale) => {
@@ -27,4 +36,22 @@ describe("numerology content", () => {
       expect(en?.parents.length, String(n)).toBe(vi?.parents.length);
     }
   });
+});
+
+describe("chart reading content", () => {
+  it.each(["vi", "en"] as const)(
+    "covers every digit, count, plane and the centre in %s",
+    (locale) => {
+      for (let d = 1; d <= 9; d++) {
+        for (const n of [1, 2, 3, 4] as const)
+          expect(CELL_MEANINGS[locale][d]?.[n], `${String(d)}×${String(n)}`).toBeTruthy();
+        expect(MISSING_MEANINGS[locale][d], String(d)).toBeTruthy();
+      }
+      for (const key of Object.keys(PLANES)) {
+        const plane = PLANE_MEANINGS[locale][key as keyof typeof PLANES];
+        expect(plane.name && plane.strong, key).toBeTruthy();
+      }
+      expect(CENTER_FIVE[locale].present && CENTER_FIVE[locale].absent).toBeTruthy();
+    },
+  );
 });

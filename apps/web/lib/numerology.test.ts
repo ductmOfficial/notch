@@ -3,7 +3,10 @@ import { describe, expect, it } from "vitest";
 import {
   attitudeNumber,
   birthChart,
+  addedByName,
   combinedChart,
+  countBucket,
+  dominantDigits,
   birthdayNumber,
   expressionNumber,
   lifePathNumber,
@@ -11,6 +14,7 @@ import {
   personalityNumber,
   personalYearNumber,
   pinnacles,
+  planeTotals,
   plainLetters,
   soulUrgeNumber,
 } from "./numerology";
@@ -127,5 +131,34 @@ describe("combinedChart", () => {
     expect(chart.full).toEqual(["practical"]);
     expect(chart.empty).toEqual(["mind"]);
     expect(chart.missing).toEqual([3, 6, 8, 9]);
+  });
+});
+
+describe("reading a chart", () => {
+  const date = birthChart("2025-05-20");
+  const combined = combinedChart("2025-05-20", "Mây");
+
+  it("totals rows and columns and names the fullest", () => {
+    // 2 ×3 and 5 ×2: the 2-5-8 row holds all five; columns 1-2-3 (3) and 4-5-6 (2).
+    const planes = planeTotals(date);
+    expect(planes.totals).toMatchObject({ rowHeart: 5, rowMind: 0, rowBody: 0 });
+    expect(planes.totals).toMatchObject({ colThought: 3, colWill: 2, colAction: 0 });
+    expect(planes.topRows).toEqual(["rowHeart"]);
+    expect(planes.topCols).toEqual(["colThought"]);
+    expect(planeTotals(birthChart("0000-00-00")).topRows).toEqual([]);
+  });
+
+  it("finds the most repeated digits, from two times on", () => {
+    expect(dominantDigits(date)).toEqual([2]);
+    expect(dominantDigits(birthChart("1987-06-23"))).toEqual([]);
+  });
+
+  it("says what the name fills in", () => {
+    // Mây adds 1, 4 and 7, which completes 1-4-7.
+    expect(addedByName(date, combined)).toEqual({ digits: [1, 4, 7], arrows: ["practical"] });
+  });
+
+  it("buckets counts as 1, 2, 3 and 4 or more", () => {
+    expect([1, 2, 3, 4, 6].map(countBucket)).toEqual([1, 2, 3, 4, 4]);
   });
 });
