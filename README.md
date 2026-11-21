@@ -228,7 +228,8 @@ A thin card at the end of Today links to a numerology page for the selected chil
 
 - **Life path**, the main number, with strengths, what to nurture and how parents can help.
 - **Other numbers**: expression (the birth-certificate name, or the family's name until one is entered; Vietnamese marks dropped, A=1 … I=9), soul urge (vowels, Y included), personality (consonants), attitude (day and month), birthday, maturity (life path + expression), the English name when there is one, and the personal year.
-- **Birth charts**: the digits of the birth date on a 3×3 grid, and a combined chart that adds the letters of the full name, each with its full and empty arrows and missing digits.
+- **Birth charts**: the digits of the birth date on a 3×3 grid, and a combined chart that adds the letters of the full name. Each is read in full: its full and empty arrows; what every place means by how often its digit appears (once, twice, three times, four or more); the empty places, with what to nurture; the most repeated digit; the totals of the three rows (mental, emotional, physical) and columns (thought, will, action) with the strongest ones; and whether the 5, on four arrows, sits in the middle.
+- **What the name adds**: the digits the name fills in and the arrows it completes, compared with the birth date alone.
 - **Four pinnacles**: stages of life by age, the current one highlighted.
 
 Every number shows how it was reached. The page says plainly that numerology is entertainment with no scientific basis, and the descriptions are kind and practical, never about health or the future. It is not in the navigation or the PDF, and it reads nothing but the names and the birth date. The calculations live in `apps/web/lib/numerology.ts` and the texts, in Vietnamese and English, in `apps/web/lib/numerology-content.ts`.

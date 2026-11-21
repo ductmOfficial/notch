@@ -195,3 +195,64 @@ export function pinnacles(birthDate: string): readonly Pinnacle[] {
     { reading: p4, fromAge: firstEnd + 19, toAge: null },
   ];
 }
+
+// ── Reading a chart ────────────────────────────────────────────────────────
+
+/** The three rows (planes) and three columns of the chart. */
+export const PLANES = {
+  rowMind: [3, 6, 9],
+  rowHeart: [2, 5, 8],
+  rowBody: [1, 4, 7],
+  colThought: [1, 2, 3],
+  colWill: [4, 5, 6],
+  colAction: [7, 8, 9],
+} as const satisfies Record<string, readonly [number, number, number]>;
+
+export type PlaneKey = keyof typeof PLANES;
+
+export interface PlaneTotals {
+  /** How many digits fall in each row and column. */
+  readonly totals: Readonly<Record<PlaneKey, number>>;
+  /** The fullest row(s) and column(s); empty when the chart has no digit. */
+  readonly topRows: readonly PlaneKey[];
+  readonly topCols: readonly PlaneKey[];
+}
+
+/** Counts each row and column of a chart and names the fullest ones. */
+export function planeTotals(chart: BirthChart): PlaneTotals {
+  const keys = Object.keys(PLANES) as PlaneKey[];
+  const totals = Object.fromEntries(
+    keys.map((k) => [k, PLANES[k].reduce((sum, d) => sum + (chart.counts[d] ?? 0), 0)]),
+  ) as Record<PlaneKey, number>;
+  const top = (group: readonly PlaneKey[]) => {
+    const max = Math.max(...group.map((k) => totals[k]));
+    return max === 0 ? [] : group.filter((k) => totals[k] === max);
+  };
+  return {
+    totals,
+    topRows: top(["rowMind", "rowHeart", "rowBody"]),
+    topCols: top(["colThought", "colWill", "colAction"]),
+  };
+}
+
+/** The digit(s) that appear most, when one appears at least twice. */
+export function dominantDigits(chart: BirthChart): readonly number[] {
+  const max = Math.max(...[1, 2, 3, 4, 5, 6, 7, 8, 9].map((d) => chart.counts[d] ?? 0));
+  if (max < 2) return [];
+  return [1, 2, 3, 4, 5, 6, 7, 8, 9].filter((d) => (chart.counts[d] ?? 0) === max);
+}
+
+/** What the name adds to the birth date: digits it fills in and arrows it completes. */
+export function addedByName(
+  date: BirthChart,
+  combined: BirthChart,
+): { readonly digits: readonly number[]; readonly arrows: readonly ArrowKey[] } {
+  return {
+    digits: date.missing.filter((d) => !combined.missing.includes(d)),
+    arrows: combined.full.filter((k) => !date.full.includes(k)),
+  };
+}
+
+/** The bucket a count reads in: 1, 2, 3, or 4 for four times and more. */
+export const countBucket = (count: number): 1 | 2 | 3 | 4 =>
+  count >= 4 ? 4 : count <= 1 ? 1 : (count as 2 | 3);

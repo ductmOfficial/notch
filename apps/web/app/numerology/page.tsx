@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import type { ReactNode } from "react";
 
 import { BUTTON } from "../../components/button-styles";
+import { ChartSwitch } from "../../components/ChartSwitch";
 import { Icon } from "../../components/icons";
 import { type CardMotifProps } from "../../components/Motifs";
 import { Card, NoChild, NoDatabase } from "../../components/ui";
@@ -14,19 +16,32 @@ import {
   type ArrowKey,
   attitudeNumber,
   birthChart,
+  addedByName,
   birthdayNumber,
   type BirthChart,
   combinedChart,
+  countBucket,
+  dominantDigits,
   expressionNumber,
   lifePathNumber,
   maturityNumber,
   type NumberReading,
   personalityNumber,
   personalYearNumber,
+  type PlaneKey,
   pinnacles,
+  planeTotals,
   soulUrgeNumber,
 } from "../../lib/numerology";
-import { ARROW_MEANINGS, MEANINGS, YEAR_THEMES } from "../../lib/numerology-content";
+import {
+  ARROW_MEANINGS,
+  CELL_MEANINGS,
+  CENTER_FIVE,
+  MEANINGS,
+  MISSING_MEANINGS,
+  PLANE_MEANINGS,
+  YEAR_THEMES,
+} from "../../lib/numerology-content";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getI18n();
@@ -76,6 +91,8 @@ export default async function NumerologyPage({ searchParams }: Props) {
   const lifePath = lifePathNumber(child.birthDate);
   const expression = expressionNumber(name);
   const chart = birthChart(child.birthDate);
+  const combined = combinedChart(child.birthDate, name);
+  const added = addedByName(chart, combined);
   const peaks = pinnacles(child.birthDate);
 
   const others: SmallCard[] = [
@@ -204,15 +221,27 @@ export default async function NumerologyPage({ searchParams }: Props) {
           {t("numerology.sectionChart")}
         </h2>
         <p className="body-medium text-on-surface-variant">{t("numerology.chartIntro")}</p>
-        <div className="grid gap-3 xl:grid-cols-2">
-          <ChartCard title={t("numerology.chartDate")} chart={chart} t={t} locale={locale} />
-          <ChartCard
-            title={t("numerology.chartCombined", { name })}
-            chart={combinedChart(child.birthDate, name)}
-            t={t}
-            locale={locale}
-          />
-        </div>
+        <ChartSwitch
+          legend={t("numerology.chartSwitch")}
+          options={[
+            {
+              value: "date",
+              label: t("numerology.chartDate"),
+              panel: <ChartPanel chart={chart} t={t} locale={locale} />,
+            },
+            {
+              value: "combined",
+              // Short, so the switch stays on one line on a phone; the name shows below.
+              label: t("numerology.chartCombinedShort"),
+              panel: (
+                <div className="space-y-3">
+                  <NameAdds added={added} combined={combined} name={name} t={t} locale={locale} />
+                  <ChartPanel chart={combined} t={t} locale={locale} />
+                </div>
+              ),
+            },
+          ]}
+        />
       </section>
 
       <section aria-labelledby="pinnacles" className="space-y-3">
@@ -351,63 +380,219 @@ function NumberCard({ card, t, locale }: { card: SmallCard; t: Translate; locale
   );
 }
 
-/** A 3×3 chart with its full and empty arrows and the missing digits. */
-function ChartCard({
-  title,
-  chart,
+const PLANE_GROUPS: readonly (readonly PlaneKey[])[] = [
+  ["rowMind", "rowHeart", "rowBody"],
+  ["colThought", "colWill", "colAction"],
+];
+
+/**
+ * One chart, read for a parent: the grid and a summary first, then the arrows next to the
+ * rows and columns, then every digit 1–9 with what it says, present or empty.
+ */
+function ChartPanel({ chart, t, locale }: { chart: BirthChart; t: Translate; locale: Locale }) {
+  const dominant = dominantDigits(chart);
+  const planes = planeTotals(chart);
+  const max = Math.max(1, ...Object.values(planes.totals));
+  const strongest = [...planes.topRows, ...planes.topCols];
+  const hasFive = (chart.counts[5] ?? 0) > 0;
+  return (
+    <div className="space-y-3">
+      <div className="grid gap-3 lg:grid-cols-[auto_1fr]">
+        <Card tone="filled" className="flex justify-center p-5">
+          <table className="border-collapse self-start" aria-label={t("numerology.chartGrid")}>
+            <tbody>
+              {CHART_ROWS.map((row) => (
+                <tr key={row[0]}>
+                  {row.map((digit) => {
+                    const count = chart.counts[digit] ?? 0;
+                    return (
+                      <td
+                        key={digit}
+                        className={`title-medium size-20 border border-outline-variant text-center tabular-nums ${count === 0 ? "text-outline" : ""}`}
+                      >
+                        {count === 0 ? "·" : String(digit).repeat(count)}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Card>
+        <Card tone="filled" className="p-5">
+          <h3 className="title-medium mb-3">{t("numerology.summary")}</h3>
+          <dl className="grid gap-x-6 gap-y-3 sm:grid-cols-2">
+            <Fact label={t("numerology.dominant")}>
+              {dominant.length === 0
+                ? t("numerology.noDominant")
+                : dominant
+                    .map(
+                      (d) =>
+                        `${String(d).repeat(chart.counts[d] ?? 0)}: ${CELL_MEANINGS[locale][d]?.[countBucket(chart.counts[d] ?? 0)] ?? ""}`,
+                    )
+                    .join(" ")}
+            </Fact>
+            <Fact label={t("numerology.tendency")}>
+              {strongest.length === 0
+                ? t("numerology.arrowsNone")
+                : strongest.map((k) => PLANE_MEANINGS[locale][k].strong).join(" ")}
+            </Fact>
+            <Fact label={t("numerology.center")}>
+              {hasFive ? CENTER_FIVE[locale].present : CENTER_FIVE[locale].absent}
+            </Fact>
+            <Fact label={t("numerology.arrows")}>
+              {t("numerology.arrowsCount", { full: chart.full.length, empty: chart.empty.length })}
+              {chart.missing.length > 0 && (
+                <span className="block text-on-surface-variant">
+                  {t("numerology.missing", { digits: chart.missing.join(", ") })}
+                </span>
+              )}
+            </Fact>
+          </dl>
+        </Card>
+      </div>
+
+      <div className="grid gap-3 lg:grid-cols-2">
+        <Card tone="filled" className="grid gap-4 p-5 sm:grid-cols-2">
+          <ArrowList
+            title={t("numerology.arrowsFull")}
+            keys={chart.full}
+            text={(k) => ARROW_MEANINGS[locale][k].full}
+            locale={locale}
+            none={t("numerology.arrowsNone")}
+          />
+          <ArrowList
+            title={t("numerology.arrowsEmpty")}
+            keys={chart.empty}
+            text={(k) => ARROW_MEANINGS[locale][k].empty}
+            locale={locale}
+            none={t("numerology.arrowsNone")}
+          />
+        </Card>
+        <Card tone="filled" className="space-y-4 p-5">
+          <h3 className="title-small">{t("numerology.planes")}</h3>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {PLANE_GROUPS.map((group) => (
+              <ul key={group[0]} className="space-y-2">
+                {group.map((k) => (
+                  <li key={k} className="body-small space-y-1">
+                    <span className="flex justify-between gap-2">
+                      <span className={strongest.includes(k) ? "font-medium" : ""}>
+                        {PLANE_MEANINGS[locale][k].name}
+                      </span>
+                      <span className="tabular-nums text-on-surface-variant">
+                        {t("numerology.planesCount", { n: planes.totals[k] })}
+                      </span>
+                    </span>
+                    <span
+                      aria-hidden="true"
+                      className="block h-2 rounded-full bg-surface-container-low"
+                    >
+                      <span
+                        className="block h-2 rounded-full bg-primary"
+                        style={{ width: `${String((planes.totals[k] / max) * 100)}%` }}
+                      />
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ))}
+          </div>
+        </Card>
+      </div>
+
+      <Card tone="filled" className="p-5">
+        <h3 className="title-small mb-3">{t("numerology.cells")}</h3>
+        <ul className="grid gap-x-6 gap-y-3 md:grid-cols-2 xl:grid-cols-3">
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((d) => {
+            const count = chart.counts[d] ?? 0;
+            return (
+              <li key={d} className="flex gap-3">
+                <span
+                  className={`label-large inline-flex h-8 min-w-12 shrink-0 items-center justify-center rounded-m3-sm px-2 tabular-nums ${count === 0 ? "border border-dashed border-outline text-on-surface-variant" : "bg-secondary-container text-on-secondary-container"}`}
+                >
+                  {count === 0 ? String(d) : String(d).repeat(count)}
+                </span>
+                <span className="body-medium">
+                  <span className="block text-on-surface-variant">
+                    {count === 0
+                      ? t("numerology.cellEmpty")
+                      : t("numerology.cellTimes", { n: count })}
+                  </span>
+                  {count === 0
+                    ? MISSING_MEANINGS[locale][d]
+                    : CELL_MEANINGS[locale][d]?.[countBucket(count)]}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      </Card>
+    </div>
+  );
+}
+
+function Fact({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div>
+      <dt className="title-small">{label}</dt>
+      <dd className="body-medium">{children}</dd>
+    </div>
+  );
+}
+
+/** What the full name adds to the birth date: the digits it fills in, the arrows it completes. */
+function NameAdds({
+  added,
+  combined,
+  name,
   t,
   locale,
 }: {
-  title: string;
-  chart: BirthChart;
+  added: { readonly digits: readonly number[]; readonly arrows: readonly ArrowKey[] };
+  combined: BirthChart;
+  name: string;
   t: Translate;
   locale: Locale;
 }) {
   return (
-    <Card tone="filled" className="flex flex-col gap-4 p-5 sm:flex-row">
-      <div className="shrink-0 space-y-2">
-        <h3 className="title-small">{title}</h3>
-        <table className="border-collapse" aria-label={title}>
-          <tbody>
-            {CHART_ROWS.map((row) => (
-              <tr key={row[0]}>
-                {row.map((digit) => {
-                  const count = chart.counts[digit] ?? 0;
-                  return (
-                    <td
-                      key={digit}
-                      className={`title-medium size-16 border border-outline-variant text-center tabular-nums ${count === 0 ? "text-outline" : ""}`}
-                    >
-                      {count === 0 ? "·" : String(digit).repeat(count)}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="space-y-4">
-        <ArrowList
-          title={t("numerology.arrowsFull")}
-          keys={chart.full}
-          text={(k) => ARROW_MEANINGS[locale][k].full}
-          locale={locale}
-          none={t("numerology.arrowsNone")}
-        />
-        <ArrowList
-          title={t("numerology.arrowsEmpty")}
-          keys={chart.empty}
-          text={(k) => ARROW_MEANINGS[locale][k].empty}
-          locale={locale}
-          none={t("numerology.arrowsNone")}
-        />
-        {chart.missing.length > 0 && (
-          <p className="body-medium text-on-surface-variant">
-            {t("numerology.missing", { digits: chart.missing.join(", ") })}
-          </p>
-        )}
-      </div>
+    <Card tone="outlined" className="space-y-3 p-5">
+      <h3 className="title-medium">{t("numerology.compare")}</h3>
+      <p className="body-medium text-on-surface-variant">
+        {t("numerology.compareIntro", { name })}
+      </p>
+      {added.digits.length === 0 && added.arrows.length === 0 ? (
+        <p className="body-medium">{t("numerology.compareNone")}</p>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2">
+          {added.digits.length > 0 && (
+            <div>
+              <h4 className="title-small mb-2">{t("numerology.compareDigits")}</h4>
+              <ul className="space-y-1">
+                {added.digits.map((d) => (
+                  <li key={d} className="body-medium">
+                    <span className="font-medium tabular-nums">{d}</span>:{" "}
+                    {CELL_MEANINGS[locale][d]?.[countBucket(combined.counts[d] ?? 1)]}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {added.arrows.length > 0 && (
+            <div>
+              <h4 className="title-small mb-2">{t("numerology.compareArrows")}</h4>
+              <ul className="space-y-1">
+                {added.arrows.map((k) => (
+                  <li key={k} className="body-medium">
+                    <span className="font-medium">{ARROW_MEANINGS[locale][k].name}</span>:{" "}
+                    {ARROW_MEANINGS[locale][k].full}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
     </Card>
   );
 }
