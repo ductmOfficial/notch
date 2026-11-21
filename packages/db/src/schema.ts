@@ -127,7 +127,12 @@ export const child = pgTable(
     familyId: uuid()
       .notNull()
       .references(() => family.id, { onDelete: "cascade" }),
+    /** The name the family uses ("Mây"), shown across the app. */
     name: text().notNull(),
+    /** The name on the birth certificate, when the family enters it. */
+    fullName: text(),
+    /** An English name, when the child has one. */
+    englishName: text(),
     sex: text({ enum: ["male", "female"] }).notNull(),
     birthDate: date({ mode: "string" }).notNull(),
     birthTime: time(),

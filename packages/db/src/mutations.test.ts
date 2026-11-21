@@ -15,6 +15,7 @@ import {
   getMeasurement,
   recordDose,
   saveAppointment,
+  updateChild,
   updateMeasurement,
 } from "./mutations.js";
 import { listAppointments, listMeasurements, listVaccinations } from "./queries.js";
@@ -265,5 +266,45 @@ describe("appointments", () => {
         own.id,
       ),
     ).toBeUndefined();
+  });
+});
+
+describe("updateChild", () => {
+  it("edits the family's own child, trimming names and clearing empty ones", async () => {
+    const handle2 = createDb("pglite:memory");
+    await handle2.migrate();
+    const db2 = handle2.db;
+    const [f, g] = await db2
+      .insert(family)
+      .values([{ name: "A" }, { name: "B" }])
+      .returning();
+    const familyId = f?.id ?? "";
+    const c = await addChild(db2, {
+      familyId,
+      name: "Mây",
+      sex: "female",
+      birthDate: "2030-01-01",
+    });
+    const profile = {
+      name: " Mây ",
+      fullName: "  Lê Thị Mây ",
+      englishName: "",
+      sex: "female",
+      birthDate: "2030-01-02",
+      birthTime: "12:26",
+    } as const;
+    expect(await updateChild(db2, g?.id ?? "", c.id, profile)).toBeUndefined();
+    expect(await updateChild(db2, familyId, c.id, profile)).toMatchObject({
+      name: "Mây",
+      fullName: "Lê Thị Mây",
+      englishName: null,
+      birthDate: "2030-01-02",
+      birthTime: "12:26:00",
+    });
+    await expect(
+      updateChild(db2, familyId, c.id, { ...profile, birthTime: "25:00" }),
+    ).rejects.toThrow();
+    await expect(updateChild(db2, familyId, c.id, { ...profile, name: "  " })).rejects.toThrow();
+    await handle2.close();
   });
 });

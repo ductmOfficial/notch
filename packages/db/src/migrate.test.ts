@@ -10,12 +10,10 @@ import { drizzle } from "drizzle-orm/pglite";
 import { migrate } from "drizzle-orm/pglite/migrator";
 import { afterAll, describe, expect, it } from "vitest";
 
-import { syncCatalog } from "./catalog.js";
 import { createDb, type DbHandle } from "./client.js";
 import { migrateDatabase } from "./migrate.js";
 import * as schema from "./schema.js";
 import { disease, productDisease, vaccineProduct } from "./schema.js";
-import { seedChild } from "./seed.js";
 
 const handle = createDb("pglite:memory");
 const { db } = handle;
@@ -111,19 +109,43 @@ describe("migrating a database with records", () => {
     previous = folder;
     expect(latest).not.toBe("");
     await migrate(db, { migrationsFolder: folder });
-    await syncCatalog(db, CATALOG);
 
-    // Records as the app wrote them before: the demo child, a parent signed in, a calendar link.
-    const demo: unknown = JSON.parse(
-      await readFile(join(here, "..", "fixtures", "demo-child.json"), "utf8"),
-    );
-    await seedChild(db, CATALOG, demo);
+    // Records as the app wrote them before, in plain SQL: code written against the current
+    // schema would name columns the older database does not have yet.
     await client.exec(`
+      insert into disease (code, name_vi, name_en) values ('tuberculosis', 'Lao', 'Tuberculosis');
+      insert into vaccine_product (code, name) values ('bcg', 'BCG');
+      insert into product_disease (product_code, disease_code) values ('bcg', 'tuberculosis');
+      insert into family (id, name) values ('00000000-0000-4000-8000-000000000001', 'Gia đình');
+      insert into child (id, family_id, name, sex, birth_date, birth_time) values
+        ('00000000-0000-4000-8000-000000000002', '00000000-0000-4000-8000-000000000001',
+         'Mây', 'female', '2025-05-20', '08:40');
+      insert into measurement (child_id, measured_on, weight_g, length_mm, head_mm, note) values
+        ('00000000-0000-4000-8000-000000000002', '2025-05-20', 3150, 490, 338, null),
+        ('00000000-0000-4000-8000-000000000002', '2025-06-20', 4200, 535, null, 'clinic');
+      insert into vaccination (child_id, product_code, dose_no, given_on, place) values
+        ('00000000-0000-4000-8000-000000000002', 'bcg', 1, '2025-05-21', 'Phòng tiêm');
+      insert into appointment (child_id, product_code, dose_no, due_on) values
+        ('00000000-0000-4000-8000-000000000002', 'bcg', 2, null);
       insert into "user" (id, name, email, email_verified) values ('u1', 'Parent', 'parent@example.com', true);
       insert into session (id, user_id, token, expires_at) values ('s1', 'u1', 't1', now() + interval '1 day');
       insert into family_member (family_id, user_id) select id, 'u1' from family;
       insert into calendar_token (family_id, token_hash) select id, 'hash' from family;
     `);
+    // The health log exists from migration 0003 on.
+    const hasHealthLog = await client.query(
+      "select 1 from information_schema.tables where table_name = 'health_entry'",
+    );
+    if (hasHealthLog.rows.length > 0) {
+      await client.exec(`
+        insert into health_entry (id, child_id, kind, title, started_on) values
+          ('00000000-0000-4000-8000-000000000003', '00000000-0000-4000-8000-000000000002',
+           'illness', 'Fever', '2025-07-01');
+        insert into temperature (child_id, measured_at, tenths_c, health_entry_id) values
+          ('00000000-0000-4000-8000-000000000002', '2025-07-01T20:00:00+07:00', 385,
+           '00000000-0000-4000-8000-000000000003');
+      `);
+    }
     const before = await snapshot(client);
     expect(before.measurement?.length).toBeGreaterThan(0);
     expect(before.vaccination?.length).toBeGreaterThan(0);
@@ -137,8 +159,11 @@ describe("migrating a database with records", () => {
     await migrateDatabase(handle, CATALOG);
     const after = await snapshot(client);
 
+    // The catalog sync adds the products and diseases these few rows lacked; other tables keep
+    // exactly their rows.
+    const catalog = new Set(["disease", "vaccine_product", "product_disease"]);
     for (const [table, rows] of Object.entries(before)) {
-      expect(after[table], table).toHaveLength(rows.length);
+      if (!catalog.has(table)) expect(after[table], table).toHaveLength(rows.length);
       // A new column may appear on old rows; every value that was there stays.
       expect(after[table], table).toEqual(
         expect.arrayContaining(rows.map((row): unknown => expect.objectContaining(row))),

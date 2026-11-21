@@ -53,6 +53,11 @@ export function DateField({ hint, error, ...props }: InputProps) {
   return <SenTextField type="date" description={hint} error={error} {...props} />;
 }
 
+/** A time of day (HH:MM), with the native time picker. */
+export function TimeField({ hint, error, ...props }: InputProps) {
+  return <SenTextField type="time" description={hint} error={error} {...props} />;
+}
+
 /**
  * Multi-line note. Sen UI has no text area yet, so this one is native, wired the same way
  * (label, description) and styled with the same tokens.

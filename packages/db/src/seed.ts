@@ -11,6 +11,8 @@ const isoDate = z.iso.date();
 export const seedFileSchema = z.object({
   child: z.object({
     name: z.string().min(1),
+    fullName: z.string().min(1).optional(),
+    englishName: z.string().min(1).optional(),
     sex: z.enum(["male", "female"]),
     birthDate: isoDate,
     birthTime: z.iso.time({ precision: -1 }).optional(),
@@ -130,6 +132,8 @@ export async function seedChild(
         .values({
           familyId: newFamily.id,
           name: data.child.name,
+          fullName: data.child.fullName ?? null,
+          englishName: data.child.englishName ?? null,
           sex: data.child.sex,
           birthDate: data.child.birthDate,
           birthTime: data.child.birthTime ?? null,

@@ -56,6 +56,8 @@ export default async function NumerologyPage({ searchParams }: Props) {
   if (!child) return <NoChild />;
 
   const day = Number(child.birthDate.slice(8, 10));
+  // The expression number goes with the birth-certificate name; the family's name stands in.
+  const expressionName = child.fullName ?? child.name;
   const cards = [
     {
       key: "lifePath",
@@ -67,8 +69,8 @@ export default async function NumerologyPage({ searchParams }: Props) {
     {
       key: "expression",
       title: t("numerology.expression"),
-      from: t("numerology.expressionFrom", { name: child.name }),
-      reading: expressionNumber(child.name),
+      from: t("numerology.expressionFrom", { name: expressionName }),
+      reading: expressionNumber(expressionName),
       motif: { kind: "bloom", place: "bottomRight", tilt: -8 },
     },
     {
@@ -78,6 +80,17 @@ export default async function NumerologyPage({ searchParams }: Props) {
       reading: birthdayNumber(child.birthDate),
       motif: { kind: "petals", place: "right" },
     },
+    ...(child.englishName
+      ? [
+          {
+            key: "english",
+            title: t("numerology.englishName"),
+            from: t("numerology.englishFrom", { name: child.englishName }),
+            reading: expressionNumber(child.englishName),
+            motif: { kind: "bud", place: "bottomRight", tilt: 10 } as const,
+          },
+        ]
+      : []),
   ] satisfies readonly {
     key: string;
     title: string;
@@ -105,7 +118,21 @@ export default async function NumerologyPage({ searchParams }: Props) {
         {t("numerology.disclaimer")}
       </p>
 
-      <div className="grid gap-3 md:grid-cols-3">
+      {!child.fullName && (
+        <p className="body-medium flex flex-wrap items-center gap-x-3 gap-y-1">
+          {t("numerology.fullNameMissing", { name: child.name })}
+          <Link
+            href={`/child/edit?child=${child.id}`}
+            className="label-large text-primary underline"
+          >
+            {t("numerology.addFullName")}
+          </Link>
+        </p>
+      )}
+
+      <div
+        className={`grid gap-3 ${cards.length === 4 ? "md:grid-cols-2 xl:grid-cols-4" : "md:grid-cols-3"}`}
+      >
         {cards.map(({ key, ...card }) => (
           <NumberCard key={key} {...card} t={t} />
         ))}

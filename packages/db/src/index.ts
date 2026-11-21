@@ -40,11 +40,18 @@ export {
 export * as schema from "./schema.js";
 export type { SeedFile, SeedOptions, SeedResult } from "./seed.js";
 export { SeedConflictError, seedChild, seedFileSchema } from "./seed.js";
-export type { AppointmentInput, ChildInput, DoseInput, MeasurementInput } from "./mutations.js";
+export type {
+  AppointmentInput,
+  ChildInput,
+  ChildProfile,
+  DoseInput,
+  MeasurementInput,
+} from "./mutations.js";
 export {
   addChild,
   addMeasurement,
   childInputSchema,
+  childProfileSchema,
   appointmentInputSchema,
   deleteAppointment,
   deleteMeasurement,
@@ -57,5 +64,6 @@ export {
   measurementInputSchema,
   recordDose,
   saveAppointment,
+  updateChild,
   updateMeasurement,
 } from "./mutations.js";

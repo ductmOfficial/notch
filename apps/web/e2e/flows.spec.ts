@@ -348,3 +348,23 @@ test("numerology is reached from a card on Today, just for fun", async ({ page }
   await page.goto("/settings");
   await expect(page.getByRole("link", { name: /Thần số học/ })).toHaveCount(0);
 });
+
+test("the child's profile takes the birth-certificate and English names", async ({ page }) => {
+  await page.goto("/settings");
+  await page.getByRole("link", { name: "Sửa hồ sơ" }).click();
+  await expect(page).toHaveURL(/\/child\/edit\?child=/);
+  // Fictional names for the demo child.
+  await page.getByLabel("Tên khai sinh").fill("Lê Minh Mây");
+  await page.getByLabel("Tên tiếng Anh").fill("Mia");
+  await page.getByLabel("Giờ sinh").fill("08:40");
+  await page.getByRole("button", { name: "Lưu hồ sơ" }).click();
+  await expect(page).toHaveURL(/\/settings$/);
+  await expect(page.getByText("Tên khai sinh: Lê Minh Mây")).toBeVisible();
+  await expect(page.getByText("Tên tiếng Anh: Mia")).toBeVisible();
+
+  // Numerology now reads the birth-certificate name and adds the English one.
+  await page.goto("/numerology");
+  await expect(page.getByText("3+5+4+9+5+8+4+1+7 = 46 → 4+6 = 10 → 1+0 = 1")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Số tên tiếng Anh" })).toBeVisible();
+  await expect(page.getByText("Chưa có tên khai sinh")).toHaveCount(0);
+});

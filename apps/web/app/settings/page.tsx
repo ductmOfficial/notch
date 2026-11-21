@@ -1,12 +1,15 @@
 import { calendarLinkInfo } from "@notch/db";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { BackupCard } from "../../components/BackupCard";
+import { BUTTON } from "../../components/button-styles";
 import { CalendarLink, type CalendarLinkSummary } from "../../components/CalendarLink";
 import { LanguagePicker } from "../../components/LanguagePicker";
 import { PalettePicker } from "../../components/PalettePicker";
 import { SignOutButton } from "../../components/SignOutButton";
 import { ThemePicker } from "../../components/ThemePicker";
+import { Icon } from "../../components/icons";
 import { Card } from "../../components/ui";
 import { getDb } from "../../lib/db";
 import { formatDate, todayInVietnam } from "../../lib/format";
@@ -40,6 +43,45 @@ export default async function SettingsPage() {
         <PalettePicker initial={palette} />
         <LanguagePicker initial={locale} />
       </Card>
+      {viewer.children.length > 0 && (
+        <Card className="space-y-4 p-5">
+          <h2 className="title-small">{t("settings.children")}</h2>
+          <ul className="divide-y divide-outline-variant">
+            {viewer.children.map((c) => (
+              <li
+                key={c.id}
+                className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 py-3 first:pt-0 last:pb-0"
+              >
+                <div className="body-medium">
+                  <p className="body-large">{c.name}</p>
+                  {c.fullName && (
+                    <p className="text-on-surface-variant">
+                      {t("settings.childFullName", { name: c.fullName })}
+                    </p>
+                  )}
+                  {c.englishName && (
+                    <p className="text-on-surface-variant">
+                      {t("settings.childEnglishName", { name: c.englishName })}
+                    </p>
+                  )}
+                  <p className="text-on-surface-variant">
+                    {c.birthTime
+                      ? t("settings.childBornAt", {
+                          date: formatDate(c.birthDate, locale),
+                          time: c.birthTime.slice(0, 5),
+                        })
+                      : t("settings.childBorn", { date: formatDate(c.birthDate, locale) })}
+                  </p>
+                </div>
+                <Link href={`/child/edit?child=${c.id}`} className={BUTTON.outlined}>
+                  <Icon name="edit" size={18} />
+                  {t("settings.editChild")}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
       <Card className="space-y-4 p-5">
         <h2 className="title-small">{t("settings.calendar")}</h2>
         <CalendarLink summary={calendar} />

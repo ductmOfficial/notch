@@ -18,6 +18,32 @@ export const childInputSchema = z.object({
 
 export type ChildInput = z.input<typeof childInputSchema>;
 
+/** An optional name: trimmed, and empty means none. */
+const optionalName = z
+  .string()
+  .trim()
+  .max(100)
+  .nullable()
+  .default(null)
+  .transform((v) => (v === "" ? null : v));
+
+/** A child's profile as edited later: the family's name for the child, and the others. */
+export const childProfileSchema = z.object({
+  name: z.string().trim().min(1).max(60),
+  fullName: optionalName,
+  englishName: optionalName,
+  sex: z.enum(["female", "male"]),
+  birthDate: isoDate,
+  /** HH:MM, or none. */
+  birthTime: z
+    .string()
+    .regex(/^([01]\d|2[0-3]):[0-5]\d$/)
+    .nullable()
+    .default(null),
+});
+
+export type ChildProfile = z.input<typeof childProfileSchema>;
+
 /** One measurement; values in grams and millimetres, at least one present. */
 export const measurementInputSchema = z
   .object({
@@ -96,6 +122,22 @@ export async function addChild(db: Db, input: ChildInput): Promise<Child> {
   const values = childInputSchema.parse(input);
   const [row] = await db.insert(child).values(values).returning();
   if (!row) throw new Error("Child not saved");
+  return row;
+}
+
+/** Updates a child of the family; returns undefined when it is not one of theirs. */
+export async function updateChild(
+  db: Db,
+  familyId: string,
+  childId: string,
+  input: ChildProfile,
+): Promise<Child | undefined> {
+  const values = childProfileSchema.parse(input);
+  const [row] = await db
+    .update(child)
+    .set(values)
+    .where(and(eq(child.id, childId), eq(child.familyId, familyId)))
+    .returning();
   return row;
 }
 
