@@ -127,6 +127,11 @@
 }
 
 /* ── M3 type scale ───────────────────────────────────────────────────── */
+@utility display-medium {
+  font-size: 45px;
+  line-height: 52px;
+  font-weight: 400;
+}
 @utility display-small {
   font-size: 36px;
   line-height: 44px;

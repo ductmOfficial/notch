@@ -221,6 +221,10 @@ The Vaccines screen shows the national expanded programme (Tiêm chủng mở r�
 
 Each dose in the history, on screen and in the PDF, also shows who makes the vaccine and in which country ("GSK, Bỉ"), from the catalog in `packages/vaccines/src/catalog.ts`. It is the usual supply in Vietnam; the label on the box is the reference for a given lot, as a note under the list says.
 
+## Just for fun: numerology
+
+A thin card at the end of Today links to a numerology page for the selected child (`/numerology`): the life path number from the birth date, the expression number from the name (Vietnamese marks dropped, A=1 … I=9) and the birthday number, by the Pythagorean method popular in Vietnam, with master numbers 11, 22 and 33 kept. Each number shows how it was reached and a short, kind description. The page says plainly that numerology is entertainment with no scientific basis; it is not in the navigation or the PDF, its card on Today is labelled "just for fun" and kept apart from the health cards, and it reads nothing but the name and the birth date. The rules live in `apps/web/lib/numerology.ts`.
+
 ## Backup
 
 Settings downloads the family's records as `notch-backup-<date>.json` and restores such a file. The format (version 2, `packages/db/src/backup.ts`) keeps values as stored (grams, millimetres, tenths of a degree, product codes), so a backup restores exactly. Version 2 adds the health log; files of version 1 still restore, with no health entries. A restore shows what the file holds, asks for confirmation, checks the whole file (schema, known vaccines, one row per dose), then replaces the family's children and records in one transaction: everything or nothing. The file holds health data; nothing is uploaded anywhere except on restore.
