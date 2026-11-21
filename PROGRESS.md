@@ -53,6 +53,7 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 | 32  | Appointments lead with the diseases, then the vaccine and dose           | `feat/appointment-diseases` | ✅     |
 | 33  | Growth reading: WHO classification, normal range, change, advice         | `feat/growth-assessment`    | ✅     |
 | 34  | Wider content; Growth shows three chart cards, each with its reading     | `fix/growth-cards-grid`     | ✅     |
+| 35  | Teddy bear (gấu bông) and baby (em bé) palettes and drawings             | `feat/teddy-baby-palettes`  | ✅     |
 
 Each step is a pull request with green checks (`Browser` from step 9), merged with rebase.
 
@@ -131,6 +132,7 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 | A fall of 1 SD between two measurements asks for a doctor         | Crossing a line of the chart is what WHO asks to look into, even within the normal range; approximate values are left out of the comparison                                        |
 | One chart card per indicator, head circumference left to the PDF  | Weight, length and BMI side by side answer "is she growing well" at a glance; head circumference is recorded and printed, not charted on screen                                    |
 | A compact chart frame for three columns                           | SVG text scales with the frame; a narrower frame keeps labels near their size in a third of the screen, and the wide frame stays for one column                                    |
+| Teddy bear and baby palettes, "done" still green                  | Parents asked for softer, child-themed looks; a quieter primary makes caramel read brown, and "done" keeps its meaning across every palette                                        |
 | No Co-Authored-By trailer in commits                              | Maintainer's preference                                                                                                                                                            |
 
 ## Follow-ups

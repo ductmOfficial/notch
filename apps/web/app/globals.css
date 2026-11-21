@@ -108,7 +108,9 @@
 /* Drawings come in every palette; only the current one shows (no attribute: lotus). */
 [data-palette] .motif-lotus,
 :root:not([data-palette="daylily"]) .motif-daylily,
-:root:not([data-palette="cloud"]) .motif-cloud {
+:root:not([data-palette="cloud"]) .motif-cloud,
+:root:not([data-palette="teddy"]) .motif-teddy,
+:root:not([data-palette="baby"]) .motif-baby {
   display: none;
 }
 

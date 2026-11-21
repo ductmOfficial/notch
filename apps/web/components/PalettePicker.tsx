@@ -27,6 +27,16 @@ const SEEDS: Record<Palette, CSSProperties> = {
     "--md-sys-color-tertiary": "#e8916a",
     "--md-sys-color-warning": "#e8b23a",
   } as CSSProperties,
+  teddy: {
+    "--md-sys-color-primary": "#9c6b43",
+    "--md-sys-color-tertiary": "#d98c8c",
+    "--md-sys-color-warning": "#e0a43a",
+  } as CSSProperties,
+  baby: {
+    "--md-sys-color-primary": "#9479cf",
+    "--md-sys-color-tertiary": "#6fa8dc",
+    "--md-sys-color-warning": "#ebc04a",
+  } as CSSProperties,
 };
 
 const swatch = (palette: Palette) => (
@@ -36,7 +46,7 @@ const swatch = (palette: Palette) => (
 );
 
 /**
- * Lotus, daylily or cloud colors and drawings. Every palette is already in the page, so it
+ * Lotus, daylily, cloud, teddy bear or baby colors and drawings. Every palette is already in the page, so it
  * switches at once; the cookie lets the server render the choice on the next visit.
  */
 export function PalettePicker({ initial }: { initial: Palette }) {
@@ -73,6 +83,16 @@ export function PalettePicker({ initial }: { initial: Palette }) {
           value: "cloud",
           label: t("settings.paletteCloud"),
           icon: swatch("cloud"),
+        },
+        {
+          value: "teddy",
+          label: t("settings.paletteTeddy"),
+          icon: swatch("teddy"),
+        },
+        {
+          value: "baby",
+          label: t("settings.paletteBaby"),
+          icon: swatch("baby"),
         },
       ]}
     />

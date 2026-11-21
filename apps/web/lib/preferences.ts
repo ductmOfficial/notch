@@ -16,7 +16,7 @@ export async function getTheme(): Promise<Theme> {
   return isTheme(value) ? value : "system";
 }
 
-export const PALETTES = ["lotus", "daylily", "cloud"] as const;
+export const PALETTES = ["lotus", "daylily", "cloud", "teddy", "baby"] as const;
 export type Palette = (typeof PALETTES)[number];
 
 export const PALETTE_COOKIE = "notch-palette";
