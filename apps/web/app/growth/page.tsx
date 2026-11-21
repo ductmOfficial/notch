@@ -23,6 +23,17 @@ import {
   type MeasurementInput,
 } from "../../lib/growth-chart";
 
+/**
+ * Summary grid columns by number of cards, so the cards always fill the row: a child
+ * without head measurements has three. Written out in full for Tailwind to find them.
+ */
+const SUMMARY_COLUMNS: Record<number, string> = {
+  1: "",
+  2: "sm:grid-cols-2",
+  3: "sm:grid-cols-3",
+  4: "sm:grid-cols-2 xl:grid-cols-4",
+};
+
 const GROWTH_MOTIFS: Record<"weight" | "length" | "bmi" | "head", CardMotifProps> = {
   weight: { kind: "bloom", place: "bottomRight", tilt: -8 },
   length: { kind: "bud", place: "right", tilt: 22 },
@@ -197,7 +208,7 @@ function Summary({
   if (cards.length === 0) return null;
 
   return (
-    <dl className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    <dl className={`grid gap-3 ${SUMMARY_COLUMNS[cards.length] ?? ""}`}>
       {cards.map(({ indicator, latest, reading }) => {
         const info = INDICATORS[indicator];
         return (

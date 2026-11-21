@@ -87,7 +87,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
 
           <main
             id="main"
-            className={`mx-auto max-w-5xl px-4 ${viewer ? "pb-32 md:pb-10 md:pl-24 md:pt-6 lg:pl-28" : "pb-10"}`}
+            className={`mx-auto max-w-7xl px-4 ${viewer ? "pb-32 md:pb-10 md:pl-24 md:pt-6 lg:pl-28" : "pb-10"}`}
           >
             {children}
           </main>

@@ -52,6 +52,7 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 | 31  | Maker and country of each vaccine, on the Vaccines screen and in the PDF | `feat/vaccine-origin`       | ✅     |
 | 32  | Appointments lead with the diseases, then the vaccine and dose           | `feat/appointment-diseases` | ✅     |
 | 33  | Growth reading: WHO classification, normal range, change, advice         | `feat/growth-assessment`    | ✅     |
+| 34  | Wider content; Growth summary cards fill their row                       | `fix/growth-cards-grid`     | ✅     |
 
 Each step is a pull request with green checks (`Browser` from step 9), merged with rebase.
 
