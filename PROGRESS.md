@@ -55,6 +55,7 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 | 34  | Wider content; Growth shows three chart cards, each with its reading     | `fix/growth-cards-grid`     | ✅     |
 | 35  | Teddy bear (gấu bông) and baby (em bé) palettes and drawings             | `feat/teddy-baby-palettes`  | ✅     |
 | 36  | Numerology page, just for fun, reached from a card on Today              | `feat/numerology`           | ✅     |
+| 37  | Child's profile: birth-certificate and English names, birth time         | `feat/child-profile`        | ✅     |
 
 Each step is a pull request with green checks (`Browser` from step 9), merged with rebase.
 
@@ -135,6 +136,8 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 | A compact chart frame for three columns                           | SVG text scales with the frame; a narrower frame keeps labels near their size in a third of the screen, and the wide frame stays for one column                                      |
 | Teddy bear and baby palettes, "done" still green                  | Parents asked for softer, child-themed looks; a quieter primary makes caramel read brown, and "done" keeps its meaning across every palette                                          |
 | Numerology kept apart from the health record                      | Asked for as entertainment; it has no scientific basis, so a thin card labelled "just for fun" closes Today, apart from the health cards, and the page opens with a plain disclaimer |
+| Three names per child, the family's one shown                     | Families call a child by a home name; the birth-certificate name matters for papers and numerology, an English name for some families; both stay optional                            |
+| The migration test writes its old records in plain SQL            | Code written against the current schema names columns an older database lacks; SQL of that time keeps the test valid for every later migration                                       |
 | No Co-Authored-By trailer in commits                              | Maintainer's preference                                                                                                                                                              |
 
 ## Follow-ups

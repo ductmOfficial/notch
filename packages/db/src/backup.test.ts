@@ -5,7 +5,7 @@ import { BackupFormatError, exportBackup, restoreBackup } from "./backup.js";
 import { syncCatalog } from "./catalog.js";
 import { createDb } from "./client.js";
 import { addHealthEntry, addTemperature, listHealthEntries, listTemperatures } from "./health.js";
-import { addChild, addMeasurement, recordDose, saveAppointment } from "./mutations.js";
+import { addChild, addMeasurement, recordDose, saveAppointment, updateChild } from "./mutations.js";
 import { listChildren } from "./queries.js";
 import { family } from "./schema.js";
 
@@ -24,6 +24,14 @@ beforeAll(async () => {
   familyId = f?.id ?? "";
   otherFamilyId = g?.id ?? "";
   const c = await addChild(db, { familyId, name: "Test", sex: "female", birthDate: "2030-01-01" });
+  await updateChild(db, familyId, c.id, {
+    name: "Test",
+    fullName: "Nguyễn Thị Test",
+    englishName: "Tess",
+    sex: "female",
+    birthDate: "2030-01-01",
+    birthTime: "08:40",
+  });
   await addMeasurement(db, {
     childId: c.id,
     measuredOn: "2030-02-01",
@@ -92,10 +100,15 @@ describe("backup", () => {
     const backup = await exportBackup(db, familyId, new Date("2030-05-01T00:00:00Z"));
     expect(backup).toMatchObject({
       format: "notch-backup",
-      version: 2,
+      version: 3,
       exportedAt: "2030-05-01T00:00:00.000Z",
     });
     expect(backup.children.map((c) => c.name)).toEqual(["Test"]);
+    expect(backup.children[0]).toMatchObject({
+      fullName: "Nguyễn Thị Test",
+      englishName: "Tess",
+      birthTime: "08:40:00",
+    });
     expect(backup.children[0]?.measurements[0]).toMatchObject({
       weightG: 4250,
       lengthMm: 551,
@@ -151,7 +164,7 @@ describe("backup", () => {
     const bad = [
       null,
       { format: "something", version: 1, exportedAt: saved.exportedAt, children: [] },
-      { ...saved, version: 3 },
+      { ...saved, version: 4 },
       { ...saved, children: [{ ...saved.children[0], sex: "other" }] },
     ];
     for (const input of bad) {
@@ -196,9 +209,33 @@ describe("backup", () => {
       temperatures: 0,
     });
     const after = await exportBackup(db, familyId, new Date(0));
-    expect(after.version).toBe(2);
-    expect(after.children[0]).toEqual({ ...v1.children[0], healthEntries: [], temperatures: [] });
+    expect(after.version).toBe(3);
+    expect(after.children[0]).toEqual({
+      ...v1.children[0],
+      healthEntries: [],
+      temperatures: [],
+      fullName: null,
+      englishName: null,
+    });
     // A version 1 file replaces everything, so it holds no health log to bring back.
+    await restoreBackup(db, familyId, saved);
+    expect(await exportBackup(db, familyId, new Date(0))).toEqual(saved);
+  });
+
+  it("still restores a version 2 file, written before the extra names", async () => {
+    const saved = await exportBackup(db, familyId, new Date(0));
+    const v2 = {
+      ...saved,
+      version: 2,
+      children: saved.children.map(({ fullName, englishName, ...c }) => {
+        expect(fullName ?? englishName).not.toBeNull();
+        return c;
+      }),
+    };
+    await restoreBackup(db, familyId, JSON.parse(JSON.stringify(v2)));
+    const after = await exportBackup(db, familyId, new Date(0));
+    expect(after.children[0]).toMatchObject({ name: "Test", fullName: null, englishName: null });
+    expect(after.children[0]?.healthEntries).toEqual(saved.children[0]?.healthEntries);
     await restoreBackup(db, familyId, saved);
     expect(await exportBackup(db, familyId, new Date(0))).toEqual(saved);
   });

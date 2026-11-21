@@ -12,6 +12,7 @@ PostgreSQL schema, migrations and queries with [Drizzle](https://orm.drizzle.tea
 
 `family` → `child` → `measurement`, `vaccination`, `appointment`, `health_entry`, `temperature`; and the vaccine catalog: `disease`, `vaccine_product`, `product_disease`.
 
+- A child has the family's name for the child (`name`, shown in the app) and, optionally, the birth-certificate name (`full_name`) and an English name (`english_name`).
 - Measurements are integers (grams, millimetres), with an `estimated` flag for values written as approximate.
 - Doses are recorded per product (`vaccination`, unique per child, product and dose number); `product_disease` maps them to diseases.
 - `appointment.due_on` is nullable for bookings like "after the first birthday".

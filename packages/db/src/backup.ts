@@ -83,10 +83,19 @@ const childV2 = childV1.extend({
   temperatures: z.array(temperatureSchema).max(10_000),
 });
 
+const childV3 = childV2.extend({
+  fullName: text(100),
+  englishName: text(100),
+});
+
 const header = {
   format: z.literal("notch-backup"),
   exportedAt: z.iso.datetime({ offset: true }),
 };
+
+// A temperature points at one of its child's health entries, by position.
+const entriesExist = (c: z.infer<typeof childV2>) =>
+  c.temperatures.every((t) => t.healthEntry === null || t.healthEntry < c.healthEntries.length);
 
 // The database keeps one row per product and dose for each child.
 const oneRowPerDose = (c: z.infer<typeof childV1>) =>
@@ -97,8 +106,8 @@ const oneRowPerDose = (c: z.infer<typeof childV1>) =>
  * millimetres, tenths of a degree, product codes), so a backup restores without rounding.
  * Ids are left out: a restore creates fresh rows.
  *
- * Version 2 adds the health log. Version 1 files, written before it, still restore: their
- * children come back without health entries or temperatures.
+ * Version 2 adds the health log, version 3 the birth-certificate and English names. Older
+ * files still restore: their children come back without what their version did not hold.
  */
 export const backupSchema = z
   .discriminatedUnion("version", [
@@ -110,34 +119,32 @@ export const backupSchema = z
     z.object({
       ...header,
       version: z.literal(2),
-      children: z
-        .array(
-          childV2
-            .refine(oneRowPerDose)
-            .refine((c) =>
-              c.temperatures.every(
-                (t) => t.healthEntry === null || t.healthEntry < c.healthEntries.length,
-              ),
-            ),
-        )
-        .max(20),
+      children: z.array(childV2.refine(oneRowPerDose).refine(entriesExist)).max(20),
+    }),
+    z.object({
+      ...header,
+      version: z.literal(3),
+      children: z.array(childV3.refine(oneRowPerDose).refine(entriesExist)).max(20),
     }),
   ])
   .transform((b): Backup => ({
     ...b,
-    version: 2,
-    children:
-      b.version === 2
-        ? b.children
-        : b.children.map((c) => ({ ...c, healthEntries: [], temperatures: [] })),
+    version: 3,
+    children: b.children.map((c) => ({
+      healthEntries: [],
+      temperatures: [],
+      fullName: null,
+      englishName: null,
+      ...c,
+    })),
   }));
 
 /** A backup in the current version, as written by `exportBackup`. */
 export interface Backup {
   readonly format: "notch-backup";
-  readonly version: 2;
+  readonly version: 3;
   readonly exportedAt: string;
-  readonly children: z.infer<typeof childV2>[];
+  readonly children: z.infer<typeof childV3>[];
 }
 
 export interface RestoreResult {
@@ -206,13 +213,15 @@ export async function exportBackup(db: Db, familyId: string, now = new Date()): 
 
   return {
     format: "notch-backup",
-    version: 2,
+    version: 3,
     exportedAt: now.toISOString(),
     children: children.map((c) => {
       const own = entries.filter((e) => e.childId === c.id);
       const position = new Map(own.map((e, i) => [e.id, i]));
       return {
         name: c.name,
+        fullName: c.fullName,
+        englishName: c.englishName,
         sex: c.sex,
         birthDate: c.birthDate,
         birthTime: c.birthTime,
@@ -298,6 +307,8 @@ export async function restoreBackup(
         .values({
           familyId,
           name: c.name,
+          fullName: c.fullName,
+          englishName: c.englishName,
           sex: c.sex,
           birthDate: c.birthDate,
           birthTime: c.birthTime,

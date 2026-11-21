@@ -4,6 +4,7 @@ import {
   fieldValue,
   parseAppointmentForm,
   parseChildForm,
+  parseChildProfileForm,
   parseDecimal,
   parseDoseForm,
   parseMeasurementForm,
@@ -205,5 +206,54 @@ describe("parseChildForm", () => {
       birthDate: "The date of birth cannot be in the future.",
     });
     expect(parsed.state.values?.sex).toBe("male");
+  });
+});
+
+describe("parseChildProfileForm", () => {
+  const form = (fields: Record<string, string>) => {
+    const f = new FormData();
+    for (const [k, v] of Object.entries(fields)) f.set(k, v);
+    return f;
+  };
+  const base = { name: " Mây ", sex: "female", birthDate: "2030-01-02" };
+  const ctx = { today: "2030-06-01" };
+
+  it("keeps the family's name and makes empty names and time none", () => {
+    expect(
+      parseChildProfileForm(form({ ...base, fullName: " ", englishName: "", birthTime: "" }), ctx),
+    ).toEqual({
+      ok: true,
+      input: {
+        name: "Mây",
+        fullName: null,
+        englishName: null,
+        sex: "female",
+        birthDate: "2030-01-02",
+        birthTime: null,
+      },
+    });
+    const full = parseChildProfileForm(
+      form({ ...base, fullName: "Lê Minh Mây", englishName: "Mia", birthTime: "12:26" }),
+      ctx,
+    );
+    expect(full).toMatchObject({
+      ok: true,
+      input: { fullName: "Lê Minh Mây", birthTime: "12:26" },
+    });
+  });
+
+  it("refuses a bad time, a long name and a missing name, keeping what was typed", () => {
+    const parsed = parseChildProfileForm(
+      form({ ...base, name: "", fullName: "x".repeat(101), birthTime: "25:00" }),
+      ctx,
+    );
+    expect(parsed.ok).toBe(false);
+    if (parsed.ok) return;
+    expect(Object.keys(parsed.state.errors ?? {}).sort()).toEqual([
+      "birthTime",
+      "fullName",
+      "name",
+    ]);
+    expect(parsed.state.values?.birthTime).toBe("25:00");
   });
 });

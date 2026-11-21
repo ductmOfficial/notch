@@ -1,4 +1,10 @@
-import type { AppointmentInput, ChildInput, DoseInput, MeasurementInput } from "@notch/db";
+import type {
+  AppointmentInput,
+  ChildInput,
+  ChildProfile,
+  DoseInput,
+  MeasurementInput,
+} from "@notch/db";
 import { CATALOG, type Catalog } from "@notch/vaccines";
 
 import { formatNumber } from "./format";
@@ -109,6 +115,50 @@ function result<T>(
   if (Object.keys(found).length > 0)
     return { ok: false, state: { errors: found, values: formValues(form) } };
   return { ok: true, input: build() };
+}
+
+const HH_MM = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+/**
+ * A child's profile as edited later: the family's name for the child (shown in the app), the
+ * birth-certificate and English names, sex, date and time of birth. The child and the family
+ * come from the page and the session, not from these fields.
+ */
+export function parseChildProfileForm(
+  form: FormData,
+  ctx: { readonly today: string; readonly locale?: Locale },
+): Parsed<ChildProfile> {
+  const t = translator(ctx.locale ?? "vi");
+  const basics = parseChildForm(form, { familyId: "", today: ctx.today, locale: ctx.locale });
+  const fullName = text(form, "fullName");
+  const englishName = text(form, "englishName");
+  const birthTime = text(form, "birthTime");
+  const tooLong = (value: string, key: MessageKey) =>
+    value.length > 100 ? t("error.tooLong", { field: t(key), max: 100 }) : undefined;
+  return result(
+    form,
+    {
+      ...(basics.ok ? {} : basics.state.errors),
+      fullName: tooLong(fullName, "field.fullName"),
+      englishName: tooLong(englishName, "field.englishName"),
+      birthTime:
+        birthTime === "" || HH_MM.test(birthTime)
+          ? undefined
+          : t("error.invalidTime", { field: t("field.birthTime") }),
+    },
+    () => {
+      if (!basics.ok) throw new Error("unreachable");
+      const { name, sex, birthDate } = basics.input;
+      return {
+        name,
+        fullName: fullName || null,
+        englishName: englishName || null,
+        sex,
+        birthDate,
+        birthTime: birthTime || null,
+      };
+    },
+  );
 }
 
 /** A new child's profile; the family comes from the session, not the form. */
