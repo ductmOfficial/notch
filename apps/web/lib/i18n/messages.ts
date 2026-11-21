@@ -57,7 +57,6 @@ export const vi = {
   "growth.subtitle": "{sex} · {age} · so với chuẩn WHO",
   "growth.add": "Thêm lần đo",
   "growth.byAge": "{indicator} theo tuổi",
-  "growth.indicators": "Chỉ số",
   "growth.pickChild": "Chọn bé",
   "growth.noValues": "Chưa có số đo {indicator}.",
   "growth.disclaimer":
@@ -79,6 +78,9 @@ export const vi = {
 
   "growth.normalRange": "Bình thường ở {age}: {low}–{high} {unit}",
   "growth.fell": "Giảm {n} SD so với lần đo {date}",
+  "growth.upSince": "tăng {delta} {unit} so với lần đo {date}",
+  "growth.downSince": "giảm {delta} {unit} so với lần đo {date}",
+  "growth.sameSince": "không đổi so với lần đo {date}",
   "growth.rose": "Tăng {n} SD so với lần đo {date}",
   "growthStatus.normal": "Bình thường",
   "growthStatus.severelyStunted": "Thấp còi mức nặng",
@@ -383,7 +385,6 @@ export const en: Messages = {
   "growth.subtitle": "{sex} · {age} · compared with the WHO standards",
   "growth.add": "Add a measurement",
   "growth.byAge": "{indicator} for age",
-  "growth.indicators": "Indicator",
   "growth.pickChild": "Choose a child",
   "growth.noValues": "No {indicator} values yet.",
   "growth.disclaimer":
@@ -405,6 +406,9 @@ export const en: Messages = {
 
   "growth.normalRange": "Normal at {age}: {low}–{high} {unit}",
   "growth.fell": "Down {n} SD since {date}",
+  "growth.upSince": "up {delta} {unit} since {date}",
+  "growth.downSince": "down {delta} {unit} since {date}",
+  "growth.sameSince": "unchanged since {date}",
   "growth.rose": "Up {n} SD since {date}",
   "growthStatus.normal": "Normal",
   "growthStatus.severelyStunted": "Severely stunted",

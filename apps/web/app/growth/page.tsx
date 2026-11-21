@@ -1,4 +1,5 @@
 import { type Child, listMeasurements, type Measurement } from "@notch/db";
+import type { GrowthLevel } from "@notch/growth";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -13,32 +14,29 @@ import { getDb } from "../../lib/db";
 import type { Locale, Translate } from "../../lib/i18n/messages";
 import { getI18n } from "../../lib/i18n/server";
 import { formatAge, formatDate, formatNumber, formatZ, todayInVietnam } from "../../lib/format";
-import { readGrowth } from "../../lib/growth-assessment";
+import { chartSubtitle, readGrowth } from "../../lib/growth-assessment";
 import {
   buildChart,
   type ChartIndicator,
   chartPoints,
   INDICATORS,
-  isChartIndicator,
   type MeasurementInput,
 } from "../../lib/growth-chart";
 
 /**
- * Summary grid columns by number of cards, so the cards always fill the row: a child
- * without head measurements has three. Written out in full for Tailwind to find them.
+ * Summary grid columns by number of cards, so the cards always fill the row (a child
+ * measured only for weight has one). Written out in full for Tailwind to find them.
  */
 const SUMMARY_COLUMNS: Record<number, string> = {
   1: "",
   2: "sm:grid-cols-2",
   3: "sm:grid-cols-3",
-  4: "sm:grid-cols-2 xl:grid-cols-4",
 };
 
-const GROWTH_MOTIFS: Record<"weight" | "length" | "bmi" | "head", CardMotifProps> = {
+const GROWTH_MOTIFS: Record<"weight" | "length" | "bmi", CardMotifProps> = {
   weight: { kind: "bloom", place: "bottomRight", tilt: -8 },
   length: { kind: "bud", place: "right", tilt: 22 },
   bmi: { kind: "petals", place: "topRight" },
-  head: { kind: "leaf", place: "bottomRight", tilt: 12 },
 };
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -47,10 +45,17 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 export const dynamic = "force-dynamic";
 
-const TABS: readonly ChartIndicator[] = ["weight", "length", "bmi", "head"];
+const CHARTS: readonly ChartIndicator[] = ["weight", "length", "bmi"];
+
+/** Level of a reading as a text colour; "watch" stays neutral but bold. */
+const LEVEL_TEXT: Record<GrowthLevel, string> = {
+  normal: "text-success",
+  watch: "text-on-surface",
+  doctor: "text-error",
+};
 
 interface Props {
-  readonly searchParams: Promise<{ indicator?: string | string[]; child?: string | string[] }>;
+  readonly searchParams: Promise<{ child?: string | string[] }>;
 }
 
 export default async function GrowthPage({ searchParams }: Props) {
@@ -61,11 +66,18 @@ export default async function GrowthPage({ searchParams }: Props) {
   const { children, child } = await getCurrentChild(db, params.child);
   if (!child) return <NoChild />;
 
-  const indicator: ChartIndicator = isChartIndicator(params.indicator)
-    ? params.indicator
-    : "weight";
   const measurements = await listMeasurements(db, child.id);
-  const chart = buildChart(indicator, child.sex, child.birthDate, measurements);
+  const charts = CHARTS.map((indicator) => ({
+    indicator,
+    chart: buildChart(indicator, child.sex, child.birthDate, measurements),
+    subtitle: chartSubtitle(
+      indicator,
+      child.sex,
+      child.birthDate,
+      chartPoints(indicator, child.sex, child.birthDate, measurements),
+      locale,
+    ),
+  }));
   const today = todayInVietnam();
 
   return (
@@ -81,9 +93,7 @@ export default async function GrowthPage({ searchParams }: Props) {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          {children.length > 1 && (
-            <ChildPicker items={children} current={child.id} indicator={indicator} t={t} />
-          )}
+          {children.length > 1 && <ChildPicker items={children} current={child.id} t={t} />}
           <Link
             href={`/growth/new${children.length > 1 ? `?child=${child.id}` : ""}`}
             className={BUTTON.filled}
@@ -102,48 +112,62 @@ export default async function GrowthPage({ searchParams }: Props) {
         locale={locale}
       />
 
-      <section aria-labelledby="chart-title" className="rounded-m3-md bg-surface-container-low p-4">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-          <h2 id="chart-title" className="title-medium">
-            {t("growth.byAge", { indicator: t(INDICATORS[indicator].labelKey) })}
-          </h2>
-          <nav aria-label={t("growth.indicators")} className="flex flex-wrap gap-2">
-            {TABS.map((tab) => (
-              <Link
-                key={tab}
-                href={`/growth?indicator=${tab}${children.length > 1 ? `&child=${child.id}` : ""}`}
-                aria-current={tab === indicator ? "page" : undefined}
-                className="state-layer label-large inline-flex h-8 items-center rounded-m3-sm border border-outline-variant px-3 text-on-surface-variant aria-[current=page]:border-transparent aria-[current=page]:bg-secondary-container aria-[current=page]:text-on-secondary-container"
-              >
-                {t(INDICATORS[tab].labelKey)}
-              </Link>
-            ))}
-          </nav>
-        </div>
-        {chart.points.length === 0 ? (
-          <p className="body-medium py-12 text-center text-on-surface-variant">
-            {t("growth.noValues", { indicator: t(INDICATORS[indicator].labelKey).toLowerCase() })}
-          </p>
-        ) : (
-          // On narrow screens the chart scrolls sideways. A right-to-left scroll
-          // container starts scrolled to the end, where the latest measurements
-          // are, without client JavaScript. The inner box must be as wide as the chart
-          // (w-max) so it overflows to the left; the content stays left-to-right.
-          <div
-            dir="rtl"
-            // Focusable so the chart can be scrolled with the keyboard when it overflows.
-            tabIndex={0}
-            role="region"
-            aria-labelledby="chart-title"
-            className="-mx-4 overflow-x-auto px-4"
-          >
-            <div dir="ltr" className="w-max min-w-full">
-              <GrowthChart chart={chart} titleId="chart-title" locale={locale} />
-            </div>
-          </div>
-        )}
-        <Legend t={t} />
-      </section>
+      <div className="grid gap-3 xl:grid-cols-3">
+        {charts.map(({ indicator, chart, subtitle }) => {
+          const titleId = `chart-${indicator}`;
+          return (
+            <section
+              key={indicator}
+              aria-labelledby={titleId}
+              // min-w-0: a grid item otherwise grows to the chart's minimum width and the page
+              // scrolls sideways on phones; the chart's own scroll box should take the overflow.
+              className="flex min-w-0 flex-col rounded-m3-md bg-surface-container-low p-4"
+            >
+              <h2 id={titleId} className="title-medium">
+                {t("growth.byAge", { indicator: t(INDICATORS[indicator].labelKey) })}
+              </h2>
+              <p className="body-medium mt-1 mb-3 text-on-surface-variant">
+                {subtitle.label && subtitle.level && (
+                  <>
+                    <strong className={`font-medium ${LEVEL_TEXT[subtitle.level]}`}>
+                      {subtitle.label}
+                    </strong>
+                    {" · "}
+                  </>
+                )}
+                {subtitle.detail}
+              </p>
+              {chart.points.length > 0 && (
+                <>
+                  {/*
+                   * Below xl the card is full width: the wide frame, scrolling sideways on
+                   * phones. A right-to-left scroll container starts scrolled to the end, where
+                   * the latest measurements are, without client JavaScript; the inner box is
+                   * as wide as the chart (w-max) so it overflows to the left.
+                   */}
+                  <div
+                    dir="rtl"
+                    // Focusable so the chart can be scrolled with the keyboard when it overflows.
+                    tabIndex={0}
+                    role="region"
+                    aria-labelledby={titleId}
+                    className="-mx-4 overflow-x-auto px-4 xl:hidden"
+                  >
+                    <div dir="ltr" className="w-max min-w-full">
+                      <GrowthChart chart={chart} titleId={titleId} locale={locale} />
+                    </div>
+                  </div>
+                  {/* From xl, three cards share the row: the compact frame, without scrolling. */}
+                  <div className="-mx-2 mt-auto hidden xl:block">
+                    <GrowthChart chart={chart} titleId={titleId} locale={locale} size="compact" />
+                  </div>
+                </>
+              )}
+            </section>
+          );
+        })}
+      </div>
+      <Legend t={t} />
 
       <MeasurementTable
         sex={child.sex}
@@ -158,23 +182,13 @@ export default async function GrowthPage({ searchParams }: Props) {
   );
 }
 
-function ChildPicker({
-  items,
-  current,
-  indicator,
-  t,
-}: {
-  items: Child[];
-  current: string;
-  indicator: ChartIndicator;
-  t: Translate;
-}) {
+function ChildPicker({ items, current, t }: { items: Child[]; current: string; t: Translate }) {
   return (
     <nav aria-label={t("growth.pickChild")} className="flex gap-2">
       {items.map((c) => (
         <Link
           key={c.id}
-          href={`/growth?indicator=${indicator}&child=${c.id}`}
+          href={`/growth?child=${c.id}`}
           aria-current={c.id === current ? "page" : undefined}
           className="state-layer label-large inline-flex h-8 items-center rounded-m3-sm border border-outline-variant px-3 text-on-surface-variant aria-[current=page]:border-transparent aria-[current=page]:bg-secondary-container aria-[current=page]:text-on-secondary-container"
         >
@@ -198,7 +212,7 @@ function Summary({
   t: Translate;
   locale: Locale;
 }) {
-  const cards = (["weight", "length", "bmi", "head"] as const).flatMap((indicator) => {
+  const cards = (["weight", "length", "bmi"] as const).flatMap((indicator) => {
     const points = chartPoints(indicator, sex, birthDate, measurements);
     const latest = points.at(-1);
     return latest

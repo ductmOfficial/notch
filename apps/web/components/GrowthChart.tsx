@@ -2,9 +2,16 @@ import { type ChartModel, INDICATORS } from "../lib/growth-chart";
 import { formatDate, formatNumber, formatZ } from "../lib/format";
 import { type Locale, translator } from "../lib/i18n/messages";
 
-const WIDTH = 720;
-const HEIGHT = 420;
-const PAD = { top: 28, right: 44, bottom: 40, left: 48 };
+/**
+ * Two frames for the same chart. "wide" fills a full-width card and scrolls sideways below
+ * 560px on phones; "compact" fits a third of a wide screen with labels about as large.
+ */
+const SIZES = {
+  wide: { width: 720, height: 420, className: "h-auto w-full min-w-[560px]" },
+  compact: { width: 420, height: 360, className: "h-auto w-full" },
+} as const;
+/** Just room for the y tick labels on the left and the curve labels (+3, TB, −3) on the right. */
+const PAD = { top: 28, right: 30, bottom: 40, left: 34 };
 
 const CURVE_STYLE: Record<number, { stroke: string; dash?: string; width: number }> = {
   [-3]: { stroke: "var(--chart-sd3)", dash: "4 4", width: 1 },
@@ -23,11 +30,14 @@ export function GrowthChart({
   chart,
   titleId,
   locale,
+  size = "wide",
 }: {
   chart: ChartModel;
   titleId: string;
   locale: Locale;
+  size?: keyof typeof SIZES;
 }) {
+  const { width: WIDTH, height: HEIGHT, className } = SIZES[size];
   const t = translator(locale);
   const info = INDICATORS[chart.indicator];
   const x = (age: number) => PAD.left + (age / chart.maxAgeDays) * (WIDTH - PAD.left - PAD.right);
@@ -46,8 +56,7 @@ export function GrowthChart({
       viewBox={`0 0 ${String(WIDTH)} ${String(HEIGHT)}`}
       role="img"
       aria-labelledby={titleId}
-      // Keep labels readable on phones: the chart scrolls sideways below 600px.
-      className="h-auto w-full min-w-[600px]"
+      className={className}
     >
       <g aria-hidden="true">
         {chart.yTicks.map((v) => (
@@ -64,7 +73,7 @@ export function GrowthChart({
               y={y(v)}
               dy="0.32em"
               textAnchor="end"
-              fontSize="11"
+              fontSize="13"
               fill="var(--md-sys-color-on-surface-variant)"
             >
               {formatNumber(v, Number.isInteger(v) ? 0 : 1, locale)}
@@ -84,7 +93,7 @@ export function GrowthChart({
               x={x(t.ageDays)}
               y={HEIGHT - PAD.bottom + 18}
               textAnchor="middle"
-              fontSize="11"
+              fontSize="13"
               fill="var(--md-sys-color-on-surface-variant)"
             >
               {t.months}
@@ -95,18 +104,13 @@ export function GrowthChart({
           x={(WIDTH + PAD.left - PAD.right) / 2}
           y={HEIGHT - 4}
           textAnchor="middle"
-          fontSize="11"
+          fontSize="13"
           fill="var(--md-sys-color-on-surface-variant)"
         >
           {t("growth.monthsOfAge")}
         </text>
-        <text
-          x={PAD.left - 8}
-          y={12}
-          textAnchor="end"
-          fontSize="11"
-          fill="var(--md-sys-color-on-surface-variant)"
-        >
+        {/* From the left edge, so a long unit such as kg/m² needs no wider margin. */}
+        <text x={2} y={12} fontSize="13" fill="var(--md-sys-color-on-surface-variant)">
           {info.unit}
         </text>
 
@@ -127,7 +131,7 @@ export function GrowthChart({
                   x={x(last[0]) + 6}
                   y={y(last[1])}
                   dy="0.32em"
-                  fontSize="10"
+                  fontSize="12"
                   fill="var(--md-sys-color-on-surface-variant)"
                 >
                   {curve.z === 0
