@@ -105,6 +105,26 @@ NOTCH_ALLOWED_EMAILS=you@example.com pnpm --filter web dev   # http://localhost:
 
 Open http://localhost:3000 and sign in with that address: without a mail service, the sign-in link is printed in the terminal running `dev`. Skip the seed to start from the welcome page instead.
 
+### Your own records, from a backup
+
+To try a change on the family's real records without touching the deployed database, run a local copy from a backup. The local app never connects to the deployed database, and nothing syncs between them: refresh the copy with a newer backup when you need it.
+
+1. In the deployed app, open **Settings** and download the backup (`notch-backup-<date>.json`). It holds health data: keep it outside the repository.
+2. Create a separate PGlite folder for it (`.data/` is git-ignored), apply the migrations and start the app:
+
+   ```bash
+   pnpm build
+   export DATABASE_URL=pglite:.data/own
+   pnpm --filter @notch/db migrate
+   NOTCH_ALLOWED_EMAILS=you@example.com pnpm --filter web dev   # http://localhost:3000
+   ```
+
+3. Sign in, open http://localhost:3000/settings (it works before the welcome form is filled in), restore the file and confirm. The restore replaces the local family's children and records.
+
+Next time, start from step 2 without `migrate`. Run `migrate` again only after pulling new migrations, and with `dev` stopped: PGlite lets one process at a time open a folder. A newer backup restores over the old copy the same way; it also replaces what you entered locally.
+
+Keep one folder per set of data (`.data/pglite` for the demo child, `.data/own` for your records). Browsers share cookies across every port of `localhost`, so after switching folders the app may send you to the sign-in page: sign in again.
+
 ### With PostgreSQL
 
 ```bash
@@ -281,6 +301,8 @@ Without `BETTER_AUTH_URL`, sign-in links point at the production domain in produ
 | `pnpm install` fails with `ERR_PNPM_UNSUPPORTED_ENGINE`                                                     | Wrong Node.js major: `nvm use` (Node.js 24), then install again. On Vercel, set Node.js 24.x in the project settings                                            |
 | `pnpm: command not found`, or a different pnpm version runs                                                 | `corepack enable`, then open a new terminal; `pnpm -v` should print `12.14.0`                                                                                   |
 | "DATABASE_URL is not set. Copy .env.example to .env, or pass it inline."                                    | Create `.env` from `.env.example`, or `export DATABASE_URL=pglite:.data/pglite`                                                                                 |
+| `migrate` fails or waits while `dev` runs on the same PGlite folder                                         | PGlite opens a folder from one process at a time: stop `dev`, run `migrate`, start `dev` again                                                                  |
+| After switching to another database folder, the app asks to sign in again                                   | Expected: the browser kept the session of the other database (cookies are shared across `localhost` ports). Sign in again                                       |
 | `migrate` or `seed` cannot find its script                                                                  | Run `pnpm build` first: the db scripts run from `packages/db/dist`                                                                                              |
 | `seed` cannot read the seed file                                                                            | `NOTCH_SEED_FILE` is resolved from the repository root; for a try, use `packages/db/fixtures/demo-child.json`                                                   |
 | `pnpm db:up` fails with "port is already allocated"                                                         | Something already uses 5433: set `POSTGRES_PORT` in `.env` and the same port in `DATABASE_URL`                                                                  |
