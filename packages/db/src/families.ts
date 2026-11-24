@@ -2,12 +2,25 @@ import { asc, eq, getTableColumns } from "drizzle-orm";
 
 import type { Db } from "./client.js";
 import { type Child, listChildren } from "./queries.js";
-import { child, family, familyMember } from "./schema.js";
+import { child, family, familyMember, user } from "./schema.js";
+
+/**
+ * A session names a user this database does not know: a signed session cookie made
+ * by another database (two local servers share cookies on localhost), or a user
+ * removed since. The caller treats it as signed out.
+ */
+export class UnknownUserError extends Error {
+  constructor(readonly userId: string) {
+    super("Unknown user");
+    this.name = "UnknownUserError";
+  }
+}
 
 /**
  * The family of a signed-in user, joining one on first use. Notch serves one
  * household: everyone allowed to sign in shares its oldest family (the one the
  * seed or the first parent created), so both parents see the same children.
+ * Throws `UnknownUserError` for a user the database does not have.
  */
 export async function familyIdForUser(db: Db, userId: string): Promise<string> {
   const [member] = await db
@@ -15,6 +28,9 @@ export async function familyIdForUser(db: Db, userId: string): Promise<string> {
     .from(familyMember)
     .where(eq(familyMember.userId, userId));
   if (member) return member.familyId;
+
+  const [known] = await db.select({ id: user.id }).from(user).where(eq(user.id, userId));
+  if (!known) throw new UnknownUserError(userId);
 
   let [home] = await db
     .select({ id: family.id })
