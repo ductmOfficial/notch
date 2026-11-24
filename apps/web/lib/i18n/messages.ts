@@ -553,6 +553,10 @@ export const vi = {
     "Người đó bị đăng xuất ở lần truy cập kế tiếp và không đăng nhập lại được.",
   "members.readOnly":
     "Bạn đang xem với quyền người xem: chỉ người sửa và chủ gia đình mới thay đổi được dữ liệu.",
+  "offline.title": "Không có mạng",
+  "offline.body":
+    "Notch cần mạng để mở dữ liệu của bé: dữ liệu không được lưu trên máy này. Kiểm tra kết nối rồi thử lại.",
+  "offline.retry": "Thử lại",
   "followUp.title": "Theo dõi sau tiêm",
   "followUp.given": "{name} được tiêm {vaccines} {when}.",
   "followUp.today": "hôm nay",
@@ -1167,6 +1171,10 @@ export const en: Messages = {
   "members.removeConfirm": "They are signed out on their next visit and cannot sign in again.",
   "members.readOnly":
     "You are viewing as a viewer: only editors and owners can change the records.",
+  "offline.title": "You are offline",
+  "offline.body":
+    "Notch needs the network to open your child's records: they are not stored on this device. Check the connection and try again.",
+  "offline.retry": "Try again",
   "followUp.title": "After the vaccine",
   "followUp.given": "{name} had {vaccines} {when}.",
   "followUp.today": "today",

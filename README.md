@@ -220,6 +220,14 @@ pnpm --filter web e2e
 - **Icons** are Material Symbols (Rounded), generated into `components/icons.tsx` as inline SVG.
 - **Growth** shows a card per indicator (weight, length/height, BMI) with its WHO reading and the change since the previous measurement, three across on wide screens. The SVG chart has a wide frame for a full-width card, scrolling sideways on phones, and a compact one for a third of the screen, so labels keep their size. Head circumference is recorded and in the PDF, not charted on screen.
 
+## Install on a phone
+
+Notch is a progressive web app: "Add to Home Screen" (iOS Safari) or "Install app" (Chrome) opens it without the browser bar.
+
+- **Manifest** `app/manifest.ts` (`/manifest.webmanifest`), with icons rendered from `app/icon.svg` on this machine by `pnpm --filter web app-icons`: `public/icons/` (192 and 512 px, and a maskable 512 px) and `app/apple-icon.png` for iOS.
+- **Service worker** `public/sw.js`, registered in production builds: it keeps only an offline page (`/offline`, cached without a session) and its stylesheets. Pages and records always come from the network and are never stored on the device, since they hold a child's health data. It is served with `Cache-Control: no-cache`, so a new version takes over on the next visit.
+- The manifest, icons, service worker and offline page are served without a session (`proxy.ts`); none of them holds anything about the family.
+
 ## Calendar
 
 - **Download** (`/calendar.ics`, signed in): the selected child's upcoming appointments, once.
