@@ -61,7 +61,8 @@ export function DoseForm({
         />
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-3">
+      {/* No hint lines here: field-row lines the inputs up across the row. */}
+      <div className="field-row sm:grid-cols-3">
         <DateField
           label={t("form.givenOn")}
           name="givenOn"
@@ -70,18 +71,8 @@ export function DoseForm({
           error={state.errors?.givenOn}
           required
         />
-        <TextField
-          label={t("form.place")}
-          hint={t("common.optional")}
-          name="place"
-          defaultValue={v("place")}
-        />
-        <TextField
-          label={t("form.lot")}
-          hint={t("common.optional")}
-          name="lot"
-          defaultValue={v("lot")}
-        />
+        <TextField label={t("form.placeOptional")} name="place" defaultValue={v("place")} />
+        <TextField label={t("form.lotOptional")} name="lot" defaultValue={v("lot")} />
       </div>
 
       <fieldset className="min-w-0 space-y-4 rounded-m3-md border border-outline-variant p-4">

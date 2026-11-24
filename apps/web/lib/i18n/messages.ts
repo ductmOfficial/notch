@@ -157,8 +157,8 @@ export const vi = {
   "form.pickVaccine": "Chọn vaccine…",
   "form.doseNo": "Mũi số",
   "form.givenOn": "Ngày tiêm",
-  "form.place": "Nơi tiêm",
-  "form.lot": "Số lô",
+  "form.placeOptional": "Nơi tiêm (không bắt buộc)",
+  "form.lotOptional": "Số lô (không bắt buộc)",
   "form.nextAppointment": "Lịch hẹn mũi kế tiếp",
   "form.nextAppointmentHint":
     "Theo lịch phòng tiêm hẹn. Để trống nếu không có hẹn; chỉ ghi chú (như “sau 1 tuổi”) nếu chưa có ngày.",
@@ -639,8 +639,8 @@ export const en: Messages = {
   "form.pickVaccine": "Choose a vaccine…",
   "form.doseNo": "Dose number",
   "form.givenOn": "Date given",
-  "form.place": "Place",
-  "form.lot": "Lot number",
+  "form.placeOptional": "Place (optional)",
+  "form.lotOptional": "Lot number (optional)",
   "form.nextAppointment": "Next appointment",
   "form.nextAppointmentHint":
     "As booked by the clinic. Leave empty if there is none; write only a note (such as “after the first birthday”) if there is no date yet.",
