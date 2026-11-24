@@ -44,8 +44,15 @@ export function resolveDatabaseUrl(url: string, baseDir: string): string {
  * - `postgres://…` / `postgresql://…`: a PostgreSQL server (node-postgres pool)
  * - `pglite:memory`: an in-memory PGlite database (tests)
  * - `pglite:<path>`: a PGlite database stored in a folder (local runs without Docker)
+ *
+ * `migrationsFolder` overrides where `migrate()` reads the migrations: a bundled app, such as
+ * the web app's in-memory demo, cannot find them next to this module.
  */
-export function createDb(url: string): DbHandle {
+export function createDb(
+  url: string,
+  { migrationsFolder: folder }: { readonly migrationsFolder?: string } = {},
+): DbHandle {
+  const migrationsAt = () => folder ?? migrationsFolder();
   if (url.startsWith("pglite:")) {
     const location = url.slice("pglite:".length);
     // PGlite creates only the last folder of the path; create the parents too (".data/pglite").
@@ -54,7 +61,7 @@ export function createDb(url: string): DbHandle {
     const db = drizzlePglite({ client, ...options });
     return {
       db,
-      migrate: () => migratePglite(db, { migrationsFolder: migrationsFolder() }),
+      migrate: () => migratePglite(db, { migrationsFolder: migrationsAt() }),
       close: () => client.close(),
     };
   }
@@ -63,7 +70,7 @@ export function createDb(url: string): DbHandle {
     const db = drizzlePg({ client: pool, ...options });
     return {
       db,
-      migrate: () => migratePg(db, { migrationsFolder: migrationsFolder() }),
+      migrate: () => migratePg(db, { migrationsFolder: migrationsAt() }),
       close: () => pool.end(),
     };
   }

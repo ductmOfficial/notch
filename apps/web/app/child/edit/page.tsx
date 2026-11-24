@@ -21,7 +21,7 @@ interface Props {
 /** Edit the selected child's names, sex and birth; reached from Settings. */
 export default async function EditChildPage({ searchParams }: Props) {
   const { t } = await getI18n();
-  const db = getDb();
+  const db = await getDb();
   if (!db) return <NoDatabase />;
   const { child } = await getCurrentChild(db, (await searchParams).child);
   if (!child) return <NoChild />;

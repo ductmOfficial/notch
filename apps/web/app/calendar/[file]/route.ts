@@ -1,7 +1,7 @@
 import { familyIdForCalendarToken, listChildren } from "@notch/db";
 
 import { vaccinationCalendar } from "../../../lib/calendar-feed";
-import { getDb } from "../../../lib/db";
+import { getAppDb } from "../../../lib/db";
 import { getI18n } from "../../../lib/i18n/server";
 
 export const dynamic = "force-dynamic";
@@ -17,7 +17,7 @@ export async function GET(
   _: Request,
   { params }: { params: Promise<{ file: string }> },
 ): Promise<Response> {
-  const db = getDb();
+  const db = getAppDb();
   if (!db) return new Response("DATABASE_URL is not configured", { status: 503 });
   const { file } = await params;
   if (!file.endsWith(".ics")) return NOT_FOUND();

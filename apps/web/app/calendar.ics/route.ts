@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 /** One-off download of the selected child's upcoming appointments (signed in). */
 export async function GET(request: Request): Promise<Response> {
-  const db = getDb();
+  const db = await getDb();
   if (!db) return new Response("DATABASE_URL is not configured", { status: 503 });
   const { child } = await getCurrentChild(
     db,

@@ -19,7 +19,7 @@ export const dynamic = "force-dynamic";
  * is generic, so it reveals nothing in a downloads folder or a chat preview.
  */
 export async function GET(request: Request): Promise<Response> {
-  const db = getDb();
+  const db = await getDb();
   if (!db) return new Response("DATABASE_URL is not configured", { status: 503 });
   const { child } = await getCurrentChild(
     db,

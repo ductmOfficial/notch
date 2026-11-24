@@ -8,7 +8,10 @@ import { sentTo, signInLink } from "./mail";
 test.use({ storageState: { cookies: [], origins: [] } });
 
 test("every page and every file need a session", async ({ page, request }) => {
-  for (const path of ["/", "/growth", "/vaccines", "/settings", "/growth/new"]) {
+  // The home page introduces Notch to a first visitor; every other page asks to sign in.
+  await page.goto("/");
+  await expect(page).toHaveURL(/\/about$/);
+  for (const path of ["/growth", "/vaccines", "/settings", "/growth/new", "/health"]) {
     await page.goto(path);
     await expect(page).toHaveURL(/\/sign-in$/);
   }
@@ -58,7 +61,7 @@ test("a link signs in once; signing out ends the session", async ({ page }) => {
   await expect(page.getByText(`Đăng nhập bằng ${PARENT}`)).toBeVisible();
   await page.getByRole("button", { name: "Đăng xuất" }).click();
   await expect(page).toHaveURL(/\/sign-in$/);
-  await page.goto("/");
+  await page.goto("/settings");
   await expect(page).toHaveURL(/\/sign-in$/);
 
   // The same link again: already used, so it leads back with a message.

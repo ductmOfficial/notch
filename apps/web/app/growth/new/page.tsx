@@ -20,7 +20,7 @@ export default async function NewMeasurementPage({
   searchParams: Promise<{ child?: string }>;
 }) {
   const { t } = await getI18n();
-  const db = getDb();
+  const db = await getDb();
   if (!db) return <NoDatabase />;
   const { child } = await getCurrentChild(db, (await searchParams).child);
   if (!child) return <NoChild />;

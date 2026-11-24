@@ -25,7 +25,7 @@ interface Props {
 
 export default async function EditAppointmentPage({ params, searchParams }: Props) {
   const { t } = await getI18n();
-  const db = getDb();
+  const db = await getDb();
   if (!db) return <NoDatabase />;
   const { child } = await getCurrentChild(db, (await searchParams).child);
   if (!child) return <NoChild />;

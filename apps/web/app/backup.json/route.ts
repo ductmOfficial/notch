@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 /** The signed-in family's records as a JSON file (see packages/db/src/backup.ts). */
 export async function GET(): Promise<Response> {
   const { familyId } = await requireViewer();
-  const db = getDb();
+  const db = await getDb();
   if (!db) return new Response("DATABASE_URL is not configured", { status: 503 });
   const backup = await exportBackup(db, familyId);
   return new Response(`${JSON.stringify(backup, null, 2)}\n`, {

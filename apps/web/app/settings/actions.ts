@@ -17,7 +17,7 @@ import {
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
-import { getDb } from "../../lib/db";
+import { getAppDb } from "../../lib/db";
 import { getI18n } from "../../lib/i18n/server";
 import { isLocale } from "../../lib/i18n/messages";
 import { LOCALE_COOKIE } from "../../lib/i18n/server";
@@ -49,7 +49,7 @@ export async function setLocaleAction(locale: string): Promise<void> {
 }
 
 function database() {
-  const db = getDb();
+  const db = getAppDb();
   if (!db) throw new Error("DATABASE_URL is not configured");
   return db;
 }

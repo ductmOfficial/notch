@@ -20,7 +20,7 @@ export const dynamic = "force-dynamic";
 /** First run: the signed-in family has no child yet. Families that do go to Today. */
 export default async function WelcomePage() {
   const { familyId } = await requireViewer();
-  const db = getDb();
+  const db = await getDb();
   if (!db) return <NoDatabase />;
   if ((await listChildren(db, familyId)).length > 0) redirect("/");
   const { t } = await getI18n();
