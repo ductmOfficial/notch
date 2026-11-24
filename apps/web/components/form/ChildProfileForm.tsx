@@ -61,7 +61,7 @@ export function ChildProfileForm({ child, today }: { child: Child; today: string
         />
         <p className="body-small text-on-surface-variant">{t("form.sexHint")}</p>
       </div>
-      <div className="grid gap-6 sm:grid-cols-2">
+      <div className="field-row sm:grid-cols-2">
         <DateField
           label={t("form.birthDate")}
           name="birthDate"
@@ -70,7 +70,7 @@ export function ChildProfileForm({ child, today }: { child: Child; today: string
           error={state.errors?.birthDate}
           required
         />
-        {/* No hint line, so this field lines up with the date beside it. */}
+        {/* No hint line: field-row lines it up with the date beside it. */}
         <TimeField
           label={t("form.birthTimeOptional")}
           name="birthTime"

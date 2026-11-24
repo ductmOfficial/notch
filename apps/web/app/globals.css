@@ -219,3 +219,25 @@
     opacity: 0.1;
   }
 }
+
+/*
+ * A row of text fields without hint lines (label, input, error). Side by side, each field
+ * spans the row's three tracks, so the inputs line up even when one label wraps to two
+ * lines or one field shows an error. Stacked on phones, it is a plain grid.
+ */
+@utility field-row {
+  display: grid;
+  gap: 1.5rem;
+  @variant sm {
+    grid-template-rows: auto auto auto;
+    row-gap: var(--sen-space-1);
+    & > * {
+      display: grid;
+      grid-row: span 3;
+      grid-template-rows: subgrid;
+    }
+    & > * > label {
+      align-self: end;
+    }
+  }
+}
