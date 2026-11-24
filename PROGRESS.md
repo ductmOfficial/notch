@@ -13,57 +13,58 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 | P0    | Foundation: growth and vaccines engines, database, app skeleton             | ✅     |
 | P1    | Today, Growth and Vaccinations screens, forms, `.ics` calendar, design, E2E | ✅     |
 | P2    | Health log, post-vaccination follow-up, family sharing (PDF done in P1)     | ✅     |
-| P3    | PWA, demo mode, deployment                                                  | ⬜     |
+| P3    | PWA, demo mode, deployment                                                  | ✅     |
 
 ## Steps
 
-| #   | Step                                                                        | Branch                      | Status |
-| --- | --------------------------------------------------------------------------- | --------------------------- | ------ |
-| 1   | Repository from the `ductran-starter` template                              | `main`                      | ✅     |
-| 2   | Rename to `notch`, drop the sample package, PostgreSQL on port 5433         | `chore/setup`               | ✅     |
-| 3   | `@notch/growth`: WHO LMS z-scores and percentiles, generated data           | `feat/growth`               | ✅     |
-| 4   | `@notch/vaccines`: catalog, appointments, schedule engine                   | `feat/vaccines`             | ✅     |
-| 5   | `@notch/db`: schema, migrations, queries, mutations, seed, demo data        | `feat/db`                   | ✅     |
-| 6   | Today, Growth and Vaccinations screens                                      | `feat/web`                  | ✅     |
-| 7   | Forms for measurements, doses and appointments; `.ics` download             | `feat/forms`                | ✅     |
-| 8   | Material Design 3 with a lotus palette, on Sen UI                           | `feat/theme`                | ✅     |
-| 9   | Playwright and axe tests, `Browser` job in CI                               | `test/e2e`                  | ✅     |
-| 10  | README and this progress log                                                | `docs/readme`               | ✅     |
-| 11  | Settings page with a light, dark or system theme                            | `feat/theme-setting`        | ✅     |
-| 12  | Vietnamese and English, chosen in Settings                                  | `feat/i18n`                 | ✅     |
-| 13  | Lotus watermark behind the content                                          | `feat/lotus-backdrop`       | ✅     |
-| 14  | Add button flat in the navigation rail                                      | `fix/rail-fab-flat`         | ✅     |
-| 15  | Lotus mark next to the name, on empty states, as the favicon                | `feat/lotus-mark`           | ✅     |
-| 16  | Lotus drawings on the summary cards                                         | `feat/card-lotus`           | ✅     |
-| 17  | Daylily (huyên thảo) palette and drawings, chosen in Settings               | `feat/daylily-palette`      | ✅     |
-| 18  | Cloud (mây) palette and drawings                                            | `feat/cloud-palette`        | ✅     |
-| 19  | Quiet chips for given doses; status colors harmonized                       | `feat/quiet-done`           | ✅     |
-| 20  | Reload settings only once the choice is saved (test)                        | `test/settings-cookie`      | ✅     |
-| 21  | Sign-in by email link with an allowlist; data limited to the family         | `feat/auth`                 | ✅     |
-| 22  | Welcome page for the first child                                            | `feat/onboarding`           | ✅     |
-| 23  | Ready for Vercel and Neon: build with migrations, sign-in URLs on Vercel    | `chore/vercel`              | ✅     |
-| 24  | Calendar subscription link with a secret token                              | `feat/calendar-feed`        | ✅     |
-| 25  | Build log and dependency housekeeping after the first deployment            | `chore/build-hygiene`       | ✅     |
-| 26  | Backup and restore as a JSON file                                           | `feat/backup`               | ✅     |
-| 27  | PDF report of a child                                                       | `feat/pdf`                  | ✅     |
-| 28  | National schedule (TCMR) by age on the Vaccines screen                      | `feat/tcmr`                 | ✅     |
-| 29  | Health log data: tables, queries, backup version 2                          | `feat/health-log-db`        | ✅     |
-| 30  | Faster navigation: loading state, session cookie cache, one family query    | `perf/faster-navigation`    | ✅     |
-| 31  | Maker and country of each vaccine, on the Vaccines screen and in the PDF    | `feat/vaccine-origin`       | ✅     |
-| 32  | Appointments lead with the diseases, then the vaccine and dose              | `feat/appointment-diseases` | ✅     |
-| 33  | Growth reading: WHO classification, normal range, change, advice            | `feat/growth-assessment`    | ✅     |
-| 34  | Wider content; Growth shows three chart cards, each with its reading        | `fix/growth-cards-grid`     | ✅     |
-| 35  | Teddy bear (gấu bông) and baby (em bé) palettes and drawings                | `feat/teddy-baby-palettes`  | ✅     |
-| 36  | Numerology page, just for fun, reached from a card on Today                 | `feat/numerology`           | ✅     |
-| 37  | Child's profile: birth-certificate and English names, birth time            | `feat/child-profile`        | ✅     |
-| 38  | Numerology in depth: more numbers, two birth charts, pinnacles, guidance    | `feat/numerology-more`      | ✅     |
-| 39  | The child's page like a social profile: cover, tabs, feed, milestones       | `feat/child-page`           | ✅     |
-| 40  | Backlog: PDF minus signs, next dose number, phone chart axis, restore       | `fix/backlog`               | ✅     |
-| 41  | Health screen: entries, temperatures, quick add, Today, PDF, timeline       | `feat/health-log`           | ✅     |
-| 42  | Follow-up after a vaccine: temperatures for two days, on Today and Vaccines | `feat/vaccine-follow-up`    | ✅     |
-| 43  | Family sharing: owners add relatives as editors or viewers                  | `feat/family-sharing`       | ✅     |
-| 44  | Installable app: manifest, icons, a service worker with an offline page     | `feat/pwa`                  | ✅     |
-| 45  | About page and a read-only demo on an in-memory database                    | `feat/demo`                 | ✅     |
+| #   | Step                                                                        | Branch                        | Status |
+| --- | --------------------------------------------------------------------------- | ----------------------------- | ------ |
+| 1   | Repository from the `ductran-starter` template                              | `main`                        | ✅     |
+| 2   | Rename to `notch`, drop the sample package, PostgreSQL on port 5433         | `chore/setup`                 | ✅     |
+| 3   | `@notch/growth`: WHO LMS z-scores and percentiles, generated data           | `feat/growth`                 | ✅     |
+| 4   | `@notch/vaccines`: catalog, appointments, schedule engine                   | `feat/vaccines`               | ✅     |
+| 5   | `@notch/db`: schema, migrations, queries, mutations, seed, demo data        | `feat/db`                     | ✅     |
+| 6   | Today, Growth and Vaccinations screens                                      | `feat/web`                    | ✅     |
+| 7   | Forms for measurements, doses and appointments; `.ics` download             | `feat/forms`                  | ✅     |
+| 8   | Material Design 3 with a lotus palette, on Sen UI                           | `feat/theme`                  | ✅     |
+| 9   | Playwright and axe tests, `Browser` job in CI                               | `test/e2e`                    | ✅     |
+| 10  | README and this progress log                                                | `docs/readme`                 | ✅     |
+| 11  | Settings page with a light, dark or system theme                            | `feat/theme-setting`          | ✅     |
+| 12  | Vietnamese and English, chosen in Settings                                  | `feat/i18n`                   | ✅     |
+| 13  | Lotus watermark behind the content                                          | `feat/lotus-backdrop`         | ✅     |
+| 14  | Add button flat in the navigation rail                                      | `fix/rail-fab-flat`           | ✅     |
+| 15  | Lotus mark next to the name, on empty states, as the favicon                | `feat/lotus-mark`             | ✅     |
+| 16  | Lotus drawings on the summary cards                                         | `feat/card-lotus`             | ✅     |
+| 17  | Daylily (huyên thảo) palette and drawings, chosen in Settings               | `feat/daylily-palette`        | ✅     |
+| 18  | Cloud (mây) palette and drawings                                            | `feat/cloud-palette`          | ✅     |
+| 19  | Quiet chips for given doses; status colors harmonized                       | `feat/quiet-done`             | ✅     |
+| 20  | Reload settings only once the choice is saved (test)                        | `test/settings-cookie`        | ✅     |
+| 21  | Sign-in by email link with an allowlist; data limited to the family         | `feat/auth`                   | ✅     |
+| 22  | Welcome page for the first child                                            | `feat/onboarding`             | ✅     |
+| 23  | Ready for Vercel and Neon: build with migrations, sign-in URLs on Vercel    | `chore/vercel`                | ✅     |
+| 24  | Calendar subscription link with a secret token                              | `feat/calendar-feed`          | ✅     |
+| 25  | Build log and dependency housekeeping after the first deployment            | `chore/build-hygiene`         | ✅     |
+| 26  | Backup and restore as a JSON file                                           | `feat/backup`                 | ✅     |
+| 27  | PDF report of a child                                                       | `feat/pdf`                    | ✅     |
+| 28  | National schedule (TCMR) by age on the Vaccines screen                      | `feat/tcmr`                   | ✅     |
+| 29  | Health log data: tables, queries, backup version 2                          | `feat/health-log-db`          | ✅     |
+| 30  | Faster navigation: loading state, session cookie cache, one family query    | `perf/faster-navigation`      | ✅     |
+| 31  | Maker and country of each vaccine, on the Vaccines screen and in the PDF    | `feat/vaccine-origin`         | ✅     |
+| 32  | Appointments lead with the diseases, then the vaccine and dose              | `feat/appointment-diseases`   | ✅     |
+| 33  | Growth reading: WHO classification, normal range, change, advice            | `feat/growth-assessment`      | ✅     |
+| 34  | Wider content; Growth shows three chart cards, each with its reading        | `fix/growth-cards-grid`       | ✅     |
+| 35  | Teddy bear (gấu bông) and baby (em bé) palettes and drawings                | `feat/teddy-baby-palettes`    | ✅     |
+| 36  | Numerology page, just for fun, reached from a card on Today                 | `feat/numerology`             | ✅     |
+| 37  | Child's profile: birth-certificate and English names, birth time            | `feat/child-profile`          | ✅     |
+| 38  | Numerology in depth: more numbers, two birth charts, pinnacles, guidance    | `feat/numerology-more`        | ✅     |
+| 39  | The child's page like a social profile: cover, tabs, feed, milestones       | `feat/child-page`             | ✅     |
+| 40  | Backlog: PDF minus signs, next dose number, phone chart axis, restore       | `fix/backlog`                 | ✅     |
+| 41  | Health screen: entries, temperatures, quick add, Today, PDF, timeline       | `feat/health-log`             | ✅     |
+| 42  | Follow-up after a vaccine: temperatures for two days, on Today and Vaccines | `feat/vaccine-follow-up`      | ✅     |
+| 43  | Family sharing: owners add relatives as editors or viewers                  | `feat/family-sharing`         | ✅     |
+| 44  | Installable app: manifest, icons, a service worker with an offline page     | `feat/pwa`                    | ✅     |
+| 45  | About page and a read-only demo on an in-memory database                    | `feat/demo`                   | ✅     |
+| 46  | Architecture diagram; tests run with 90% coverage in CI                     | `chore/coverage-architecture` | ✅     |
 
 Each step is a pull request with green checks (`Browser` from step 9), merged with rebase.
 

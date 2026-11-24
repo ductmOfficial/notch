@@ -12,7 +12,19 @@ export default defineConfig({
     include: ["lib/**/*.test.ts", "lib/**/*.test.tsx"],
     coverage: {
       include: ["lib/**/*.ts"],
-      exclude: ["lib/db.ts", "lib/child.ts"],
+      // Code that needs a Next.js request (cookies, headers, the session) or a browser; the
+      // end-to-end tests cover it.
+      exclude: [
+        "lib/db.ts",
+        "lib/child.ts",
+        "lib/auth.ts",
+        "lib/auth-client.ts",
+        "lib/session.ts",
+        "lib/preferences.ts",
+        "lib/i18n/server.ts",
+        "lib/use-hydrated.ts",
+        "lib/demo-cookie.ts",
+      ],
       thresholds: { lines: 90, functions: 90, branches: 90, statements: 90 },
     },
   },

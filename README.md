@@ -30,7 +30,7 @@
 ```
 .
 ├── apps/
-│   └── web/                    # Next.js app: / (Today), /growth, /vaccines, forms, /settings, calendars
+│   └── web/                    # Next.js app: / (Today), /growth, /vaccines, /health, /child, /settings, /about
 ├── packages/
 │   ├── growth/                 # @notch/growth: WHO LMS z-scores and percentiles (pure TypeScript)
 │   ├── vaccines/               # @notch/vaccines: vaccine catalog, appointments, schedule engine (pure TypeScript)
@@ -43,6 +43,52 @@
 ```
 
 The domain packages never import React or Next.js, so a future React Native app can reuse them unchanged.
+
+## Architecture
+
+```mermaid
+flowchart LR
+  subgraph Device["Phone or computer"]
+    Browser["Browser or installed app"]
+    SW["Service worker<br/>(offline page only)"]
+    Calendar["Calendar app"]
+  end
+
+  subgraph Web["apps/web · Next.js on Vercel (sin1)"]
+    Proxy["proxy.ts<br/>session cookie check"]
+    Pages["Server components<br/>Today, Growth, Vaccines, Health, Child, Settings"]
+    Actions["Server actions<br/>role check, then write"]
+    Routes["Route handlers<br/>PDF, backup, .ics"]
+    Auth["Better Auth<br/>magic link, owners + invites"]
+    Demo["Demo database<br/>in-memory PGlite"]
+  end
+
+  subgraph Packages["Domain packages (no React)"]
+    Growth["@notch/growth<br/>WHO z-scores, readings"]
+    Vaccines["@notch/vaccines<br/>catalog, TCMR schedule"]
+    Db["@notch/db<br/>Drizzle schema, queries, backup"]
+  end
+
+  Postgres[("PostgreSQL · Neon<br/>or PGlite locally")]
+  Resend["Resend<br/>sign-in emails"]
+
+  Browser --> Proxy --> Pages
+  Browser --> Actions
+  Browser -.-> SW
+  Calendar -- "secret token" --> Routes
+  Pages --> Growth & Vaccines & Db
+  Actions --> Db
+  Routes --> Db
+  Auth --> Db
+  Auth --> Resend
+  Pages -. "demo browser" .-> Demo
+  Db --> Postgres
+```
+
+- **Reads** go through server components: a page asks `getDb` for the database (the family's, or the in-memory demo for a demo browser) and renders HTML; no client fetches records.
+- **Writes** are server actions: each checks the session, the role (viewers cannot write) and that the child belongs to the signed-in family, then calls `@notch/db`.
+- **Rules** live in the domain packages (growth readings, vaccine schedules), tested on their own and reused by the PDF and the calendar.
+- **Nothing about a child leaves the server** except the pages themselves, the PDF and the backup the parent downloads; calendar events and emails are generic.
 
 ## Setup
 
@@ -180,7 +226,7 @@ pnpm --filter web e2e
 | `pnpm dev`                            | Every package's `dev` task (the app's `next dev`)                                                    |
 | `pnpm lint`                           | ESLint everywhere; warnings fail the run                                                             |
 | `pnpm typecheck`                      | `tsc --noEmit` everywhere                                                                            |
-| `pnpm test` / `test:coverage`         | Vitest everywhere / with coverage thresholds (not run by CI; `web` is below its 90% threshold today) |
+| `pnpm test` / `test:coverage`         | Vitest everywhere / with 90% coverage thresholds on lines, branches and functions (CI runs this one) |
 | `pnpm format` / `format:check`        | Prettier write / check                                                                               |
 | `pnpm db:up` / `db:down` / `db:reset` | Start / stop / stop and delete local PostgreSQL                                                      |
 | `pnpm db:logs` / `db:psql`            | Follow its logs / open `psql` in the container                                                       |

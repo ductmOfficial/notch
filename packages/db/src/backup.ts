@@ -342,6 +342,7 @@ export async function restoreBackup(
           birthTime: c.birthTime,
         })
         .returning({ id: child.id });
+      /* v8 ignore next -- @preserve: a write that returns no row */
       if (!row) throw new Error("Child not restored");
       const childId = row.id;
       if (c.measurements.length > 0)
@@ -357,6 +358,7 @@ export async function restoreBackup(
           .insert(healthEntry)
           .values({ ...e, childId })
           .returning({ id: healthEntry.id });
+        /* v8 ignore next -- @preserve: a write that returns no row */
         if (!saved) throw new Error("Health entry not restored");
         entryIds.push(saved.id);
       }

@@ -76,6 +76,7 @@ export async function getHealthEntry(
 export async function addHealthEntry(db: Db, input: HealthEntryInput): Promise<HealthEntry> {
   const values = healthEntryInputSchema.parse(input);
   const [row] = await db.insert(healthEntry).values(values).returning();
+  /* v8 ignore next -- @preserve: a write that returns no row */
   if (!row) throw new Error("Health entry not saved");
   return row;
 }
@@ -150,6 +151,7 @@ export async function addTemperature(db: Db, input: TemperatureInput): Promise<T
   return db.transaction(async (tx) => {
     await checkHealthEntry(tx, values);
     const [row] = await tx.insert(temperature).values(values).returning();
+    /* v8 ignore next -- @preserve: a write that returns no row */
     if (!row) throw new Error("Temperature not saved");
     return row;
   });

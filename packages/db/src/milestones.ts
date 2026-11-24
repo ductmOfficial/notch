@@ -44,6 +44,7 @@ export async function getMilestone(
 export async function addMilestone(db: Db, input: MilestoneInput): Promise<Milestone> {
   const values = milestoneInputSchema.parse(input);
   const [row] = await db.insert(milestone).values(values).returning();
+  /* v8 ignore next -- @preserve: a write that returns no row */
   if (!row) throw new Error("Milestone not saved");
   return row;
 }
