@@ -7,8 +7,10 @@ import {
   parseChildProfileForm,
   parseDecimal,
   parseDoseForm,
+  parseHealthEntryForm,
   parseMeasurementForm,
   parseMilestoneForm,
+  parseTemperatureForm,
 } from "./form-values";
 
 const CTX = {
@@ -302,5 +304,151 @@ describe("parseMilestoneForm", () => {
       ctx,
     );
     expect(future.ok).toBe(false);
+  });
+});
+
+describe("parseHealthEntryForm", () => {
+  it("reads an entry still going on", () => {
+    expect(
+      parseHealthEntryForm(
+        form({ kind: "illness", title: " Sốt ", startedOn: "2030-05-30", endedOn: "", note: "" }),
+        CTX,
+      ),
+    ).toEqual({
+      ok: true,
+      input: {
+        childId: CTX.childId,
+        kind: "illness",
+        title: "Sốt",
+        startedOn: "2030-05-30",
+        endedOn: null,
+        note: null,
+      },
+    });
+  });
+
+  it("refuses an unknown kind, an empty title and an end before the start", () => {
+    const parsed = parseHealthEntryForm(
+      form({ kind: "x", title: "", startedOn: "2030-05-30", endedOn: "2030-05-29" }),
+      CTX,
+    );
+    expect(parsed.ok).toBe(false);
+    if (parsed.ok) return;
+    expect(parsed.state.errors).toEqual({
+      kind: "Chọn loại.",
+      title: "Nhập nội dung.",
+      endedOn: "Ngày kết thúc không được trước ngày bắt đầu.",
+    });
+  });
+
+  it("refuses a start in the future, a long title and a long note", () => {
+    const parsed = parseHealthEntryForm(
+      form({
+        kind: "visit",
+        title: "x".repeat(121),
+        startedOn: "2030-06-02",
+        endedOn: "",
+        note: "n".repeat(501),
+      }),
+      { ...CTX, locale: "en" },
+    );
+    expect(parsed.ok).toBe(false);
+    if (parsed.ok) return;
+    expect(Object.keys(parsed.state.errors ?? {}).sort()).toEqual(["note", "startedOn", "title"]);
+  });
+});
+
+describe("parseTemperatureForm", () => {
+  const ctx = { ...CTX, now: new Date("2030-06-01T05:00:00Z") }; // 12:00 in Vietnam
+  const entry = "00000000-0000-4000-8000-0000000000e1";
+
+  it("reads a reading in Vietnam time, with a comma or a point", () => {
+    expect(
+      parseTemperatureForm(
+        form({
+          measuredOn: "2030-06-01",
+          measuredTime: "09:30",
+          temperature: "38,5",
+          healthEntryId: entry,
+          note: "",
+        }),
+        ctx,
+        [entry],
+      ),
+    ).toEqual({
+      ok: true,
+      input: {
+        childId: CTX.childId,
+        measuredAt: "2030-06-01T09:30:00+07:00",
+        tenthsC: 385,
+        healthEntryId: entry,
+        note: null,
+      },
+    });
+    const point = parseTemperatureForm(
+      form({ measuredOn: "2030-05-31", measuredTime: "23:00", temperature: "37.2" }),
+      ctx,
+      [],
+    );
+    expect(point.ok && point.input.tenthsC).toBe(372);
+    expect(point.ok && point.input.healthEntryId).toBeNull();
+    const none = parseTemperatureForm(
+      form({
+        measuredOn: "2030-05-31",
+        measuredTime: "23:00",
+        temperature: "37",
+        healthEntryId: "none",
+      }),
+      ctx,
+      [entry],
+    );
+    expect(none.ok && none.input.healthEntryId).toBeNull();
+  });
+
+  it("refuses a reading later than now, out of range, or of another child's entry", () => {
+    const parsed = parseTemperatureForm(
+      form({
+        measuredOn: "2030-06-01",
+        measuredTime: "13:00",
+        temperature: "45",
+        healthEntryId: "someone-else",
+      }),
+      ctx,
+      [entry],
+    );
+    expect(parsed.ok).toBe(false);
+    if (parsed.ok) return;
+    expect(parsed.state.errors).toEqual({
+      measuredTime: "Thời điểm đo không thể ở tương lai.",
+      temperature: "Nhiệt độ phải từ 34,0 đến 43,0 °C.",
+      healthEntryId: "Chọn một mục của bé này.",
+    });
+  });
+
+  it("asks for every required field and a valid time", () => {
+    const empty = parseTemperatureForm(form({}), ctx, []);
+    expect(empty.ok).toBe(false);
+    if (!empty.ok)
+      expect(Object.keys(empty.state.errors ?? {}).sort()).toEqual([
+        "measuredOn",
+        "measuredTime",
+        "temperature",
+      ]);
+    const bad = parseTemperatureForm(
+      form({
+        measuredOn: "2030-06-01",
+        measuredTime: "25:00",
+        temperature: "abc",
+        note: "n".repeat(501),
+      }),
+      { ...ctx, locale: "en" },
+      [],
+    );
+    expect(bad.ok).toBe(false);
+    if (!bad.ok)
+      expect(bad.state.errors).toMatchObject({
+        measuredTime: "The time is not a valid time.",
+        temperature: "The temperature must be between 34.0 and 43.0 °C.",
+      });
   });
 });

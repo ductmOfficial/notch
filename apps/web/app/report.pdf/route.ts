@@ -1,4 +1,10 @@
-import { listAppointments, listMeasurements, listVaccinations } from "@notch/db";
+import {
+  listAppointments,
+  listHealthEntries,
+  listMeasurements,
+  listTemperatures,
+  listVaccinations,
+} from "@notch/db";
 
 import { getCurrentChild } from "../../lib/child";
 import { getDb } from "../../lib/db";
@@ -21,13 +27,24 @@ export async function GET(request: Request): Promise<Response> {
   );
   if (!child) return new Response("No child", { status: 404 });
 
-  const [{ locale }, measurements, vaccinations, appointments] = await Promise.all([
-    getI18n(),
-    listMeasurements(db, child.id),
-    listVaccinations(db, child.id),
-    listAppointments(db, child.id),
-  ]);
-  const pdf = await renderReport({ child, measurements, vaccinations, appointments, locale });
+  const [{ locale }, measurements, vaccinations, appointments, healthEntries, temperatures] =
+    await Promise.all([
+      getI18n(),
+      listMeasurements(db, child.id),
+      listVaccinations(db, child.id),
+      listAppointments(db, child.id),
+      listHealthEntries(db, child.id),
+      listTemperatures(db, child.id),
+    ]);
+  const pdf = await renderReport({
+    child,
+    measurements,
+    vaccinations,
+    appointments,
+    healthEntries,
+    temperatures,
+    locale,
+  });
   return new Response(new Uint8Array(pdf), {
     headers: {
       "Content-Type": "application/pdf",

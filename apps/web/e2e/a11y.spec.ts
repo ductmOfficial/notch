@@ -13,6 +13,9 @@ const pages = [
   "/child/edit",
   "/child",
   "/child/milestones/new",
+  "/health",
+  "/health/new",
+  "/health/temperature/new",
 ];
 
 for (const path of pages) {

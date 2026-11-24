@@ -386,3 +386,41 @@ test("a milestone is added from the child's page and shows on the timeline", asy
   await page.getByRole("link", { name: "Mũi tiêm", exact: true }).click();
   await expect(timeline.getByText("Chiếc răng đầu tiên")).toHaveCount(0);
 });
+
+test("an illness and its temperatures go in the health log", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("link", { name: "Sức khoẻ" }).first().click();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Sức khoẻ");
+
+  await page.getByRole("link", { name: "Ghi sức khoẻ" }).click();
+  await page.getByLabel("Nội dung", { exact: true }).fill("Sốt sau tiêm");
+  await page.getByRole("button", { name: "Ghi sức khoẻ" }).click();
+  await expect(page).toHaveURL(/\/health\?child=/);
+  await expect(page.getByText("Sốt sau tiêm")).toBeVisible();
+
+  // A reading from the ongoing illness is attached to it.
+  await page.getByRole("link", { name: "Đo nhiệt độ: Sốt sau tiêm" }).click();
+  await page.getByLabel("Nhiệt độ (°C)").fill("44");
+  await page.getByRole("button", { name: "Đo nhiệt độ" }).click();
+  await expect(page.getByText("Nhiệt độ phải từ 34,0 đến 43,0 °C.")).toBeVisible();
+  await page.getByLabel("Nhiệt độ (°C)").fill("38,6");
+  await page.getByRole("button", { name: "Đo nhiệt độ" }).click();
+  await expect(page).toHaveURL(/\/health\?child=/);
+  await expect(page.getByText("38,6 °C").first()).toBeVisible();
+  await expect(page.getByText("Thuộc: Sốt sau tiêm")).toBeVisible();
+  await expect(page.getByText("1 lần đo nhiệt độ")).toBeVisible();
+
+  // Today shows the reading while it is recent.
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: "Sức khoẻ" })).toBeVisible();
+  await expect(page.getByText("38,6 °C")).toBeVisible();
+
+  // The illness ends; the reading stays.
+  await page.goto("/health");
+  await page.getByRole("link", { name: "Sửa: Sốt sau tiêm" }).click();
+  await page.getByRole("button", { name: "Xoá mục này" }).click();
+  await page.getByRole("alertdialog").getByRole("button", { name: "Xoá" }).click();
+  await expect(page).toHaveURL(/\/health/);
+  await expect(page.getByText("Sốt sau tiêm")).toHaveCount(0);
+  await expect(page.getByText("38,6 °C").first()).toBeVisible();
+});

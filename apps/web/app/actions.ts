@@ -1,8 +1,16 @@
 "use server";
 
 import {
+  addHealthEntry,
   addMeasurement,
   addMilestone,
+  addTemperature,
+  deleteHealthEntry,
+  deleteTemperature,
+  listHealthEntries,
+  UnknownHealthEntryError,
+  updateHealthEntry,
+  updateTemperature,
   deleteMilestone,
   updateMilestone,
   deleteAppointment,
@@ -25,8 +33,10 @@ import {
   type FormState,
   parseAppointmentForm,
   parseDoseForm,
+  parseHealthEntryForm,
   parseMeasurementForm,
   parseMilestoneForm,
+  parseTemperatureForm,
 } from "../lib/form-values";
 import { todayInVietnam } from "../lib/format";
 import { getI18n } from "../lib/i18n/server";
@@ -173,4 +183,74 @@ export async function deleteMilestoneAction(form: FormData): Promise<void> {
     await deleteMilestone(db(), id, found.ctx.childId).catch(() => false);
   refresh("/child");
   redirect("/child");
+}
+
+const healthPage = (childId: string) => `/health?child=${childId}`;
+
+/** Adds an illness, a medicine or a doctor's visit, or updates `id` when the form carries one. */
+export async function saveHealthEntryAction(_: FormState, form: FormData): Promise<FormState> {
+  const found = await context(form);
+  if ("error" in found) return found.error;
+  const parsed = parseHealthEntryForm(form, found.ctx);
+  if (!parsed.ok) return parsed.state;
+  const id = form.get("id");
+  if (typeof id === "string" && id !== "") {
+    const saved = await updateHealthEntry(db(), id, parsed.input).catch(() => undefined);
+    if (!saved) return { message: (await getI18n()).t("error.healthEntryGone") };
+  } else {
+    await addHealthEntry(db(), parsed.input);
+  }
+  refresh("/health", "/child");
+  redirect(healthPage(found.ctx.childId));
+}
+
+export async function deleteHealthEntryAction(form: FormData): Promise<void> {
+  const found = await context(form);
+  const id = form.get("id");
+  if ("ctx" in found && typeof id === "string")
+    await deleteHealthEntry(db(), id, found.ctx.childId).catch(() => false);
+  refresh("/health", "/child");
+  redirect("/health");
+}
+
+/** Adds a temperature reading, or updates `id` when the form carries one. */
+export async function saveTemperatureAction(_: FormState, form: FormData): Promise<FormState> {
+  const found = await context(form);
+  if ("error" in found) return found.error;
+  const entries = await listHealthEntries(db(), found.ctx.childId);
+  const parsed = parseTemperatureForm(
+    form,
+    found.ctx,
+    entries.map((e) => e.id),
+  );
+  if (!parsed.ok) return parsed.state;
+  const id = form.get("id");
+  try {
+    if (typeof id === "string" && id !== "") {
+      const saved = await updateTemperature(db(), id, parsed.input);
+      if (!saved) return { message: (await getI18n()).t("error.temperatureGone") };
+    } else {
+      await addTemperature(db(), parsed.input);
+    }
+  } catch (error) {
+    // The entry was deleted between loading the form and saving it.
+    if (error instanceof UnknownHealthEntryError) {
+      return {
+        errors: { healthEntryId: (await getI18n()).t("error.unknownHealthEntry") },
+        values: formValues(form),
+      };
+    }
+    throw error;
+  }
+  refresh("/health");
+  redirect(healthPage(found.ctx.childId));
+}
+
+export async function deleteTemperatureAction(form: FormData): Promise<void> {
+  const found = await context(form);
+  const id = form.get("id");
+  if ("ctx" in found && typeof id === "string")
+    await deleteTemperature(db(), id, found.ctx.childId).catch(() => false);
+  refresh("/health");
+  redirect("/health");
 }
