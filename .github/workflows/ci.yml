@@ -63,8 +63,9 @@ jobs:
       - name: Check formatting
         run: pnpm format:check
 
-      - name: Lint, typecheck, test, build
-        run: pnpm turbo run lint typecheck test build
+      # Tests run with coverage: each package fails below 90% of lines, branches and functions.
+      - name: Lint, typecheck, test with coverage, build
+        run: pnpm turbo run lint typecheck test:coverage build
 
   # Runs the built app in Chrome: Playwright end-to-end tests with axe, on a fresh PGlite
   # database seeded with the fictional demo child.

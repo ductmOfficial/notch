@@ -121,6 +121,7 @@ function pgCode(error: unknown): string | undefined {
 export async function addChild(db: Db, input: ChildInput): Promise<Child> {
   const values = childInputSchema.parse(input);
   const [row] = await db.insert(child).values(values).returning();
+  /* v8 ignore next -- @preserve: a write that returns no row */
   if (!row) throw new Error("Child not saved");
   return row;
 }
@@ -144,6 +145,7 @@ export async function updateChild(
 export async function addMeasurement(db: Db, input: MeasurementInput): Promise<Measurement> {
   const values = measurementInputSchema.parse(input);
   const [row] = await db.insert(measurement).values(values).returning();
+  /* v8 ignore next -- @preserve: a write that returns no row */
   if (!row) throw new Error("Measurement not saved");
   return row;
 }
@@ -197,6 +199,7 @@ export async function recordDose(
     return await db.transaction(async (tx) => {
       const { nextAppointment, ...dose } = values;
       const [saved] = await tx.insert(vaccination).values(dose).returning();
+      /* v8 ignore next -- @preserve: a write that returns no row */
       if (!saved) throw new Error("Dose not saved");
       let next: AppointmentRow | undefined;
       if (nextAppointment) {

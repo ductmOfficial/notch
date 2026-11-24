@@ -167,6 +167,28 @@ describe("backup", () => {
     expect(await listChildren(db, familyId)).toHaveLength(1);
   });
 
+  it("exports a family without children, and restores a child without records", async () => {
+    const [other] = await db.insert(family).values({ name: "Empty" }).returning();
+    if (!other) throw new Error("no family");
+    const blank = await exportBackup(db, other.id, new Date(0));
+    expect(blank.children).toEqual([]);
+    const saved = await exportBackup(db, familyId, new Date(0));
+    const first = saved.children[0];
+    if (!first) throw new Error("no child");
+    const bare = {
+      ...first,
+      measurements: [],
+      vaccinations: [],
+      appointments: [],
+      healthEntries: [],
+      temperatures: [],
+      milestones: [],
+    };
+    const result = await restoreBackup(db, other.id, { ...blank, children: [bare] });
+    expect(result).toMatchObject({ children: 1, measurements: 0, vaccinations: 0 });
+    expect((await listChildren(db, other.id)).map((c) => c.name)).toEqual([first.name]);
+  });
+
   it("refuses other files and leaves the data untouched", async () => {
     const saved = await exportBackup(db, familyId, new Date(0));
     const bad = [
@@ -192,6 +214,11 @@ describe("backup", () => {
     const reading = dangling.children[0]?.temperatures[0];
     if (reading) reading.healthEntry = 9;
     await expect(restoreBackup(db, familyId, dangling)).rejects.toBeInstanceOf(BackupFormatError);
+    // A measurement without any value.
+    const empty = structuredClone(saved);
+    const m = empty.children[0]?.measurements[0];
+    if (m) Object.assign(m, { weightG: null, lengthMm: null, headMm: null });
+    await expect(restoreBackup(db, familyId, empty)).rejects.toBeInstanceOf(BackupFormatError);
     const hot = structuredClone(saved);
     const t = hot.children[0]?.temperatures[0];
     if (t) t.tenthsC = 500;

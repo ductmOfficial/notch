@@ -126,6 +126,7 @@ export async function seedChild(
         .insert(family)
         .values({ name: `Gia đình ${data.child.name}` })
         .returning();
+      /* v8 ignore next -- @preserve: a write that returns no row */
       if (!newFamily) throw new Error("Could not create family");
       const [newChild] = await tx
         .insert(child)
@@ -139,6 +140,7 @@ export async function seedChild(
           birthTime: data.child.birthTime ?? null,
         })
         .returning();
+      /* v8 ignore next -- @preserve: a write that returns no row */
       if (!newChild) throw new Error("Could not create child");
       childId = newChild.id;
     }
