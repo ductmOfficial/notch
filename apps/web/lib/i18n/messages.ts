@@ -296,13 +296,18 @@ export const vi = {
   "settings.backupDownload": "Tải bản sao lưu",
   "settings.restoreChoose": "Khôi phục từ file…",
   "settings.restoreSummary":
-    "Bản sao lưu ngày {date}: {children} bé, {measurements} lần đo, {vaccinations} mũi tiêm, {appointments} lịch hẹn.",
+    "Bản sao lưu ngày {date}: {children} bé, {measurements} lần đo, {vaccinations} mũi tiêm, {appointments} lịch hẹn, {healthEntries} mục sức khoẻ, {temperatures} lần đo nhiệt độ, {milestones} cột mốc.",
+  "settings.restoreOlder":
+    "Đây là bản sao lưu cũ (phiên bản {version}), không có {parts}. Khôi phục sẽ xoá phần đó của dữ liệu hiện tại.",
+  "settings.restorePart.health": "nhật ký sức khoẻ",
+  "settings.restorePart.names": "các tên (khai sinh, tiếng Anh)",
+  "settings.restorePart.milestones": "cột mốc",
   "settings.restoreConfirmTitle": "Khôi phục từ file này?",
   "settings.restoreConfirm":
     "Mọi dữ liệu hiện có của gia đình sẽ được thay bằng nội dung file và không thể hoàn tác. Nên tải bản sao lưu hiện tại trước.",
   "settings.restore": "Khôi phục",
   "settings.restoreDone":
-    "Đã khôi phục: {children} bé, {measurements} lần đo, {vaccinations} mũi tiêm, {appointments} lịch hẹn.",
+    "Đã khôi phục: {children} bé, {measurements} lần đo, {vaccinations} mũi tiêm, {appointments} lịch hẹn, {healthEntries} mục sức khoẻ, {temperatures} lần đo nhiệt độ, {milestones} cột mốc.",
   "settings.restoreInvalid": "File này không phải bản sao lưu của Notch, hoặc đã bị sửa.",
   "settings.restoreTooLarge": "File quá lớn (tối đa 1 MB).",
   "settings.restoreUnknownProduct": "File có vaccine không có trong danh mục: {product}.",
@@ -780,13 +785,18 @@ export const en: Messages = {
   "settings.backupDownload": "Download backup",
   "settings.restoreChoose": "Restore from a file…",
   "settings.restoreSummary":
-    "Backup of {date}: {children} children, {measurements} measurements, {vaccinations} doses, {appointments} appointments.",
+    "Backup of {date}: {children} children, {measurements} measurements, {vaccinations} doses, {appointments} appointments, {healthEntries} health entries, {temperatures} temperatures, {milestones} milestones.",
+  "settings.restoreOlder":
+    "This is an older backup (version {version}) without {parts}. Restoring it deletes that part of the current data.",
+  "settings.restorePart.health": "the health log",
+  "settings.restorePart.names": "the other names (birth certificate, English)",
+  "settings.restorePart.milestones": "milestones",
   "settings.restoreConfirmTitle": "Restore from this file?",
   "settings.restoreConfirm":
     "All of the family's current data is replaced by the file's content, and this cannot be undone. Download a backup of the current data first.",
   "settings.restore": "Restore",
   "settings.restoreDone":
-    "Restored: {children} children, {measurements} measurements, {vaccinations} doses, {appointments} appointments.",
+    "Restored: {children} children, {measurements} measurements, {vaccinations} doses, {appointments} appointments, {healthEntries} health entries, {temperatures} temperatures, {milestones} milestones.",
   "settings.restoreInvalid": "This file is not a Notch backup, or it was changed.",
   "settings.restoreTooLarge": "The file is too large (1 MB at most).",
   "settings.restoreUnknownProduct": "The file has a vaccine that is not in the catalog: {product}.",

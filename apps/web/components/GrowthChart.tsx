@@ -12,6 +12,8 @@ const SIZES = {
 } as const;
 /** Just room for the y tick labels on the left and the curve labels (+3, TB, −3) on the right. */
 const PAD = { top: 28, right: 30, bottom: 40, left: 34 };
+/** The share of the wide chart's width taken by its y-axis margin, for `GrowthAxis`. */
+export const AXIS_WIDTH = `${String((PAD.left / SIZES.wide.width) * 100)}%`;
 
 const CURVE_STYLE: Record<number, { stroke: string; dash?: string; width: number }> = {
   [-3]: { stroke: "var(--chart-sd3)", dash: "4 4", width: 1 },
@@ -169,6 +171,54 @@ export function GrowthChart({
           </title>
         </circle>
       ))}
+    </svg>
+  );
+}
+
+/**
+ * The y-axis of the wide chart alone, for phones: laid over the chart's left edge and kept
+ * there while the chart scrolls sideways, so the values stay readable next to the latest
+ * measurements. Its frame is the wide chart's left margin at the same scale; decorative,
+ * since the chart and its table carry the values.
+ */
+export function GrowthAxis({ chart, locale }: { chart: ChartModel; locale: Locale }) {
+  const { height: HEIGHT } = SIZES.wide;
+  const info = INDICATORS[chart.indicator];
+  const y = (value: number) =>
+    HEIGHT -
+    PAD.bottom -
+    ((value - chart.yMin) / (chart.yMax - chart.yMin)) * (HEIGHT - PAD.top - PAD.bottom);
+  return (
+    <svg
+      viewBox={`0 0 ${String(PAD.left)} ${String(HEIGHT)}`}
+      aria-hidden="true"
+      overflow="visible"
+      className="h-auto w-full"
+    >
+      {/* Past the left edge too: the scroll container's padding keeps the axis off it. */}
+      <rect
+        x={-24}
+        y={0}
+        width={PAD.left + 24}
+        height={HEIGHT - PAD.bottom}
+        fill="var(--md-sys-color-surface-container-low)"
+      />
+      {chart.yTicks.map((v) => (
+        <text
+          key={v}
+          x={PAD.left - 8}
+          y={y(v)}
+          dy="0.32em"
+          textAnchor="end"
+          fontSize="13"
+          fill="var(--md-sys-color-on-surface-variant)"
+        >
+          {formatNumber(v, Number.isInteger(v) ? 0 : 1, locale)}
+        </text>
+      ))}
+      <text x={2} y={12} fontSize="13" fill="var(--md-sys-color-on-surface-variant)">
+        {info.unit}
+      </text>
     </svg>
   );
 }

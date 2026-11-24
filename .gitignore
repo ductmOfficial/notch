@@ -37,3 +37,6 @@ apps/web/e2e/.auth/
 
 # Local-only Vietnamese README
 README.vi.md
+
+# Written by `next dev` for coding tools; not part of the project
+apps/web/AGENTS.md
