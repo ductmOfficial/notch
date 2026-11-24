@@ -1,12 +1,12 @@
 import "server-only";
 
-import { schema } from "@notch/db";
+import { maySignIn, schema } from "@notch/db";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { magicLink } from "better-auth/plugins/magic-link";
 
-import { allowedEmails, isAllowed } from "./allowlist";
+import { allowedEmails } from "./allowlist";
 import { getDb } from "./db";
 import { getI18n } from "./i18n/server";
 import { sendMail } from "./mail";
@@ -49,8 +49,9 @@ function createAuth(db: NonNullable<ReturnType<typeof getDb>>) {
     databaseHooks: {
       user: {
         create: {
-          // A second guard behind the one in sendMagicLink: no account outside the allowlist.
-          before: (user) => Promise.resolve(isAllowed(user.email, allowedEmails())),
+          // A second guard behind the one in sendMagicLink: no account for an address that
+          // is neither an owner nor invited.
+          before: (user) => maySignIn(db, user.email, allowedEmails()),
         },
       },
     },
@@ -60,10 +61,10 @@ function createAuth(db: NonNullable<ReturnType<typeof getDb>>) {
         storeToken: "hashed",
         sendMagicLink: async ({ email, url }) => {
           // The answer is the same either way, so the form does not reveal who may sign in.
-          if (!isAllowed(email, allowedEmails())) {
+          if (!(await maySignIn(db, email, allowedEmails()))) {
             // For the server log only, and without the address: the visitor sees "sent".
             console.info(
-              "[auth] No sign-in link sent: the address is not on NOTCH_ALLOWED_EMAILS.",
+              "[auth] No sign-in link sent: the address is neither on NOTCH_ALLOWED_EMAILS nor invited.",
             );
             return;
           }

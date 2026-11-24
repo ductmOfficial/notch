@@ -14,6 +14,7 @@ PostgreSQL schema, migrations and queries with [Drizzle](https://orm.drizzle.tea
 
 - A child has the family's name for the child (`name`, shown in the app) and, optionally, the birth-certificate name (`full_name`) and an English name (`english_name`).
 - `milestone` keeps what the family wants to remember (a first tooth, a first step): a kind, a title, a date and a note. It is never compared with an expected age.
+- `family_member` links a user to the family with a role: `owner` (the addresses on `NOTCH_ALLOWED_EMAILS`), `editor` or `viewer`. `family_invite` holds the addresses an owner added; the first sign-in turns an invite into a membership (`familyForUser`, `maySignIn` in `src/families.ts`).
 - Measurements are integers (grams, millimetres), with an `estimated` flag for values written as approximate.
 - Doses are recorded per product (`vaccination`, unique per child, product and dose number); `product_disease` maps them to diseases.
 - `appointment.due_on` is nullable for bookings like "after the first birthday".

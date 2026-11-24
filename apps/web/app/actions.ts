@@ -40,9 +40,10 @@ import {
 } from "../lib/form-values";
 import { todayInVietnam } from "../lib/format";
 import { getI18n } from "../lib/i18n/server";
-import { requireViewer } from "../lib/session";
+import { mayEdit, requireViewer } from "../lib/session";
 
-// Every action checks the session and that the child belongs to the signed-in family.
+// Every action checks the session, that the role may write, and that the child belongs to the
+// signed-in family.
 
 async function context(form: FormData): Promise<{ ctx: FormContext } | { error: FormState }> {
   const viewer = await requireViewer();
@@ -50,6 +51,7 @@ async function context(form: FormData): Promise<{ ctx: FormContext } | { error: 
   const childId = form.get("childId");
   const { t, locale } = await getI18n();
   if (!db) return { error: { message: t("error.noDatabase") } };
+  if (!mayEdit(viewer)) return { error: { message: t("error.readOnly") } };
   if (typeof childId !== "string") return { error: { message: t("error.noChildId") } };
   const child = await getChild(db, childId).catch(() => undefined);
   // Another family's child reads as missing, so its id reveals nothing.

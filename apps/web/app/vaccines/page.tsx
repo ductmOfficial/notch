@@ -68,11 +68,11 @@ export default async function VaccinesPage({ searchParams }: Props) {
             <Icon name="download" size={18} />
             {t("vaccines.download")}
           </a>
-          <Link href="/vaccines/appointments/new" className={BUTTON.tonal}>
+          <Link href="/vaccines/appointments/new" className={`${BUTTON.tonal} editor-only`}>
             <Icon name="event" size={18} />
             {t("vaccines.addAppointment")}
           </Link>
-          <Link href="/vaccines/record" className={BUTTON.filled}>
+          <Link href="/vaccines/record" className={`${BUTTON.filled} editor-only`}>
             <Icon name="add" size={18} />
             {t("vaccines.recordDose")}
           </Link>
@@ -110,7 +110,7 @@ export default async function VaccinesPage({ searchParams }: Props) {
                   </span>
                 </span>
                 <AppointmentBadge state={a} locale={locale} />
-                <span className="ml-auto flex flex-wrap items-center gap-1">
+                <span className="editor-only ml-auto flex flex-wrap items-center gap-1">
                   <Link
                     href={`/vaccines/appointments/${appointmentIds.get(key(a.productCode, a.doseNo)) ?? ""}/edit`}
                     className={BUTTON.text}
@@ -221,7 +221,7 @@ export default async function VaccinesPage({ searchParams }: Props) {
                   </span>
                 )}
               </span>
-              <span className="-ml-3 sm:ml-0">
+              <span className="editor-only -ml-3 sm:ml-0">
                 <DeleteForm
                   action={deleteDoseAction}
                   childId={child.id}

@@ -169,6 +169,8 @@ describe("migrating a database with records", () => {
         expect.arrayContaining(rows.map((row): unknown => expect.objectContaining(row))),
       );
     }
+    // Members from before roles are owners.
+    for (const member of after.family_member ?? []) expect(member).toMatchObject({ role: "owner" });
     const added = Object.keys(after).filter((table) => !(table in before));
     for (const table of added) expect(after[table], table).toEqual([]);
 

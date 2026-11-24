@@ -186,7 +186,7 @@ export default async function NumerologyPage({ searchParams }: Props) {
           {t("numerology.fullNameMissing", { name: child.name })}
           <Link
             href={`/child/edit?child=${child.id}`}
-            className="label-large text-primary underline"
+            className="editor-only label-large text-primary underline"
           >
             {t("numerology.addFullName")}
           </Link>

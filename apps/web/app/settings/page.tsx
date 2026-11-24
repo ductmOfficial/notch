@@ -1,8 +1,9 @@
-import { calendarLinkInfo } from "@notch/db";
+import { calendarLinkInfo, listInvites, listMembers } from "@notch/db";
 import type { Metadata } from "next";
 import Link from "next/link";
 
 import { BackupCard } from "../../components/BackupCard";
+import { MembersCard, ROLE_LABEL } from "../../components/MembersCard";
 import { BUTTON } from "../../components/button-styles";
 import { CalendarLink, type CalendarLinkSummary } from "../../components/CalendarLink";
 import { LanguagePicker } from "../../components/LanguagePicker";
@@ -15,7 +16,7 @@ import { getDb } from "../../lib/db";
 import { formatDate, todayInVietnam } from "../../lib/format";
 import { getI18n } from "../../lib/i18n/server";
 import { getPalette, getTheme } from "../../lib/preferences";
-import { requireViewer } from "../../lib/session";
+import { isOwner, mayEdit, requireViewer } from "../../lib/session";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getI18n();
@@ -26,7 +27,12 @@ export default async function SettingsPage() {
   const [viewer, theme, palette] = await Promise.all([requireViewer(), getTheme(), getPalette()]);
   const { t, locale } = await getI18n();
   const db = getDb();
-  const info = db ? await calendarLinkInfo(db, viewer.familyId) : undefined;
+  const owner = isOwner(viewer);
+  const [info, members, invites] = await Promise.all([
+    db ? calendarLinkInfo(db, viewer.familyId) : undefined,
+    db && owner ? listMembers(db, viewer.familyId) : [],
+    db && owner ? listInvites(db, viewer.familyId) : [],
+  ]);
   const day = (date: Date) => formatDate(todayInVietnam(date), locale);
   const calendar: CalendarLinkSummary | null = info
     ? { created: day(info.createdAt), lastUsed: info.lastUsedAt ? day(info.lastUsedAt) : null }
@@ -77,28 +83,47 @@ export default async function SettingsPage() {
                   <Link href={`/child?child=${c.id}`} className={BUTTON.text}>
                     {t("child.viewPage")}
                   </Link>
-                  <Link href={`/child/edit?child=${c.id}`} className={BUTTON.outlined}>
-                    <Icon name="edit" size={18} />
-                    {t("settings.editChild")}
-                  </Link>
+                  {mayEdit(viewer) && (
+                    <Link href={`/child/edit?child=${c.id}`} className={BUTTON.outlined}>
+                      <Icon name="edit" size={18} />
+                      {t("settings.editChild")}
+                    </Link>
+                  )}
                 </span>
               </li>
             ))}
           </ul>
         </Card>
       )}
-      <Card className="space-y-4 p-5">
-        <h2 className="title-small">{t("settings.calendar")}</h2>
-        <CalendarLink summary={calendar} />
-      </Card>
+      {owner && (
+        <Card className="space-y-4 p-5">
+          <h2 className="title-small">{t("members.title")}</h2>
+          <MembersCard
+            members={members}
+            invites={invites}
+            selfId={viewer.userId}
+            t={t}
+            locale={locale}
+          />
+        </Card>
+      )}
+      {/* The calendar link is the family's: editors and owners create or revoke it. */}
+      {mayEdit(viewer) && (
+        <Card className="space-y-4 p-5">
+          <h2 className="title-small">{t("settings.calendar")}</h2>
+          <CalendarLink summary={calendar} />
+        </Card>
+      )}
       <Card className="space-y-4 p-5">
         <h2 className="title-small">{t("settings.backup")}</h2>
-        <BackupCard />
+        <BackupCard canRestore={owner} />
       </Card>
       <Card className="space-y-4 p-5">
         <h2 className="title-small">{t("settings.account")}</h2>
         <p className="body-medium text-on-surface-variant">
           {t("settings.signedInAs", { email: viewer.email })}
+          <br />
+          {t("settings.yourRole", { role: t(ROLE_LABEL[viewer.role]) })}
         </p>
         <SignOutButton />
       </Card>

@@ -74,11 +74,11 @@ export default async function HealthPage({ searchParams }: Props) {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link className={BUTTON.tonal} href={`/health/temperature/new${q}`}>
+          <Link className={`${BUTTON.tonal} editor-only`} href={`/health/temperature/new${q}`}>
             <Icon name="thermostat" size={18} />
             {t("health.addTemperature")}
           </Link>
-          <Link className={BUTTON.filled} href={`/health/new${q}`}>
+          <Link className={`${BUTTON.filled} editor-only`} href={`/health/new${q}`}>
             <Icon name="add" size={18} />
             {t("health.addEntry")}
           </Link>
@@ -203,7 +203,7 @@ function LatestReading({
         <p className="body-medium">{t("health.noTemperatures")}</p>
         <Link
           href={href}
-          className="state-layer label-large -mx-3 mt-auto inline-flex h-10 w-fit items-center gap-1 rounded-full px-3 text-primary"
+          className="editor-only state-layer label-large -mx-3 mt-auto inline-flex h-10 w-fit items-center gap-1 rounded-full px-3 text-primary"
         >
           {t("health.addTemperature")}
           <Icon name="chevronRight" size={18} />
@@ -235,7 +235,7 @@ function LatestReading({
       {today !== vietnamDateTime(reading.measuredAt).date && (
         <Link
           href={href}
-          className="state-layer label-large -mx-3 mt-auto inline-flex h-10 w-fit items-center gap-1 rounded-full px-3"
+          className="editor-only state-layer label-large -mx-3 mt-auto inline-flex h-10 w-fit items-center gap-1 rounded-full px-3"
         >
           {t("health.addTemperature")}
           <Icon name="chevronRight" size={18} />
@@ -279,7 +279,7 @@ function EntryRow({
           </p>
         )}
       </div>
-      <div className="flex gap-1">
+      <div className="editor-only flex gap-1">
         {addReading && entry.kind === "illness" && (
           <Link
             href={`/health/temperature/new${q}&entry=${entry.id}`}
@@ -335,7 +335,7 @@ function ReadingRow({
       <Badge tone={LEVEL_TONE[level]}>{temperatureLevelLabel(level, locale)}</Badge>
       <Link
         href={href}
-        className={BUTTON.text}
+        className={`${BUTTON.text} editor-only`}
         aria-label={`${t("health.edit")}: ${value}, ${formatDateTime(reading.measuredAt, locale)}`}
       >
         <Icon name="edit" size={18} />
