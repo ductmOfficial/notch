@@ -84,6 +84,29 @@ export function formatDate(date: string, locale: Locale = "vi"): string {
   return `${String(d).padStart(2, "0")}/${String(m).padStart(2, "0")}/${String(y)}`;
 }
 
+const MONTHS_EN_LONG = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+/** 2026-11 (or a full date) → Tháng 11/2026 (vi) or November 2026 (en). */
+export function formatMonth(date: string, locale: Locale = "vi"): string {
+  const y = Number(date.slice(0, 4));
+  const m = Number(date.slice(5, 7));
+  if (locale === "en") return `${MONTHS_EN_LONG[m - 1] ?? ""} ${String(y)}`;
+  return `Tháng ${String(m)}/${String(y)}`;
+}
+
 const formatters = new Map<string, Intl.NumberFormat>();
 
 /** Number with a fixed number of decimals: decimal comma in Vietnamese, point in English. */

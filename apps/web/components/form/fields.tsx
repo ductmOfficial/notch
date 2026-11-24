@@ -101,6 +101,7 @@ export function SelectField({
   placeholder,
   error,
   isRequired,
+  onChange,
 }: {
   readonly label: string;
   readonly name: string;
@@ -109,6 +110,8 @@ export function SelectField({
   readonly placeholder?: string;
   readonly error?: string;
   readonly isRequired?: boolean;
+  /** Called with the chosen id, for forms that adapt to the choice. */
+  readonly onChange?: (id: string) => void;
 }) {
   return (
     <SenSelect
@@ -120,6 +123,9 @@ export function SelectField({
       placeholder={placeholder}
       error={error}
       isRequired={isRequired}
+      onChange={(key) => {
+        if (key !== null) onChange?.(String(key));
+      }}
     >
       {(item) => <SelectItem id={item.id}>{item.name}</SelectItem>}
     </SenSelect>

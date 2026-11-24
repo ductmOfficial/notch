@@ -8,6 +8,7 @@ import {
   parseDecimal,
   parseDoseForm,
   parseMeasurementForm,
+  parseMilestoneForm,
 } from "./form-values";
 
 const CTX = {
@@ -255,5 +256,51 @@ describe("parseChildProfileForm", () => {
       "name",
     ]);
     expect(parsed.state.values?.birthTime).toBe("25:00");
+  });
+});
+
+describe("parseMilestoneForm", () => {
+  const ctx = { childId: "c", birthDate: "2030-01-01", today: "2030-09-01" };
+  const form = (fields: Record<string, string>) => {
+    const f = new FormData();
+    for (const [k, v] of Object.entries(fields)) f.set(k, v);
+    return f;
+  };
+
+  it("reads a milestone", () => {
+    expect(
+      parseMilestoneForm(
+        form({ kind: "teeth", title: " First tooth ", happenedOn: "2030-07-10", note: "" }),
+        ctx,
+      ),
+    ).toEqual({
+      ok: true,
+      input: {
+        childId: "c",
+        kind: "teeth",
+        title: "First tooth",
+        happenedOn: "2030-07-10",
+        note: null,
+      },
+    });
+  });
+
+  it("refuses an unknown kind, an empty title and a date before birth or in the future", () => {
+    const before = parseMilestoneForm(
+      form({ kind: "sport", title: "", happenedOn: "2029-12-31" }),
+      ctx,
+    );
+    expect(before.ok).toBe(false);
+    if (!before.ok)
+      expect(Object.keys(before.state.errors ?? {}).sort()).toEqual([
+        "happenedOn",
+        "kind",
+        "title",
+      ]);
+    const future = parseMilestoneForm(
+      form({ kind: "motor", title: "x", happenedOn: "2030-09-02" }),
+      ctx,
+    );
+    expect(future.ok).toBe(false);
   });
 });

@@ -73,10 +73,15 @@ export default async function SettingsPage() {
                       : t("settings.childBorn", { date: formatDate(c.birthDate, locale) })}
                   </p>
                 </div>
-                <Link href={`/child/edit?child=${c.id}`} className={BUTTON.outlined}>
-                  <Icon name="edit" size={18} />
-                  {t("settings.editChild")}
-                </Link>
+                <span className="flex flex-wrap gap-2">
+                  <Link href={`/child?child=${c.id}`} className={BUTTON.text}>
+                    {t("child.viewPage")}
+                  </Link>
+                  <Link href={`/child/edit?child=${c.id}`} className={BUTTON.outlined}>
+                    <Icon name="edit" size={18} />
+                    {t("settings.editChild")}
+                  </Link>
+                </span>
               </li>
             ))}
           </ul>

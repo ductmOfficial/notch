@@ -11,6 +11,8 @@ const pages = [
   "/settings",
   "/numerology",
   "/child/edit",
+  "/child",
+  "/child/milestones/new",
 ];
 
 for (const path of pages) {

@@ -72,10 +72,12 @@ export default async function TodayPage({ searchParams }: Props) {
             {t("today.date", { date: formatDate(today, locale) })}
           </p>
           <h1 className="headline-medium mt-1">
-            {t("today.heading", {
-              name: child.name,
-              age: formatAge(child.birthDate, today, locale),
-            })}
+            <Link href={`/child?child=${child.id}`} className="hover:underline">
+              {t("today.heading", {
+                name: child.name,
+                age: formatAge(child.birthDate, today, locale),
+              })}
+            </Link>
           </h1>
         </div>
         <a className={BUTTON.tonal} href={`/report.pdf?child=${child.id}`} download>
