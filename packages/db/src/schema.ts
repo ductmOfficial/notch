@@ -310,3 +310,31 @@ export const temperature = pgTable(
     check("temperature_range_check", sql`${t.tenthsC} between 340 and 430`),
   ],
 );
+
+// ── Milestones ───────────────────────────────────────────────────────────
+
+/**
+ * Something the family wants to remember: a first tooth, a first step, a first word. Recorded,
+ * never assessed: the app does not say whether it came early or late.
+ */
+export const milestone = pgTable(
+  "milestone",
+  {
+    id: id(),
+    childId: uuid()
+      .notNull()
+      .references(() => child.id, { onDelete: "cascade" }),
+    kind: text({ enum: ["motor", "language", "teeth", "social", "other"] }).notNull(),
+    title: text().notNull(),
+    happenedOn: date({ mode: "string" }).notNull(),
+    note: text(),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    index("milestone_child_happened_idx").on(t.childId, t.happenedOn),
+    check(
+      "milestone_kind_check",
+      sql`${t.kind} in ('motor', 'language', 'teeth', 'social', 'other')`,
+    ),
+  ],
+);

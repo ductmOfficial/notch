@@ -12,6 +12,16 @@ export {
 } from "./calendar-tokens.js";
 export type { FamilyOfUser } from "./families.js";
 export { familyForUser, familyIdForUser } from "./families.js";
+export type { Milestone, MilestoneInput, MilestoneKind } from "./milestones.js";
+export {
+  addMilestone,
+  deleteMilestone,
+  getMilestone,
+  listMilestones,
+  MILESTONE_KINDS,
+  milestoneInputSchema,
+  updateMilestone,
+} from "./milestones.js";
 export type { HealthEntry, HealthEntryInput, Temperature, TemperatureInput } from "./health.js";
 export {
   addHealthEntry,

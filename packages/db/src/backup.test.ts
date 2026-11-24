@@ -5,6 +5,7 @@ import { BackupFormatError, exportBackup, restoreBackup } from "./backup.js";
 import { syncCatalog } from "./catalog.js";
 import { createDb } from "./client.js";
 import { addHealthEntry, addTemperature, listHealthEntries, listTemperatures } from "./health.js";
+import { addMilestone } from "./milestones.js";
 import { addChild, addMeasurement, recordDose, saveAppointment, updateChild } from "./mutations.js";
 import { listChildren } from "./queries.js";
 import { family } from "./schema.js";
@@ -83,6 +84,12 @@ beforeAll(async () => {
     measuredAt: "2030-02-01T08:00:00+07:00",
     tenthsC: 368,
   });
+  await addMilestone(db, {
+    childId: c.id,
+    kind: "teeth",
+    title: "First tooth",
+    happenedOn: "2030-04-02",
+  });
   await addChild(db, {
     familyId: otherFamilyId,
     name: "Other",
@@ -100,7 +107,7 @@ describe("backup", () => {
     const backup = await exportBackup(db, familyId, new Date("2030-05-01T00:00:00Z"));
     expect(backup).toMatchObject({
       format: "notch-backup",
-      version: 3,
+      version: 4,
       exportedAt: "2030-05-01T00:00:00.000Z",
     });
     expect(backup.children.map((c) => c.name)).toEqual(["Test"]);
@@ -139,6 +146,7 @@ describe("backup", () => {
       appointments: 2,
       healthEntries: 2,
       temperatures: 2,
+      milestones: 1,
     });
     expect(await exportBackup(db, familyId, new Date(0))).toEqual(before);
     // The reading still belongs to the restored fever, under its new id.
@@ -164,7 +172,7 @@ describe("backup", () => {
     const bad = [
       null,
       { format: "something", version: 1, exportedAt: saved.exportedAt, children: [] },
-      { ...saved, version: 4 },
+      { ...saved, version: 5 },
       { ...saved, children: [{ ...saved.children[0], sex: "other" }] },
     ];
     for (const input of bad) {
@@ -209,13 +217,14 @@ describe("backup", () => {
       temperatures: 0,
     });
     const after = await exportBackup(db, familyId, new Date(0));
-    expect(after.version).toBe(3);
+    expect(after.version).toBe(4);
     expect(after.children[0]).toEqual({
       ...v1.children[0],
       healthEntries: [],
       temperatures: [],
       fullName: null,
       englishName: null,
+      milestones: [],
     });
     // A version 1 file replaces everything, so it holds no health log to bring back.
     await restoreBackup(db, familyId, saved);
@@ -236,6 +245,25 @@ describe("backup", () => {
     const after = await exportBackup(db, familyId, new Date(0));
     expect(after.children[0]).toMatchObject({ name: "Test", fullName: null, englishName: null });
     expect(after.children[0]?.healthEntries).toEqual(saved.children[0]?.healthEntries);
+    await restoreBackup(db, familyId, saved);
+    expect(await exportBackup(db, familyId, new Date(0))).toEqual(saved);
+  });
+
+  it("still restores a version 3 file, written before the milestones", async () => {
+    const saved = await exportBackup(db, familyId, new Date(0));
+    expect(saved.children[0]?.milestones).toEqual([
+      { kind: "teeth", title: "First tooth", happenedOn: "2030-04-02", note: null },
+    ]);
+    const v3 = {
+      ...saved,
+      version: 3,
+      children: saved.children.map(({ milestones, ...c }) => {
+        expect(milestones).toHaveLength(1);
+        return c;
+      }),
+    };
+    await restoreBackup(db, familyId, JSON.parse(JSON.stringify(v3)));
+    expect((await exportBackup(db, familyId, new Date(0))).children[0]?.milestones).toEqual([]);
     await restoreBackup(db, familyId, saved);
     expect(await exportBackup(db, familyId, new Date(0))).toEqual(saved);
   });
