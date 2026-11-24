@@ -78,7 +78,7 @@ interface SmallCard {
 export default async function NumerologyPage({ searchParams }: Props) {
   const params = await searchParams;
   const { t, locale } = await getI18n();
-  const db = getDb();
+  const db = await getDb();
   if (!db) return <NoDatabase />;
   const { child } = await getCurrentChild(db, params.child);
   if (!child) return <NoChild />;

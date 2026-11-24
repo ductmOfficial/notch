@@ -7,7 +7,7 @@ import { nextCookies } from "better-auth/next-js";
 import { magicLink } from "better-auth/plugins/magic-link";
 
 import { allowedEmails } from "./allowlist";
-import { getDb } from "./db";
+import { getAppDb } from "./db";
 import { getI18n } from "./i18n/server";
 import { sendMail } from "./mail";
 import { signInMail } from "./sign-in-mail";
@@ -19,7 +19,7 @@ export const LINK_MINUTES = 10;
 /** How long the signed session cookie stands in for the session query. */
 export const SESSION_CACHE_SECONDS = 5 * 60;
 
-function createAuth(db: NonNullable<ReturnType<typeof getDb>>) {
+function createAuth(db: NonNullable<ReturnType<typeof getAppDb>>) {
   return betterAuth({
     appName: "Notch",
     // BETTER_AUTH_SECRET comes from the environment; the URL from BETTER_AUTH_URL or Vercel.
@@ -82,7 +82,7 @@ const cache = globalThis as unknown as { notchAuth?: ReturnType<typeof createAut
 
 /** Better Auth on the app database, or undefined when DATABASE_URL is not configured. */
 export function getAuth(): ReturnType<typeof createAuth> | undefined {
-  const db = getDb();
+  const db = getAppDb();
   if (!db) return undefined;
   cache.notchAuth ??= createAuth(db);
   return cache.notchAuth;

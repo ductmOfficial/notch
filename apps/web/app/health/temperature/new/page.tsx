@@ -22,7 +22,7 @@ interface Props {
 
 export default async function NewTemperaturePage({ searchParams }: Props) {
   const { t } = await getI18n();
-  const db = getDb();
+  const db = await getDb();
   if (!db) return <NoDatabase />;
   const params = await searchParams;
   const { child } = await getCurrentChild(db, params.child);

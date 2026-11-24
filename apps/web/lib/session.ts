@@ -7,7 +7,8 @@ import { cache } from "react";
 
 import { allowedEmails } from "./allowlist";
 import { getAuth } from "./auth";
-import { getDb } from "./db";
+import { getAppDb } from "./db";
+import { demoFamily, isDemo } from "./demo";
 
 export interface Viewer {
   readonly userId: string;
@@ -26,8 +27,12 @@ export interface Viewer {
  * cookie is still valid.
  */
 export const getViewer = cache(async (): Promise<Viewer | undefined> => {
+  // The demo needs no account: a viewer of the fictional family in the in-memory database.
+  if (await isDemo()) {
+    return { userId: "demo", email: "demo", role: "viewer", ...(await demoFamily()) };
+  }
   const auth = getAuth();
-  const db = getDb();
+  const db = getAppDb();
   if (!auth || !db) return undefined;
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) return undefined;

@@ -22,7 +22,7 @@ interface Props {
 export default async function RecordDosePage({ searchParams }: Props) {
   const params = await searchParams;
   const { t } = await getI18n();
-  const db = getDb();
+  const db = await getDb();
   if (!db) return <NoDatabase />;
   const { child } = await getCurrentChild(db, params.child);
   if (!child) return <NoChild />;

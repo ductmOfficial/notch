@@ -6,8 +6,7 @@ import { signInLink } from "./mail";
 
 // Runs against the second server, whose database has no family and no child yet.
 test("a new family signs in, creates its first child and lands on Today", async ({ page }) => {
-  await page.goto("/");
-  await expect(page).toHaveURL(/\/sign-in$/);
+  await page.goto("/sign-in");
   await page.getByLabel("Email").fill(PARENT);
   await page.getByRole("button", { name: "Gửi link đăng nhập" }).click();
   await expect(page.getByRole("status")).toContainText(PARENT);

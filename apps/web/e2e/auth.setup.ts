@@ -5,6 +5,8 @@ import { signInLink } from "./mail";
 
 setup("sign in with a magic link", async ({ page }) => {
   await page.goto("/");
+  await expect(page).toHaveURL(/\/about$/);
+  await page.getByRole("link", { name: "Đăng nhập" }).click();
   await expect(page).toHaveURL(/\/sign-in$/);
   await page.getByLabel("Email").fill(PARENT);
   await page.getByRole("button", { name: "Gửi link đăng nhập" }).click();

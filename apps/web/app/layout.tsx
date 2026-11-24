@@ -7,10 +7,12 @@ import type { ReactNode } from "react";
 import { MotifBackdrop, MotifMark } from "../components/Motifs";
 import { NavLinks } from "../components/NavLinks";
 import { QuickAdd } from "../components/QuickAdd";
+import { DemoBanner } from "../components/DemoBanner";
 import { ServiceWorker } from "../components/ServiceWorker";
 import { I18nProvider } from "../lib/i18n/client";
 import { getI18n } from "../lib/i18n/server";
 import { getPalette, getTheme } from "../lib/preferences";
+import { isDemo } from "../lib/demo";
 import { getViewer, mayEdit } from "../lib/session";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -36,7 +38,12 @@ export const viewport: Viewport = {
  */
 export default async function RootLayout({ children }: { children: ReactNode }) {
   // Theme and palette chosen in Settings are rendered on the server, so the page never flashes.
-  const [theme, palette, viewer] = await Promise.all([getTheme(), getPalette(), getViewer()]);
+  const [theme, palette, viewer, demo] = await Promise.all([
+    getTheme(),
+    getPalette(),
+    getViewer(),
+    isDemo(),
+  ]);
   const { t, locale } = await getI18n();
   return (
     <html
@@ -94,6 +101,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             id="main"
             className={`mx-auto max-w-7xl px-4 ${viewer ? "pb-32 md:pb-10 md:pl-24 md:pt-6 lg:pl-28" : "pb-10"}`}
           >
+            {demo && <DemoBanner />}
             {children}
           </main>
 

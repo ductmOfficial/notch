@@ -16,6 +16,7 @@ import { getDb } from "../../lib/db";
 import { formatDate, todayInVietnam } from "../../lib/format";
 import { getI18n } from "../../lib/i18n/server";
 import { getPalette, getTheme } from "../../lib/preferences";
+import { isDemo } from "../../lib/demo";
 import { isOwner, mayEdit, requireViewer } from "../../lib/session";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -26,8 +27,9 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function SettingsPage() {
   const [viewer, theme, palette] = await Promise.all([requireViewer(), getTheme(), getPalette()]);
   const { t, locale } = await getI18n();
-  const db = getDb();
+  const db = await getDb();
   const owner = isOwner(viewer);
+  const demo = await isDemo();
   const [info, members, invites] = await Promise.all([
     db ? calendarLinkInfo(db, viewer.familyId) : undefined,
     db && owner ? listMembers(db, viewer.familyId) : [],
@@ -118,15 +120,26 @@ export default async function SettingsPage() {
         <h2 className="title-small">{t("settings.backup")}</h2>
         <BackupCard canRestore={owner} />
       </Card>
-      <Card className="space-y-4 p-5">
-        <h2 className="title-small">{t("settings.account")}</h2>
-        <p className="body-medium text-on-surface-variant">
-          {t("settings.signedInAs", { email: viewer.email })}
-          <br />
-          {t("settings.yourRole", { role: t(ROLE_LABEL[viewer.role]) })}
-        </p>
-        <SignOutButton />
-      </Card>
+      {demo ? (
+        <Card className="space-y-4 p-5">
+          <h2 className="title-small">{t("settings.account")}</h2>
+          <p className="body-medium text-on-surface-variant">{t("demo.banner")}</p>
+          {}
+          <a href="/demo/exit" className={BUTTON.outlined}>
+            {t("demo.exit")}
+          </a>
+        </Card>
+      ) : (
+        <Card className="space-y-4 p-5">
+          <h2 className="title-small">{t("settings.account")}</h2>
+          <p className="body-medium text-on-surface-variant">
+            {t("settings.signedInAs", { email: viewer.email })}
+            <br />
+            {t("settings.yourRole", { role: t(ROLE_LABEL[viewer.role]) })}
+          </p>
+          <SignOutButton />
+        </Card>
+      )}
     </div>
   );
 }

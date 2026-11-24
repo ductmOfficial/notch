@@ -220,6 +220,15 @@ pnpm --filter web e2e
 - **Icons** are Material Symbols (Rounded), generated into `components/icons.tsx` as inline SVG.
 - **Growth** shows a card per indicator (weight, length/height, BMI) with its WHO reading and the change since the previous measurement, three across on wide screens. The SVG chart has a wide frame for a full-width card, scrolling sideways on phones, and a compact one for a third of the screen, so labels keep their size. Head circumference is recorded and in the PDF, not charted on screen.
 
+## About page and demo
+
+A signed-out visit to `/` lands on `/about`: what Notch does, and two ways in.
+
+- **Try the demo** (`/demo`) sets a cookie for this browser and opens Today on Mây, the fictional child of `packages/db/fixtures/demo-child.json`, with a few milestones and a short illness added (`apps/web/lib/demo.ts`). The demo reads an in-memory PGlite database built on the first request of each server instance (migrations and catalog included, shipped with every route by `next.config.ts`); it never reads or writes a family's database, and its viewer has the viewer role, so nothing can be changed. A banner on every page says it is a demo, with links to sign in or leave (`/demo/exit`).
+- **Sign in** as usual. In the demo, the sign-in page first asks to leave it, so a link signs in to the family rather than the demo.
+
+Sign-in, server actions and the calendar subscription always use the app's database (`getAppDb`); pages read through `getDb`, which picks the demo for a demo browser.
+
 ## Install on a phone
 
 Notch is a progressive web app: "Add to Home Screen" (iOS Safari) or "Install app" (Chrome) opens it without the browser bar.

@@ -557,6 +557,38 @@ export const vi = {
   "offline.body":
     "Notch cần mạng để mở dữ liệu của bé: dữ liệu không được lưu trên máy này. Kiểm tra kết nối rồi thử lại.",
   "offline.retry": "Thử lại",
+  "about.title": "Giới thiệu",
+  "about.heading": "Notch · Sổ lớn khôn của bé",
+  "about.intro":
+    "Tăng trưởng theo chuẩn WHO, lịch tiêm chủng, sức khoẻ và những cột mốc của con ở cùng một nơi, cho cả gia đình.",
+  "about.tryDemo": "Xem bản demo",
+  "about.signIn": "Đăng nhập",
+  "about.demoNote": "Bản demo dùng bé giả lập Mây, chỉ để xem; không cần tài khoản.",
+  "about.growthTitle": "Tăng trưởng theo WHO",
+  "about.growthBody":
+    "Cân nặng, chiều dài, vòng đầu và BMI trên biểu đồ WHO, kèm cách đọc dễ hiểu và khoảng bình thường theo tuổi.",
+  "about.vaccinesTitle": "Tiêm chủng",
+  "about.vaccinesBody":
+    "Lịch tiêm chủng mở rộng theo Thông tư 52/2025, các mũi đã tiêm, lịch hẹn và nhắc lịch trên điện thoại.",
+  "about.healthTitle": "Sức khoẻ",
+  "about.healthBody":
+    "Nhật ký ốm, thuốc, đi khám và nhiệt độ; nhắc đo nhiệt độ trong 2 ngày sau tiêm. Không chẩn đoán, không tính liều.",
+  "about.pageTitle": "Trang của bé",
+  "about.pageBody":
+    "Dòng thời gian như một trang cá nhân: cột mốc, lần đo và mũi tiêm theo từng tháng.",
+  "about.familyTitle": "Cả gia đình",
+  "about.familyBody":
+    "Bố mẹ quản lý; ông bà, người thân được thêm bằng email với quyền sửa hoặc chỉ xem.",
+  "about.privacyTitle": "Riêng tư",
+  "about.privacyBody":
+    "Chỉ người được mời mới vào được. Sao lưu, khôi phục và báo cáo PDF để mang đi khám; dữ liệu không được lưu trên máy.",
+  "about.disclaimer":
+    "Notch là công cụ ghi chép cho gia đình, không thay thế lời khuyên của bác sĩ.",
+  "demo.label": "Bản demo",
+  "demo.banner": "Mây là bé giả lập; mọi dữ liệu đều là giả và chỉ để xem.",
+  "demo.exit": "Thoát demo",
+  "demo.signIn": "Đăng nhập",
+  "demo.leaveToSignIn": "Bạn đang xem bản demo. Thoát demo để đăng nhập vào gia đình của bạn.",
   "followUp.title": "Theo dõi sau tiêm",
   "followUp.given": "{name} được tiêm {vaccines} {when}.",
   "followUp.today": "hôm nay",
@@ -1175,6 +1207,38 @@ export const en: Messages = {
   "offline.body":
     "Notch needs the network to open your child's records: they are not stored on this device. Check the connection and try again.",
   "offline.retry": "Try again",
+  "about.title": "About",
+  "about.heading": "Notch · Your child's growing-up book",
+  "about.intro":
+    "Growth on the WHO standards, vaccinations, health and milestones in one place, for the whole family.",
+  "about.tryDemo": "Try the demo",
+  "about.signIn": "Sign in",
+  "about.demoNote": "The demo shows Mây, a fictional child, read-only; no account needed.",
+  "about.growthTitle": "Growth on the WHO standards",
+  "about.growthBody":
+    "Weight, length, head circumference and BMI on the WHO charts, with a plain reading and the normal range for the age.",
+  "about.vaccinesTitle": "Vaccinations",
+  "about.vaccinesBody":
+    "Vietnam's expanded programme schedule (Circular 52/2025), doses given, appointments and reminders on the phone's calendar.",
+  "about.healthTitle": "Health",
+  "about.healthBody":
+    "A log of illnesses, medicines, doctor's visits and temperatures, and a reminder to take temperatures for two days after a vaccine. No diagnosis, no doses.",
+  "about.pageTitle": "The child's page",
+  "about.pageBody":
+    "A timeline like a profile page: milestones, measurements and doses, month by month.",
+  "about.familyTitle": "The whole family",
+  "about.familyBody":
+    "Parents manage; grandparents and relatives are added by email as editors or viewers.",
+  "about.privacyTitle": "Private",
+  "about.privacyBody":
+    "Only invited people get in. Backup, restore and a PDF report for the doctor; records are not stored on the device.",
+  "about.disclaimer":
+    "Notch is a record-keeping tool for families; it does not replace a doctor's advice.",
+  "demo.label": "Demo",
+  "demo.banner": "Mây is a fictional child; every record is made up and read-only.",
+  "demo.exit": "Leave the demo",
+  "demo.signIn": "Sign in",
+  "demo.leaveToSignIn": "You are looking at the demo. Leave it to sign in to your family.",
   "followUp.title": "After the vaccine",
   "followUp.given": "{name} had {vaccines} {when}.",
   "followUp.today": "today",

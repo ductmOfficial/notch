@@ -26,7 +26,7 @@ import {
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { getDb } from "../lib/db";
+import { getAppDb } from "../lib/db";
 import {
   type FormContext,
   formValues,
@@ -47,7 +47,7 @@ import { mayEdit, requireViewer } from "../lib/session";
 
 async function context(form: FormData): Promise<{ ctx: FormContext } | { error: FormState }> {
   const viewer = await requireViewer();
-  const db = getDb();
+  const db = getAppDb();
   const childId = form.get("childId");
   const { t, locale } = await getI18n();
   if (!db) return { error: { message: t("error.noDatabase") } };
@@ -66,7 +66,7 @@ function refresh(...paths: string[]) {
 }
 
 function db() {
-  const instance = getDb();
+  const instance = getAppDb();
   if (!instance) throw new Error("DATABASE_URL is not configured");
   return instance;
 }
