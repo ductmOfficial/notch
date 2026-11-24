@@ -9,6 +9,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { AppointmentBadge } from "../components/AppointmentBadge";
+import { FollowUpCard } from "../components/FollowUpCard";
 import { GrowthReadingView } from "../components/GrowthReading";
 import { BUTTON } from "../components/button-styles";
 import { type CardMotifProps, MotifMark } from "../components/Motifs";
@@ -32,6 +33,7 @@ import {
   temperatureLevelLabel,
   vietnamDateTime,
 } from "../lib/health-view";
+import { vaccineFollowUp } from "../lib/vaccine-follow-up";
 import { buildVaccinationView, dueLabel, productDiseases, productName } from "../lib/vaccines-view";
 
 const TODAY_MOTIFS: Record<"weight" | "length", CardMotifProps> = {
@@ -66,6 +68,7 @@ export default async function TodayPage({ searchParams }: Props) {
   ]);
   const today = todayInVietnam();
   const health = healthOverview(healthEntries, temperatures, today);
+  const followUp = vaccineFollowUp(doses, temperatures, today);
   // Shown only while something is going on or a reading is recent, so Today stays calm.
   const recentReading = health.recent[0];
   const recentAdvice =
@@ -118,6 +121,15 @@ export default async function TodayPage({ searchParams }: Props) {
       </header>
 
       <div className="grid gap-3 md:grid-cols-3">
+        {followUp && (
+          <FollowUpCard
+            followUp={followUp}
+            child={child}
+            t={t}
+            locale={locale}
+            className="md:col-span-3"
+          />
+        )}
         <Card
           tone={next?.status === "overdue" ? "error" : "primary"}
           className="flex flex-col gap-4 p-5 md:col-span-2 md:row-span-2"

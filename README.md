@@ -251,6 +251,8 @@ The Health screen (`/health`) keeps the child's illnesses, medicines and doctor'
 - **Advice that never diagnoses**: keep watching and keep the child drinking, ask a doctor if the fever lasts or the child is listless, and see a doctor at once for a baby under three months with a fever. Notch never works out a dose.
 - **Today** shows a health card only while something is going on or a reading is less than 48 hours old. The PDF lists the entries and the latest 20 readings, and the child's page shows the entries on the timeline.
 
+**After a vaccine.** From the day of the latest doses to two days later, Today and Vaccines show a follow-up card: what was given, the readings since, what is common in the first day or two (mild fever, fussiness, a sore spot) and the signs that need a doctor at once, with a button to add a temperature (`apps/web/lib/vaccine-follow-up.ts`).
+
 Quick add has "Add a temperature" and "Add to the health log". The rules and wording live in `apps/web/lib/health-view.ts`; the data in `packages/db/src/health.ts`.
 
 ## The child's page

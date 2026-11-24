@@ -1,9 +1,10 @@
-import { listAppointments, listVaccinations } from "@notch/db";
+import { listAppointments, listTemperatures, listVaccinations } from "@notch/db";
 import type { Metadata } from "next";
 import Link from "next/link";
 
 import { deleteDoseAction } from "../actions";
 import { AppointmentBadge } from "../../components/AppointmentBadge";
+import { FollowUpCard } from "../../components/FollowUpCard";
 import { BUTTON } from "../../components/button-styles";
 import { DeleteForm } from "../../components/form/DeleteForm";
 import { Icon } from "../../components/icons";
@@ -12,6 +13,7 @@ import { Card, NoChild, NoDatabase } from "../../components/ui";
 import { getCurrentChild } from "../../lib/child";
 import { getDb } from "../../lib/db";
 import { getI18n } from "../../lib/i18n/server";
+import { vaccineFollowUp } from "../../lib/vaccine-follow-up";
 import { formatAge, formatDate, todayInVietnam } from "../../lib/format";
 import { buildVaccinationView, productDiseases, productName } from "../../lib/vaccines-view";
 
@@ -33,11 +35,14 @@ export default async function VaccinesPage({ searchParams }: Props) {
   const { child } = await getCurrentChild(db, params.child);
   if (!child) return <NoChild />;
 
-  const [doses, appointments] = await Promise.all([
+  const [doses, appointments, temperatures] = await Promise.all([
     listVaccinations(db, child.id),
     listAppointments(db, child.id),
+    listTemperatures(db, child.id),
   ]);
   const today = todayInVietnam();
+  // Right after recording a dose, the follow-up is the next thing to do.
+  const followUp = vaccineFollowUp(doses, temperatures, today);
   const view = buildVaccinationView(doses, appointments, today, undefined, locale);
   // Views work on product + dose number; map them back to row ids for edit links.
   const key = (productCode: string, doseNo: number) => `${productCode}#${String(doseNo)}`;
@@ -73,6 +78,8 @@ export default async function VaccinesPage({ searchParams }: Props) {
           </Link>
         </div>
       </header>
+
+      {followUp && <FollowUpCard followUp={followUp} child={child} t={t} locale={locale} />}
 
       <Card className="p-0">
         <h2 id="appointments-title" className="title-medium px-4 pt-4 pb-2">

@@ -424,3 +424,27 @@ test("an illness and its temperatures go in the health log", async ({ page }) =>
   await expect(page.getByText("Sốt sau tiêm")).toHaveCount(0);
   await expect(page.getByText("38,6 °C").first()).toBeVisible();
 });
+
+test("after a dose given today, Today and Vaccines ask to take the temperature", async ({
+  page,
+}) => {
+  await page.goto("/vaccines/record");
+  await page.getByRole("button", { name: /Vaccine/ }).click();
+  await page.getByRole("option", { name: "Rotarix" }).click();
+  await page.getByLabel("Mũi số", { exact: true }).first().fill("5");
+  await page.getByRole("button", { name: "Ghi nhận mũi tiêm" }).click();
+  await expect(page).toHaveURL(/\/vaccines$/);
+
+  const card = page.locator("section").filter({ hasText: "Theo dõi sau tiêm" });
+  await expect(card).toContainText("Mây được tiêm Rotarix hôm nay.");
+  await expect(card).toContainText("Đưa bé đi khám ngay nếu sốt từ 39 °C");
+  await card.getByRole("link", { name: "Đo nhiệt độ" }).click();
+  await page.getByLabel("Nhiệt độ (°C)").fill("37,8");
+  await page.getByRole("button", { name: "Đo nhiệt độ" }).click();
+  await expect(page).toHaveURL(/\/health\?child=/);
+
+  await page.goto("/");
+  const today = page.locator("section").filter({ hasText: "Theo dõi sau tiêm" });
+  await expect(today).toContainText("37,8 °C");
+  await expect(today).toContainText("Hơi ấm");
+});
