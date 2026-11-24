@@ -2,7 +2,14 @@ import "server-only";
 
 import { join } from "node:path";
 
-import type { AppointmentRow, Child, Measurement, Vaccination } from "@notch/db";
+import type {
+  AppointmentRow,
+  Child,
+  HealthEntry,
+  Measurement,
+  Temperature,
+  Vaccination,
+} from "@notch/db";
 import {
   Document,
   Font,
@@ -18,6 +25,14 @@ import {
 
 import { formatAge, formatDate, formatNumber, formatZ, todayInVietnam } from "./format";
 import { readGrowth } from "./growth-assessment";
+import {
+  entryPeriod,
+  formatDateTime,
+  formatTemperature,
+  healthKindLabel,
+  temperatureLevel,
+  temperatureLevelLabel,
+} from "./health-view";
 import {
   buildChart,
   type ChartIndicator,
@@ -208,15 +223,26 @@ interface ReportData {
   readonly measurements: readonly Measurement[];
   readonly vaccinations: readonly Vaccination[];
   readonly appointments: readonly AppointmentRow[];
+  /** The health log, newest first. */
+  readonly healthEntries?: readonly HealthEntry[];
+  /** Temperature readings, oldest first; the latest ones are printed. */
+  readonly temperatures?: readonly Temperature[];
   readonly locale: Locale;
   readonly today?: string;
 }
+
+/** How many of the latest temperature readings the report lists. */
+const REPORT_READINGS = 20;
+const NO_ENTRIES: readonly HealthEntry[] = [];
+const NO_READINGS: readonly Temperature[] = [];
 
 function Report({
   child,
   measurements,
   vaccinations,
   appointments,
+  healthEntries = NO_ENTRIES,
+  temperatures = NO_READINGS,
   locale,
   today: givenToday,
 }: ReportData) {
@@ -392,13 +418,65 @@ function Report({
             ))}
           </View>
         )}
+
+        <Text style={styles.h2}>{t("report.health")}</Text>
+        {healthEntries.length === 0 ? (
+          <Text style={styles.muted}>{t("report.noHealth")}</Text>
+        ) : (
+          <View style={styles.table}>
+            <View style={styles.tr} fixed>
+              <Text style={[styles.th, { width: 70 }]}>{t("report.colKind")}</Text>
+              <Text style={[styles.th, { flex: 1 }]}>{t("report.colWhat")}</Text>
+              <Text style={[styles.th, { width: 140 }]}>{t("report.colPeriod")}</Text>
+            </View>
+            {healthEntries.map((e) => (
+              <View key={e.id} style={styles.tr} wrap={false}>
+                <Text style={{ width: 70 }}>{healthKindLabel(e.kind, locale)}</Text>
+                <Text style={{ flex: 1 }}>
+                  {e.title}
+                  {e.note ? <Text style={styles.muted}> · {e.note}</Text> : null}
+                </Text>
+                <Text style={{ width: 140 }}>{entryPeriod(e, today, locale)}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+
+        {temperatures.length > 0 && (
+          <>
+            <Text style={styles.h2}>{t("report.recentTemperatures")}</Text>
+            <View style={styles.table}>
+              <View style={styles.tr} fixed>
+                <Text style={[styles.th, { width: 110 }]}>{t("report.colTime")}</Text>
+                <Text style={[styles.th, { width: 80 }]}>{t("report.colTemperature")}</Text>
+                <Text style={[styles.th, { flex: 1 }]} />
+              </View>
+              {temperatures
+                .slice(-REPORT_READINGS)
+                .reverse()
+                .map((r) => (
+                  <View key={r.id} style={styles.tr} wrap={false}>
+                    <Text style={{ width: 110 }}>{formatDateTime(r.measuredAt, locale)}</Text>
+                    <Text style={{ width: 80 }}>{formatTemperature(r.tenthsC, locale)}</Text>
+                    <Text style={[styles.muted, { flex: 1 }]}>
+                      {temperatureLevelLabel(temperatureLevel(r.tenthsC), locale)}
+                      {r.note ? ` · ${r.note}` : ""}
+                    </Text>
+                  </View>
+                ))}
+            </View>
+          </>
+        )}
         {footer}
       </Page>
     </Document>
   );
 }
 
-/** The child's record as an A4 PDF: profile, latest measurements and WHO charts, then vaccinations. */
+/**
+ * The child's record as an A4 PDF: profile, latest measurements and WHO charts, then
+ * vaccinations and the health log.
+ */
 export function renderReport(data: ReportData): Promise<Buffer> {
   return renderToBuffer(<Report {...data} />);
 }

@@ -21,6 +21,13 @@ const ACTIONS: { href: string; label: MessageKey; hint: MessageKey; icon: IconNa
     hint: "quickAdd.appointmentHint",
     icon: "event",
   },
+  {
+    href: "/health/temperature/new",
+    label: "quickAdd.temperature",
+    hint: "quickAdd.temperatureHint",
+    icon: "thermostat",
+  },
+  { href: "/health/new", label: "quickAdd.health", hint: "quickAdd.healthHint", icon: "health" },
 ];
 
 /**

@@ -4,7 +4,7 @@
 
 **Notch · Sổ lớn khôn của bé.** A web app for parents to track a child's growth against the WHO Child Growth Standards, the vaccination schedule, and health history. The name comes from the marks parents make on a door frame each time they measure their child's height.
 
-> Live at [notch-tmd.vercel.app](https://notch-tmd.vercel.app), with sign-in limited to an allowlist. Today, Growth and Vaccinations screens, forms for measurements, doses and appointments, the national vaccination schedule, calendar download and subscription, a PDF report, backup and restore, and a Settings page, in Vietnamese and English. Sign-in by email link. See [PROGRESS.md](PROGRESS.md).
+> Live at [notch-tmd.vercel.app](https://notch-tmd.vercel.app), with sign-in limited to an allowlist. Today, Growth, Vaccinations and Health screens, forms for measurements, doses, appointments, the health log and temperatures, the national vaccination schedule, calendar download and subscription, a PDF report, backup and restore, and a Settings page, in Vietnamese and English. Sign-in by email link. See [PROGRESS.md](PROGRESS.md).
 
 ## Principles
 
@@ -241,6 +241,17 @@ The rules live in `packages/growth/src/assessment.ts` and the wording in `apps/w
 The Vaccines screen shows the national expanded programme (Tiêm chủng mở rộng) by age, from Article 1 of **Thông tư 52/2025/TT-BYT** (Ministry of Health, 31 December 2025, in force from 15 February 2026; it replaces Thông tư 10/2024/TT-BYT). Only child doses are included, on the on-time schedule; catch-up rules for late doses are not modelled. Each dose is marked recorded when the child has at least that many doses for the disease from any product, so a service vaccine counts too. This is a reference next to the clinic's own appointments, not a medical assessment. The data lives in `packages/vaccines/src/tcmr.ts`, and a test checks every disease's ages against the circular.
 
 Each dose in the history, on screen and in the PDF, also shows who makes the vaccine and in which country ("GSK, Bỉ"), from the catalog in `packages/vaccines/src/catalog.ts`. It is the usual supply in Vietnam; the label on the box is the reference for a given lot, as a note under the list says.
+
+## Health log
+
+The Health screen (`/health`) keeps the child's illnesses, medicines and doctor's visits, and temperature readings:
+
+- **Going on now** first: entries without an end date (or ending today or later), with a button to add a temperature to an illness, next to the latest reading.
+- **Temperatures** by day, in Vietnam time, each with its level against the usual thresholds for children (fever from 38.0 °C, high fever from 39.0 °C; below 36.0 °C asks to measure again). A reading can belong to an entry, such as the illness it was taken during.
+- **Advice that never diagnoses**: keep watching and keep the child drinking, ask a doctor if the fever lasts or the child is listless, and see a doctor at once for a baby under three months with a fever. Notch never works out a dose.
+- **Today** shows a health card only while something is going on or a reading is less than 48 hours old. The PDF lists the entries and the latest 20 readings, and the child's page shows the entries on the timeline.
+
+Quick add has "Add a temperature" and "Add to the health log". The rules and wording live in `apps/web/lib/health-view.ts`; the data in `packages/db/src/health.ts`.
 
 ## The child's page
 

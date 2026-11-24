@@ -59,6 +59,7 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 | 38  | Numerology in depth: more numbers, two birth charts, pinnacles, guidance | `feat/numerology-more`      | ✅     |
 | 39  | The child's page like a social profile: cover, tabs, feed, milestones    | `feat/child-page`           | ✅     |
 | 40  | Backlog: PDF minus signs, next dose number, phone chart axis, restore    | `fix/backlog`               | ✅     |
+| 41  | Health screen: entries, temperatures, quick add, Today, PDF, timeline    | `feat/health-log`           | ✅     |
 
 Each step is a pull request with green checks (`Browser` from step 9), merged with rebase.
 
@@ -145,6 +146,9 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 | Milestones recorded, never assessed                               | A page to remember a child's firsts; an expected age would turn it into a checklist and worry parents, and the app does not diagnose                                                 |
 | The child's page reads like a profile                             | Parents asked for a Facebook-like page; the header, a "now" column and a timeline give that shape with the data the app already has, family only                                     |
 | No Co-Authored-By trailer in commits                              | Maintainer's preference                                                                                                                                                              |
+| Temperature levels from the usual paediatric thresholds           | Fever from 38.0 °C and high fever from 39.0 °C are what parents are told; the app labels readings and advises when to ask a doctor, never diagnoses or works out a dose              |
+| Health on Today only while it matters                             | A card appears while an entry is going on or a reading is under 48 hours old, so Today stays calm the rest of the time                                                               |
+| Readings in Vietnam time                                          | Forms take a date and a time in Vietnam (UTC+7, no daylight saving) and store a timestamp, so the log reads the same on every device                                                 |
 
 ## Follow-ups
 

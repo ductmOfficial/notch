@@ -3,8 +3,10 @@ import type {
   ChildInput,
   ChildProfile,
   DoseInput,
+  HealthEntryInput,
   MeasurementInput,
   MilestoneInput,
+  TemperatureInput,
 } from "@notch/db";
 import { CATALOG, type Catalog } from "@notch/vaccines";
 
@@ -24,6 +26,8 @@ export interface FormContext {
   readonly childId: string;
   readonly birthDate: string;
   readonly today: string;
+  /** The moment of the request, to refuse a reading in the future; now by default. */
+  readonly now?: Date;
   /** Language of the error messages; Vietnamese by default. */
   readonly locale?: Locale;
 }
@@ -200,6 +204,112 @@ export function parseMilestoneForm(form: FormData, ctx: FormContext): Parsed<Mil
       kind: kind as MilestoneInput["kind"],
       title,
       happenedOn,
+      note: note || null,
+    }),
+  );
+}
+
+const HEALTH_KINDS = ["illness", "medication", "visit"] as const;
+
+/** An illness, a course of medicine or a doctor's visit; the end date stays empty while it goes on. */
+export function parseHealthEntryForm(form: FormData, ctx: FormContext): Parsed<HealthEntryInput> {
+  const t = tr(ctx);
+  const kind = text(form, "kind");
+  const title = text(form, "title");
+  const startedOn = text(form, "startedOn");
+  const endedOn = text(form, "endedOn");
+  const note = text(form, "note");
+  const startError = checkPastDate(startedOn, ctx, "field.startedOn");
+  const endError =
+    checkDate(endedOn, ctx, "field.endedOn", false) ??
+    (endedOn !== "" && startError === undefined && endedOn < startedOn
+      ? t("error.endBeforeStart")
+      : undefined);
+  return result(
+    form,
+    {
+      kind: (HEALTH_KINDS as readonly string[]).includes(kind)
+        ? undefined
+        : t("error.pickHealthKind"),
+      title:
+        title === ""
+          ? t("error.required", { field: t("field.healthTitle").toLowerCase() })
+          : title.length > 120
+            ? t("error.tooLong", { field: t("field.healthTitle"), max: 120 })
+            : undefined,
+      startedOn: startError,
+      endedOn: endError,
+      note:
+        note.length > 500 ? t("error.tooLong", { field: t("common.note"), max: 500 }) : undefined,
+    },
+    () => ({
+      childId: ctx.childId,
+      kind: kind as HealthEntryInput["kind"],
+      title,
+      startedOn,
+      endedOn: endedOn || null,
+      note: note || null,
+    }),
+  );
+}
+
+/**
+ * One temperature reading: the day and time in Vietnam, degrees Celsius with one decimal
+ * ("38,5" or "38.5"), and optionally the health entry it belongs to (`healthEntryIds` are the
+ * child's own entries).
+ */
+export function parseTemperatureForm(
+  form: FormData,
+  ctx: FormContext,
+  healthEntryIds: readonly string[],
+): Parsed<TemperatureInput> {
+  const t = tr(ctx);
+  const date = text(form, "measuredOn");
+  const time = text(form, "measuredTime");
+  const degrees = text(form, "temperature");
+  // "none" is the select's choice for a reading that belongs to no entry.
+  const chosen = text(form, "healthEntryId");
+  const entry = chosen === "none" ? "" : chosen;
+  const note = text(form, "note");
+
+  const dateError = checkPastDate(date, ctx, "field.measuredOn");
+  const timeError =
+    time === ""
+      ? t("error.required", { field: t("field.measuredTime").toLowerCase() })
+      : HH_MM.test(time)
+        ? undefined
+        : t("error.invalidTime", { field: t("field.measuredTime") });
+  const measuredAt = `${date}T${time}:00+07:00`;
+  const future =
+    dateError === undefined &&
+    timeError === undefined &&
+    Date.parse(measuredAt) > (ctx.now ?? new Date()).getTime() + 60_000;
+
+  const value = parseDecimal(degrees);
+  const tenthsC = value === null || Number.isNaN(value) ? Number.NaN : Math.round(value * 10);
+  const degreesError =
+    degrees === ""
+      ? t("error.required", { field: t("field.temperature").toLowerCase() })
+      : Number.isNaN(tenthsC) || tenthsC < 340 || tenthsC > 430
+        ? t("error.temperatureRange")
+        : undefined;
+
+  return result(
+    form,
+    {
+      measuredOn: dateError,
+      measuredTime: timeError ?? (future ? t("error.futureReading") : undefined),
+      temperature: degreesError,
+      healthEntryId:
+        entry === "" || healthEntryIds.includes(entry) ? undefined : t("error.unknownHealthEntry"),
+      note:
+        note.length > 500 ? t("error.tooLong", { field: t("common.note"), max: 500 }) : undefined,
+    },
+    () => ({
+      childId: ctx.childId,
+      measuredAt,
+      tenthsC,
+      healthEntryId: entry || null,
       note: note || null,
     }),
   );

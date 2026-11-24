@@ -71,6 +71,37 @@ describe("buildTimeline", () => {
     expect(buildTimeline({ milestones: [], measurements: [], vaccinations: [] }, "c")).toEqual([]);
   });
 
+  it("adds the health log, after milestones on a shared day", () => {
+    const entry = {
+      id: "5",
+      childId: "c",
+      kind: "illness" as const,
+      title: "Sốt",
+      startedOn: "2030-07-10",
+      endedOn: null,
+      note: null,
+      createdAt: new Date("2030-07-10T00:00:00Z"),
+    };
+    const months = buildTimeline(
+      { ...input, healthEntries: [entry] },
+      "c",
+      "all",
+      "vi",
+      "2030-07-12",
+    );
+    expect(months[0]?.events.map((e) => e.kind)).toEqual(["milestone", "health", "measurement"]);
+    expect(months[0]?.events[1]).toMatchObject({
+      title: "Sốt",
+      detail: "Ốm · Từ 10/07/2030",
+      href: "/health/5/edit?child=c",
+    });
+    expect(
+      buildTimeline({ ...input, healthEntries: [entry] }, "c", "health").flatMap((m) =>
+        m.events.map((e) => e.kind),
+      ),
+    ).toEqual(["health"]);
+  });
+
   it("knows its filters and names milestone kinds", () => {
     expect(isTimelineFilter("measurement")).toBe(true);
     expect(isTimelineFilter("photos")).toBe(false);

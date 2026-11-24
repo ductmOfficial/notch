@@ -47,4 +47,39 @@ describe("renderReport", () => {
     // Helvetica, react-pdf's fallback, has no minus sign: the −2 and −3 labels lost it.
     expect(text).not.toContain("/Helvetica");
   }, 30_000);
+
+  it("adds the health log and the latest temperatures", async () => {
+    const pdf = await renderReport({
+      child,
+      measurements: [],
+      vaccinations: [],
+      appointments: [],
+      healthEntries: [
+        {
+          id: "e1",
+          childId: "c1",
+          kind: "illness",
+          title: "Sốt",
+          startedOn: "2025-11-20",
+          endedOn: null,
+          note: "Ho nhẹ",
+          createdAt: new Date("2025-11-20T00:00:00Z"),
+        },
+      ],
+      temperatures: [
+        {
+          id: "t1",
+          childId: "c1",
+          measuredAt: new Date("2025-11-20T12:00:00Z"),
+          tenthsC: 385,
+          healthEntryId: "e1",
+          note: null,
+          createdAt: new Date("2025-11-20T12:00:00Z"),
+        },
+      ],
+      locale: "en",
+      today: "2025-11-24",
+    });
+    expect(pdf.byteLength).toBeGreaterThan(1000);
+  }, 30_000);
 });

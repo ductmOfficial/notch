@@ -2,6 +2,7 @@ import {
   type Child,
   listAppointments,
   listMeasurements,
+  listHealthEntries,
   listMilestones,
   listVaccinations,
   type Milestone,
@@ -66,6 +67,7 @@ interface Props {
 
 const KIND_ICON: Record<TimelineKind, IconName> = {
   milestone: "event",
+  health: "health",
   measurement: "scale",
   dose: "vaccines",
 };
@@ -73,6 +75,7 @@ const KIND_ICON: Record<TimelineKind, IconName> = {
 const FILTER_LABELS: Record<TimelineFilter, MessageKey> = {
   all: "timeline.all",
   milestone: "timeline.milestones",
+  health: "timeline.health",
   measurement: "timeline.measurements",
   dose: "timeline.doses",
 };
@@ -98,11 +101,12 @@ export default async function ChildPage({ searchParams }: Props) {
 
   const tab: Tab = isTab(params.tab) ? params.tab : "timeline";
   const filter: TimelineFilter = isTimelineFilter(params.filter) ? params.filter : "all";
-  const [measurements, vaccinations, appointments, milestones] = await Promise.all([
+  const [measurements, vaccinations, appointments, milestones, healthEntries] = await Promise.all([
     listMeasurements(db, child.id),
     listVaccinations(db, child.id),
     listAppointments(db, child.id),
     listMilestones(db, child.id),
+    listHealthEntries(db, child.id),
   ]);
   const today = todayInVietnam();
   const next = buildVaccinationView(vaccinations, appointments, today, undefined, locale).next;
@@ -196,10 +200,11 @@ export default async function ChildPage({ searchParams }: Props) {
             q={q}
             milestones={milestones}
             months={buildTimeline(
-              { milestones, measurements, vaccinations },
+              { milestones, measurements, vaccinations, healthEntries },
               child.id,
               filter,
               locale,
+              today,
             )}
             t={t}
             locale={locale}
@@ -572,6 +577,7 @@ function Avatar({ initial }: { initial: string }) {
 
 const POST_LABELS: Record<TimelineKind, MessageKey> = {
   milestone: "child.postMilestone",
+  health: "child.postHealth",
   measurement: "child.postMeasurement",
   dose: "child.postDose",
 };
@@ -610,7 +616,7 @@ function Post({
         {event.href && (
           <Link
             href={event.href}
-            aria-label={t("milestone.edit")}
+            aria-label={t(event.kind === "health" ? "health.editEntry" : "milestone.edit")}
             className="state-layer inline-flex size-10 items-center justify-center rounded-full text-on-surface-variant"
           >
             <Icon name="edit" size={18} />

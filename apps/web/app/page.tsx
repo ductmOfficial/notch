@@ -1,4 +1,10 @@
-import { listAppointments, listMeasurements, listVaccinations } from "@notch/db";
+import {
+  listAppointments,
+  listHealthEntries,
+  listMeasurements,
+  listTemperatures,
+  listVaccinations,
+} from "@notch/db";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -7,13 +13,25 @@ import { GrowthReadingView } from "../components/GrowthReading";
 import { BUTTON } from "../components/button-styles";
 import { type CardMotifProps, MotifMark } from "../components/Motifs";
 import { Icon } from "../components/icons";
-import { Card, NoChild, NoDatabase } from "../components/ui";
+import { Badge, Card, NoChild, NoDatabase } from "../components/ui";
 import { getCurrentChild } from "../lib/child";
 import { getDb } from "../lib/db";
 import { getI18n } from "../lib/i18n/server";
 import { formatAge, formatDate, formatNumber, formatZ, todayInVietnam } from "../lib/format";
 import { readGrowth } from "../lib/growth-assessment";
 import { chartPoints, INDICATORS } from "../lib/growth-chart";
+import {
+  entryPeriod,
+  formatDateTime,
+  formatTemperature,
+  healthKindLabel,
+  healthOverview,
+  LEVEL_TONE,
+  temperatureAdvice,
+  temperatureLevel,
+  temperatureLevelLabel,
+  vietnamDateTime,
+} from "../lib/health-view";
 import { buildVaccinationView, dueLabel, productDiseases, productName } from "../lib/vaccines-view";
 
 const TODAY_MOTIFS: Record<"weight" | "length", CardMotifProps> = {
@@ -39,12 +57,25 @@ export default async function TodayPage({ searchParams }: Props) {
   const { child } = await getCurrentChild(db, params.child);
   if (!child) return <NoChild />;
 
-  const [measurements, doses, appointments] = await Promise.all([
+  const [measurements, doses, appointments, healthEntries, temperatures] = await Promise.all([
     listMeasurements(db, child.id),
     listVaccinations(db, child.id),
     listAppointments(db, child.id),
+    listHealthEntries(db, child.id),
+    listTemperatures(db, child.id),
   ]);
   const today = todayInVietnam();
+  const health = healthOverview(healthEntries, temperatures, today);
+  // Shown only while something is going on or a reading is recent, so Today stays calm.
+  const recentReading = health.recent[0];
+  const recentAdvice =
+    recentReading &&
+    temperatureAdvice(
+      recentReading.tenthsC,
+      child.birthDate,
+      vietnamDateTime(recentReading.measuredAt).date,
+      locale,
+    );
   const view = buildVaccinationView(doses, appointments, today, undefined, locale);
   const next = view.next;
   const later = view.open.filter((a) => a !== next).slice(0, 3);
@@ -199,6 +230,54 @@ export default async function TodayPage({ searchParams }: Props) {
             <Icon name="chevronRight" size={18} />
           </Link>
         </Card>
+
+        {(health.ongoing.length > 0 || recentReading) && (
+          <Card tone="low" className="flex flex-col gap-3 p-5 md:col-span-3">
+            <h2 className="title-small flex items-center gap-2 text-on-surface-variant">
+              <Icon name="health" size={20} />
+              {t("today.health")}
+            </h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              {recentReading && (
+                <div className="space-y-1">
+                  <p className="flex flex-wrap items-center gap-3">
+                    <span className="headline-small tabular-nums">
+                      {formatTemperature(recentReading.tenthsC, locale)}
+                    </span>
+                    <Badge tone={LEVEL_TONE[temperatureLevel(recentReading.tenthsC)]}>
+                      {temperatureLevelLabel(temperatureLevel(recentReading.tenthsC), locale)}
+                    </Badge>
+                  </p>
+                  <p className="body-small tabular-nums text-on-surface-variant">
+                    {formatDateTime(recentReading.measuredAt, locale)}
+                  </p>
+                  {recentAdvice && <p className="body-medium">{recentAdvice}</p>}
+                </div>
+              )}
+              {health.ongoing.length > 0 && (
+                <ul className="space-y-1">
+                  {health.ongoing.slice(0, 3).map((entry) => (
+                    <li key={entry.id} className="body-medium">
+                      <span className="font-medium">{entry.title}</span>
+                      <span className="text-on-surface-variant">
+                        {" "}
+                        · {healthKindLabel(entry.kind, locale)} ·{" "}
+                        {entryPeriod(entry, today, locale)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <Link
+              href={`/health?child=${child.id}`}
+              className="state-layer label-large -mx-3 inline-flex h-10 w-fit items-center gap-1 rounded-full px-3 text-primary"
+            >
+              {t("today.seeHealth")}
+              <Icon name="chevronRight" size={18} />
+            </Link>
+          </Card>
+        )}
 
         {/* Just for fun, apart from the health cards: a thin row at the end, never in the PDF. */}
         <Card

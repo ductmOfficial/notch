@@ -1,11 +1,12 @@
-import type { Measurement, Milestone, MilestoneKind, Vaccination } from "@notch/db";
+import type { HealthEntry, Measurement, Milestone, MilestoneKind, Vaccination } from "@notch/db";
 import { CATALOG } from "@notch/vaccines";
 
 import { formatNumber } from "./format";
+import { entryPeriod, healthKindLabel } from "./health-view";
 import { type Locale, type MessageKey, translator } from "./i18n/messages";
 import { productDiseases, productName } from "./vaccines-view";
 
-export type TimelineKind = "milestone" | "measurement" | "dose";
+export type TimelineKind = "milestone" | "health" | "measurement" | "dose";
 
 export interface TimelineEvent {
   readonly id: string;
@@ -26,7 +27,7 @@ export interface TimelineMonth {
   readonly events: readonly TimelineEvent[];
 }
 
-export const TIMELINE_FILTERS = ["all", "milestone", "measurement", "dose"] as const;
+export const TIMELINE_FILTERS = ["all", "milestone", "health", "measurement", "dose"] as const;
 export type TimelineFilter = (typeof TIMELINE_FILTERS)[number];
 
 export const isTimelineFilter = (value: unknown): value is TimelineFilter =>
@@ -44,18 +45,20 @@ export const milestoneKindLabel = (kind: MilestoneKind, locale: Locale): string 
   translator(locale)(MILESTONE_LABELS[kind]);
 
 /**
- * The child's story, most recent first: milestones the family wrote down, measurements and
- * doses, grouped by month. A filter keeps one kind.
+ * The child's story, most recent first: milestones the family wrote down, the health log,
+ * measurements and doses, grouped by month. A filter keeps one kind.
  */
 export function buildTimeline(
   input: {
     readonly milestones: readonly Milestone[];
     readonly measurements: readonly Measurement[];
     readonly vaccinations: readonly Vaccination[];
+    readonly healthEntries?: readonly HealthEntry[];
   },
   childId: string,
   filter: TimelineFilter = "all",
   locale: Locale = "vi",
+  today = "9999-12-31",
 ): TimelineMonth[] {
   const t = translator(locale);
   const events: TimelineEvent[] = [];
@@ -70,6 +73,18 @@ export function buildTimeline(
         detail: m.note,
         href: `/child/milestones/${m.id}/edit?child=${childId}`,
         milestoneKind: m.kind,
+      });
+    }
+  }
+  if (filter === "all" || filter === "health") {
+    for (const e of input.healthEntries ?? []) {
+      events.push({
+        id: `h-${e.id}`,
+        kind: "health",
+        date: e.startedOn,
+        title: e.title,
+        detail: `${healthKindLabel(e.kind, locale)} · ${entryPeriod(e, today, locale)}`,
+        href: `/health/${e.id}/edit?child=${childId}`,
       });
     }
   }
@@ -106,7 +121,7 @@ export function buildTimeline(
   }
 
   // Milestones first on a shared day: they are what the family chose to remember.
-  const order: Record<TimelineKind, number> = { milestone: 0, measurement: 1, dose: 2 };
+  const order: Record<TimelineKind, number> = { milestone: 0, health: 1, measurement: 2, dose: 3 };
   events.sort((a, b) => b.date.localeCompare(a.date) || order[a.kind] - order[b.kind]);
 
   const months: TimelineMonth[] = [];

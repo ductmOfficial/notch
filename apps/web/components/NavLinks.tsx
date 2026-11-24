@@ -11,6 +11,7 @@ const LINKS: { href: string; label: MessageKey; icon: IconName }[] = [
   { href: "/", label: "nav.today", icon: "today" },
   { href: "/growth", label: "nav.growth", icon: "growth" },
   { href: "/vaccines", label: "nav.vaccines", icon: "vaccines" },
+  { href: "/health", label: "nav.health", icon: "health" },
   { href: "/settings", label: "nav.settings", icon: "settings" },
 ];
 
@@ -25,7 +26,7 @@ export function NavLinks({ variant }: { variant: "rail" | "bar" }) {
   const pathname = usePathname();
   const { t } = useI18n();
   return (
-    <ul className={variant === "rail" ? "flex flex-col gap-3" : "grid grid-cols-4"}>
+    <ul className={variant === "rail" ? "flex flex-col gap-3" : "grid grid-cols-5"}>
       {LINKS.map((link) => {
         const active = isActive(pathname, link.href);
         return (
@@ -33,7 +34,7 @@ export function NavLinks({ variant }: { variant: "rail" | "bar" }) {
             <Link
               href={link.href}
               aria-current={active ? "page" : undefined}
-              className="group flex flex-col items-center gap-1 py-1 label-medium text-on-surface-variant aria-[current=page]:text-on-surface"
+              className={`group flex flex-col items-center gap-1 py-1 text-center label-medium text-on-surface-variant aria-[current=page]:text-on-surface ${variant === "bar" ? "tracking-normal" : ""}`}
             >
               <span
                 className={`state-layer flex h-8 items-center justify-center rounded-full group-aria-[current=page]:bg-secondary-container group-aria-[current=page]:text-on-secondary-container ${
