@@ -8,6 +8,7 @@ import {
   child,
   healthEntry,
   measurement,
+  milestone,
   temperature,
   vaccination,
   vaccineProduct,
@@ -88,6 +89,17 @@ const childV3 = childV2.extend({
   englishName: text(100),
 });
 
+const milestoneSchema = z.object({
+  kind: z.enum(["motor", "language", "teeth", "social", "other"]),
+  title: z.string().trim().min(1).max(120),
+  happenedOn: isoDate,
+  note: text(500),
+});
+
+const childV4 = childV3.extend({
+  milestones: z.array(milestoneSchema).max(2_000),
+});
+
 const header = {
   format: z.literal("notch-backup"),
   exportedAt: z.iso.datetime({ offset: true }),
@@ -106,7 +118,8 @@ const oneRowPerDose = (c: z.infer<typeof childV1>) =>
  * millimetres, tenths of a degree, product codes), so a backup restores without rounding.
  * Ids are left out: a restore creates fresh rows.
  *
- * Version 2 adds the health log, version 3 the birth-certificate and English names. Older
+ * Version 2 adds the health log, version 3 the birth-certificate and English names, version 4
+ * the milestones. Older
  * files still restore: their children come back without what their version did not hold.
  */
 export const backupSchema = z
@@ -126,15 +139,21 @@ export const backupSchema = z
       version: z.literal(3),
       children: z.array(childV3.refine(oneRowPerDose).refine(entriesExist)).max(20),
     }),
+    z.object({
+      ...header,
+      version: z.literal(4),
+      children: z.array(childV4.refine(oneRowPerDose).refine(entriesExist)).max(20),
+    }),
   ])
   .transform((b): Backup => ({
     ...b,
-    version: 3,
+    version: 4,
     children: b.children.map((c) => ({
       healthEntries: [],
       temperatures: [],
       fullName: null,
       englishName: null,
+      milestones: [],
       ...c,
     })),
   }));
@@ -142,9 +161,9 @@ export const backupSchema = z
 /** A backup in the current version, as written by `exportBackup`. */
 export interface Backup {
   readonly format: "notch-backup";
-  readonly version: 3;
+  readonly version: 4;
   readonly exportedAt: string;
-  readonly children: z.infer<typeof childV3>[];
+  readonly children: z.infer<typeof childV4>[];
 }
 
 export interface RestoreResult {
@@ -154,6 +173,7 @@ export interface RestoreResult {
   readonly appointments: number;
   readonly healthEntries: number;
   readonly temperatures: number;
+  readonly milestones: number;
 }
 
 /** The file is not a Notch backup, or not one this version can read. */
@@ -180,9 +200,9 @@ export async function exportBackup(db: Db, familyId: string, now = new Date()): 
     .where(eq(child.familyId, familyId))
     .orderBy(asc(child.birthDate), asc(child.createdAt));
   const ids = children.map((c) => c.id);
-  const [measurements, vaccinations, appointments, entries, temperatures] =
+  const [measurements, vaccinations, appointments, entries, temperatures, milestones] =
     ids.length === 0
-      ? [[], [], [], [], []]
+      ? [[], [], [], [], [], []]
       : await Promise.all([
           db
             .select()
@@ -209,11 +229,16 @@ export async function exportBackup(db: Db, familyId: string, now = new Date()): 
             .from(temperature)
             .where(inArray(temperature.childId, ids))
             .orderBy(asc(temperature.measuredAt), asc(temperature.createdAt), asc(temperature.id)),
+          db
+            .select()
+            .from(milestone)
+            .where(inArray(milestone.childId, ids))
+            .orderBy(asc(milestone.happenedOn), asc(milestone.createdAt), asc(milestone.id)),
         ]);
 
   return {
     format: "notch-backup",
-    version: 3,
+    version: 4,
     exportedAt: now.toISOString(),
     children: children.map((c) => {
       const own = entries.filter((e) => e.childId === c.id);
@@ -271,6 +296,9 @@ export async function exportBackup(db: Db, familyId: string, now = new Date()): 
             healthEntry: t.healthEntryId === null ? null : (position.get(t.healthEntryId) ?? null),
             note: t.note,
           })),
+        milestones: milestones
+          .filter((m) => m.childId === c.id)
+          .map((m) => ({ kind: m.kind, title: m.title, happenedOn: m.happenedOn, note: m.note })),
       };
     }),
   };
@@ -341,9 +369,17 @@ export async function restoreBackup(
             healthEntryId: at === null ? null : (entryIds[at] ?? null),
           })),
         );
+      if (c.milestones.length > 0)
+        await tx.insert(milestone).values(c.milestones.map((m) => ({ ...m, childId })));
     }
     const total = (
-      key: "measurements" | "vaccinations" | "appointments" | "healthEntries" | "temperatures",
+      key:
+        | "measurements"
+        | "vaccinations"
+        | "appointments"
+        | "healthEntries"
+        | "temperatures"
+        | "milestones",
     ) => data.children.reduce((sum, c) => sum + c[key].length, 0);
     return {
       children: data.children.length,
@@ -352,6 +388,7 @@ export async function restoreBackup(
       appointments: total("appointments"),
       healthEntries: total("healthEntries"),
       temperatures: total("temperatures"),
+      milestones: total("milestones"),
     };
   });
 }
