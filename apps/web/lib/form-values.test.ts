@@ -233,12 +233,12 @@ describe("parseChildProfileForm", () => {
       },
     });
     const full = parseChildProfileForm(
-      form({ ...base, fullName: "Lê Minh Mây", englishName: "Mia", birthTime: "12:26" }),
+      form({ ...base, fullName: "Lê Minh Mây", englishName: "Mia", birthTime: "08:45" }),
       ctx,
     );
     expect(full).toMatchObject({
       ok: true,
-      input: { fullName: "Lê Minh Mây", birthTime: "12:26" },
+      input: { fullName: "Lê Minh Mây", birthTime: "08:45" },
     });
   });
 

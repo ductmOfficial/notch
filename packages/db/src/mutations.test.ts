@@ -291,7 +291,7 @@ describe("updateChild", () => {
       englishName: "",
       sex: "female",
       birthDate: "2030-01-02",
-      birthTime: "12:26",
+      birthTime: "08:45",
     } as const;
     expect(await updateChild(db2, g?.id ?? "", c.id, profile)).toBeUndefined();
     expect(await updateChild(db2, familyId, c.id, profile)).toMatchObject({
@@ -299,7 +299,7 @@ describe("updateChild", () => {
       fullName: "Lê Thị Mây",
       englishName: null,
       birthDate: "2030-01-02",
-      birthTime: "12:26:00",
+      birthTime: "08:45:00",
     });
     await expect(
       updateChild(db2, familyId, c.id, { ...profile, birthTime: "25:00" }),
