@@ -4,6 +4,7 @@ import type {
   ChildProfile,
   DoseInput,
   MeasurementInput,
+  MilestoneInput,
 } from "@notch/db";
 import { CATALOG, type Catalog } from "@notch/vaccines";
 
@@ -158,6 +159,49 @@ export function parseChildProfileForm(
         birthTime: birthTime || null,
       };
     },
+  );
+}
+
+const MILESTONE_KINDS = ["motor", "language", "teeth", "social", "other"] as const;
+
+/** A milestone: its kind, a title in the family's words, the day and a note. */
+export function parseMilestoneForm(form: FormData, ctx: FormContext): Parsed<MilestoneInput> {
+  const t = tr(ctx);
+  const kind = text(form, "kind");
+  const title = text(form, "title");
+  const happenedOn = text(form, "happenedOn");
+  const note = text(form, "note");
+  const knownKind = (MILESTONE_KINDS as readonly string[]).includes(kind);
+  return result(
+    form,
+    {
+      kind: knownKind ? undefined : t("error.pickMilestoneKind"),
+      title:
+        title === ""
+          ? t("error.required", { field: t("field.milestoneTitle").toLowerCase() })
+          : title.length > 120
+            ? t("error.tooLong", { field: t("field.milestoneTitle"), max: 120 })
+            : undefined,
+      happenedOn:
+        happenedOn === ""
+          ? t("error.required", { field: t("field.milestoneDate").toLowerCase() })
+          : !ISO_DATE.test(happenedOn) || Number.isNaN(Date.parse(happenedOn))
+            ? t("error.invalidDate", { field: t("field.milestoneDate") })
+            : happenedOn > ctx.today
+              ? t("error.future", { field: t("field.milestoneDate") })
+              : happenedOn < ctx.birthDate
+                ? t("error.beforeBirth", { field: t("field.milestoneDate") })
+                : undefined,
+      note:
+        note.length > 500 ? t("error.tooLong", { field: t("common.note"), max: 500 }) : undefined,
+    },
+    () => ({
+      childId: ctx.childId,
+      kind: kind as MilestoneInput["kind"],
+      title,
+      happenedOn,
+      note: note || null,
+    }),
   );
 }
 

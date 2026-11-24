@@ -137,6 +137,11 @@
   line-height: 44px;
   font-weight: 400;
 }
+@utility headline-large {
+  font-size: 32px;
+  line-height: 40px;
+  font-weight: 400;
+}
 @utility headline-medium {
   font-size: 28px;
   line-height: 36px;

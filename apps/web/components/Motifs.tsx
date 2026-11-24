@@ -64,6 +64,22 @@ export function MotifBackdrop() {
   });
 }
 
+/**
+ * The palette's large drawing as a profile cover: placed at the right of a wide band, faint
+ * enough for text in front of it. Decorative only, like every drawing.
+ */
+export function CoverArt() {
+  return PALETTES.map((p) => {
+    const { Backdrop } = ART[p];
+    return (
+      <Backdrop
+        key={p}
+        className={`pointer-events-none absolute -right-6 -bottom-16 h-[150%] w-auto opacity-40 motif-${p}`}
+      />
+    );
+  });
+}
+
 export interface CardMotifProps {
   readonly kind: MotifKind;
   readonly place: MotifPlace;

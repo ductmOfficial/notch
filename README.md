@@ -222,6 +222,18 @@ The Vaccines screen shows the national expanded programme (Tiêm chủng mở r�
 
 Each dose in the history, on screen and in the PDF, also shows who makes the vaccine and in which country ("GSK, Bỉ"), from the catalog in `packages/vaccines/src/catalog.ts`. It is the usual supply in Vietnam; the label on the box is the reference for a given lot, as a note under the list says.
 
+## The child's page
+
+Each child has a page (`/child`), reached from the name on Today and from the child's profile in Settings, laid out like a social profile:
+
+- **Cover and avatar**: a wide cover with the current palette's drawing (photos come later), the child's initial in a large circle over its edge, the family's name for the child, the birth-certificate and English names, the age, and buttons to add a milestone and edit the profile.
+- **Tabs**: Timeline, About and Milestones (`?tab=`).
+- **Timeline**: an intro column (date and time of birth, names), "now" (latest weight and length with their WHO reading, the next vaccine appointment), the latest milestones as tiles and the life path number (just for fun), next to a feed: a box like a post composer that opens the milestone form, filters, then each milestone, measurement and dose as a post, grouped by month.
+- **About**: basic info, health, vaccinations and the fun numbers, each with a link to its full page.
+- **Milestones**: every milestone as a tile, with a tile to add one. A milestone has a kind (movement, language, teeth, social, other), a title in the family's words with common ones offered for the kind, a date and a note. Milestones are recorded, never assessed: the app never says one came early or late.
+
+Like every page, it is for the signed-in family only.
+
 ## Just for fun: numerology
 
 A thin card at the end of Today links to a numerology page for the selected child (`/numerology`), by the Pythagorean method popular in Vietnam, master numbers 11, 22 and 33 kept:
@@ -236,7 +248,7 @@ Every number shows how it was reached. The page says plainly that numerology is 
 
 ## Backup
 
-Settings downloads the family's records as `notch-backup-<date>.json` and restores such a file. The format (version 3, `packages/db/src/backup.ts`) keeps values as stored (grams, millimetres, tenths of a degree, product codes), so a backup restores exactly. Version 2 adds the health log and version 3 the birth-certificate and English names; older files still restore, without what their version did not hold. A restore shows what the file holds, asks for confirmation, checks the whole file (schema, known vaccines, one row per dose), then replaces the family's children and records in one transaction: everything or nothing. The file holds health data; nothing is uploaded anywhere except on restore.
+Settings downloads the family's records as `notch-backup-<date>.json` and restores such a file. The format (version 4, `packages/db/src/backup.ts`) keeps values as stored (grams, millimetres, tenths of a degree, product codes), so a backup restores exactly. Version 2 adds the health log, version 3 the birth-certificate and English names and version 4 the milestones; older files still restore, without what their version did not hold. A restore shows what the file holds, asks for confirmation, checks the whole file (schema, known vaccines, one row per dose), then replaces the family's children and records in one transaction: everything or nothing. The file holds health data; nothing is uploaded anywhere except on restore.
 
 ## PDF report
 

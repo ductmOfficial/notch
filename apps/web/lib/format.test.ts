@@ -4,6 +4,7 @@ import {
   ageInMonths,
   formatAge,
   formatDate,
+  formatMonth,
   formatNumber,
   formatZ,
   todayInVietnam,
@@ -66,5 +67,12 @@ describe("ageInMonths", () => {
     expect(ageInMonths("2030-01-15", "2031-07-14")).toBe(17);
     expect(ageInMonths("2030-01-15", "2031-07-15")).toBe(18);
     expect(ageInMonths("2030-01-15", "2029-12-01")).toBe(0);
+  });
+});
+
+describe("formatMonth", () => {
+  it("names a month in either language", () => {
+    expect(formatMonth("2026-11")).toBe("Tháng 11/2026");
+    expect(formatMonth("2026-03-09", "en")).toBe("March 2026");
   });
 });

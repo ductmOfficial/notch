@@ -57,6 +57,7 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 | 36  | Numerology page, just for fun, reached from a card on Today              | `feat/numerology`           | ✅     |
 | 37  | Child's profile: birth-certificate and English names, birth time         | `feat/child-profile`        | ✅     |
 | 38  | Numerology in depth: more numbers, two birth charts, pinnacles, guidance | `feat/numerology-more`      | ✅     |
+| 39  | The child's page like a social profile: cover, tabs, feed, milestones    | `feat/child-page`           | ✅     |
 
 Each step is a pull request with green checks (`Browser` from step 9), merged with rebase.
 
@@ -140,6 +141,8 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 | Three names per child, the family's one shown                     | Families call a child by a home name; the birth-certificate name matters for papers and numerology, an English name for some families; both stay optional                            |
 | The migration test writes its old records in plain SQL            | Code written against the current schema names columns an older database lacks; SQL of that time keeps the test valid for every later migration                                       |
 | Numerology texts in their own module                              | Long descriptions in both languages read better as structured content than as hundreds of flat message keys; a test keeps the two languages in step                                  |
+| Milestones recorded, never assessed                               | A page to remember a child's firsts; an expected age would turn it into a checklist and worry parents, and the app does not diagnose                                                 |
+| The child's page reads like a profile                             | Parents asked for a Facebook-like page; the header, a "now" column and a timeline give that shape with the data the app already has, family only                                     |
 | No Co-Authored-By trailer in commits                              | Maintainer's preference                                                                                                                                                              |
 
 ## Follow-ups

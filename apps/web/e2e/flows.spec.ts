@@ -368,3 +368,21 @@ test("the child's profile takes the birth-certificate and English names", async 
   await expect(page.getByRole("heading", { name: "Số tên tiếng Anh" })).toBeVisible();
   await expect(page.getByText("Chưa có tên khai sinh")).toHaveCount(0);
 });
+
+test("a milestone is added from the child's page and shows on the timeline", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("heading", { level: 1 }).getByRole("link").click();
+  await expect(page).toHaveURL(/\/child\?child=/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Mây");
+  await page.getByRole("link", { name: "Thêm cột mốc" }).first().click();
+  await page.getByLabel("Cột mốc", { exact: true }).fill("Chiếc răng đầu tiên");
+  await page.getByLabel("Ngày", { exact: true }).fill("2026-01-15");
+  await page.getByRole("button", { name: "Thêm cột mốc" }).click();
+  await expect(page).toHaveURL(/\/child\?child=/);
+  const timeline = page.getByRole("region", { name: "Dòng thời gian" });
+  await expect(timeline.getByText("Chiếc răng đầu tiên")).toBeVisible();
+  await expect(timeline.getByRole("heading", { name: "Tháng 1/2026" })).toBeVisible();
+  // Filters keep one kind.
+  await page.getByRole("link", { name: "Mũi tiêm", exact: true }).click();
+  await expect(timeline.getByText("Chiếc răng đầu tiên")).toHaveCount(0);
+});

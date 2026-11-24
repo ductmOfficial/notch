@@ -2,6 +2,9 @@
 
 import {
   addMeasurement,
+  addMilestone,
+  deleteMilestone,
+  updateMilestone,
   deleteAppointment,
   deleteMeasurement,
   deleteVaccination,
@@ -23,6 +26,7 @@ import {
   parseAppointmentForm,
   parseDoseForm,
   parseMeasurementForm,
+  parseMilestoneForm,
 } from "../lib/form-values";
 import { todayInVietnam } from "../lib/format";
 import { getI18n } from "../lib/i18n/server";
@@ -143,4 +147,30 @@ export async function deleteAppointmentAction(form: FormData): Promise<void> {
     await deleteAppointment(db(), id, found.ctx.childId);
   refresh("/vaccines");
   redirect("/vaccines");
+}
+
+/** Adds a milestone, or updates `id` when the form carries one. */
+export async function saveMilestoneAction(_: FormState, form: FormData): Promise<FormState> {
+  const found = await context(form);
+  if ("error" in found) return found.error;
+  const parsed = parseMilestoneForm(form, found.ctx);
+  if (!parsed.ok) return parsed.state;
+  const id = form.get("id");
+  if (typeof id === "string" && id !== "") {
+    const saved = await updateMilestone(db(), id, parsed.input).catch(() => undefined);
+    if (!saved) return { message: (await getI18n()).t("error.milestoneGone") };
+  } else {
+    await addMilestone(db(), parsed.input);
+  }
+  refresh("/child");
+  redirect(`/child?child=${found.ctx.childId}`);
+}
+
+export async function deleteMilestoneAction(form: FormData): Promise<void> {
+  const found = await context(form);
+  const id = form.get("id");
+  if ("ctx" in found && typeof id === "string")
+    await deleteMilestone(db(), id, found.ctx.childId).catch(() => false);
+  refresh("/child");
+  redirect("/child");
 }
