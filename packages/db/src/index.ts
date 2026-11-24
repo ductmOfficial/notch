@@ -10,8 +10,30 @@ export {
   familyIdForCalendarToken,
   revokeCalendarToken,
 } from "./calendar-tokens.js";
-export type { FamilyOfUser } from "./families.js";
-export { familyForUser, familyIdForUser, UnknownUserError } from "./families.js";
+export type {
+  FamilyInvite,
+  FamilyMemberRow,
+  FamilyOfUser,
+  InviteInput,
+  InviteRole,
+  MemberRole,
+} from "./families.js";
+export {
+  AlreadyMemberError,
+  familyForUser,
+  familyIdForUser,
+  INVITE_ROLES,
+  inviteInputSchema,
+  inviteMember,
+  listInvites,
+  listMembers,
+  maySignIn,
+  normalizeEmail,
+  removeInvite,
+  removeMember,
+  setMemberRole,
+  UnknownUserError,
+} from "./families.js";
 export type { Milestone, MilestoneInput, MilestoneKind } from "./milestones.js";
 export {
   addMilestone,

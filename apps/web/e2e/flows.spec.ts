@@ -1,6 +1,7 @@
 import { expect, type Page, test } from "@playwright/test";
 
-import { SIGNED_IN } from "./constants";
+import { PARENT, SIGNED_IN } from "./constants";
+import { signInLink, sentTo } from "./mail";
 
 // These tests change the shared database; the mobile project skips this file (playwright.config.ts).
 
@@ -447,4 +448,62 @@ test("after a dose given today, Today and Vaccines ask to take the temperature",
   const today = page.locator("section").filter({ hasText: "Theo dõi sau tiêm" });
   await expect(today).toContainText("37,8 °C");
   await expect(today).toContainText("Hơi ấm");
+});
+
+test("an owner adds a relative as a viewer, allows editing, then removes them", async ({
+  page,
+  browser,
+}) => {
+  const relative = "grandma@example.com";
+  await page.goto("/settings");
+  const members = page.getByRole("list", { name: "Thành viên gia đình" });
+  await expect(members).toContainText(PARENT);
+  await expect(members).toContainText("Chủ gia đình");
+  await page.getByLabel("Email").fill(relative);
+  await page.getByRole("button", { name: "Thêm thành viên" }).click();
+  await expect(page.getByRole("status").filter({ hasText: relative })).toBeVisible();
+  await expect(page.getByText("Chờ đăng nhập lần đầu")).toBeVisible();
+
+  // The relative signs in with an email link, like the parents.
+  const context = await browser.newContext({ storageState: { cookies: [], origins: [] } });
+  const other = await context.newPage();
+  const before = await sentTo(relative);
+  await other.goto("/sign-in");
+  await other.getByLabel("Email").fill(relative);
+  await other.getByRole("button", { name: "Gửi link đăng nhập" }).click();
+  await other.goto(await signInLink(relative, before));
+  await expect(other.locator("main h1")).toContainText("Mây");
+
+  // A viewer reads everything but sees no way to change it.
+  await expect(other.getByRole("button", { name: "Thêm nhanh" })).toHaveCount(0);
+  await other.goto("/health");
+  await expect(other.getByRole("link", { name: "Ghi sức khoẻ" })).toBeHidden();
+  await other.goto("/growth/new");
+  await expect(other.getByText("Bạn đang xem với quyền người xem")).toBeVisible();
+  await expect(other.getByRole("button", { name: "Lưu" })).toHaveCount(0);
+  await other.goto("/settings");
+  await expect(other.getByText("Quyền: Người xem")).toBeVisible();
+  await expect(other.getByRole("list", { name: "Thành viên gia đình" })).toHaveCount(0);
+
+  // The owner allows editing: the form appears for the relative.
+  await page.reload();
+  const row = members.getByRole("listitem").filter({ hasText: relative });
+  await expect(row).toContainText("Người xem");
+  await row.getByRole("button", { name: "Cho phép sửa" }).click();
+  await expect(row).toContainText("Người sửa");
+  await other.goto("/growth/new");
+  await expect(other.getByLabel("Ngày đo")).toBeVisible();
+
+  // Removed from the family: signed out on the next visit, and no new link.
+  await row.getByRole("button", { name: "Xoá khỏi gia đình" }).click();
+  await page.getByRole("alertdialog").getByRole("button", { name: "Xoá" }).click();
+  await expect(members).not.toContainText(relative);
+  await other.goto("/");
+  await expect(other).toHaveURL(/\/sign-in$/);
+  const sent = await sentTo(relative);
+  await other.getByLabel("Email").fill(relative);
+  await other.getByRole("button", { name: "Gửi link đăng nhập" }).click();
+  await expect(other.getByRole("status")).toContainText(relative);
+  expect(await sentTo(relative)).toBe(sent);
+  await context.close();
 });

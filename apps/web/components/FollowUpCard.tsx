@@ -87,7 +87,10 @@ export function FollowUpCard({
         )}
       </div>
       <p className="body-small">{t("followUp.warning")}</p>
-      <Link className={`${BUTTON.filled} w-fit`} href={`/health/temperature/new?child=${child.id}`}>
+      <Link
+        className={`${BUTTON.filled} editor-only w-fit`}
+        href={`/health/temperature/new?child=${child.id}`}
+      >
         <Icon name="thermostat" size={18} />
         {t("health.addTemperature")}
       </Link>

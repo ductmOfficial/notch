@@ -10,7 +10,7 @@ import { QuickAdd } from "../components/QuickAdd";
 import { I18nProvider } from "../lib/i18n/client";
 import { getI18n } from "../lib/i18n/server";
 import { getPalette, getTheme } from "../lib/preferences";
-import { getViewer } from "../lib/session";
+import { getViewer, mayEdit } from "../lib/session";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getI18n();
@@ -41,7 +41,9 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       data-theme={theme === "system" ? undefined : theme}
       data-palette={palette === "lotus" ? undefined : palette}
     >
-      <body className="min-h-dvh bg-surface antialiased">
+      {/* data-role hides add and edit controls from viewers (.editor-only in globals.css); the
+          server actions refuse their writes in any case. */}
+      <body className="min-h-dvh bg-surface antialiased" data-role={viewer?.role}>
         <I18nProvider locale={locale}>
           <MotifBackdrop />
           <a
@@ -65,7 +67,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
                   <MotifMark size={32} />
                   Notch
                 </Link>
-                <QuickAdd placement="rail" />
+                {mayEdit(viewer) && <QuickAdd placement="rail" />}
                 <NavLinks variant="rail" />
               </nav>
 
@@ -94,7 +96,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
 
           {viewer && (
             <div className="md:hidden">
-              <QuickAdd placement="floating" />
+              {mayEdit(viewer) && <QuickAdd placement="floating" />}
               <nav
                 aria-label={t("app.mainNav")}
                 className="fixed inset-x-0 bottom-0 z-10 bg-surface-container pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]"

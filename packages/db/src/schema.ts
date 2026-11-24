@@ -115,9 +115,38 @@ export const familyMember = pgTable(
       .notNull()
       .unique()
       .references(() => user.id, { onDelete: "cascade" }),
+    /**
+     * What the member may do: owners (the parents on NOTCH_ALLOWED_EMAILS) manage the family,
+     * editors add and change records, viewers only read. Members from before roles are owners.
+     */
+    role: text({ enum: ["owner", "editor", "viewer"] })
+      .notNull()
+      .default("owner"),
     createdAt: createdAt(),
   },
-  (t) => [primaryKey({ columns: [t.familyId, t.userId] })],
+  (t) => [
+    primaryKey({ columns: [t.familyId, t.userId] }),
+    check("family_member_role_check", sql`${t.role} in ('owner', 'editor', 'viewer')`),
+  ],
+);
+
+/**
+ * A relative an owner added by email: that address may sign in, and joins the family with the
+ * role on first sign-in, when the invite turns into a membership.
+ */
+export const familyInvite = pgTable(
+  "family_invite",
+  {
+    id: id(),
+    familyId: uuid()
+      .notNull()
+      .references(() => family.id, { onDelete: "cascade" }),
+    /** Lower case, so matching ignores case. One household: an address has one invite. */
+    email: text().notNull().unique(),
+    role: text({ enum: ["editor", "viewer"] }).notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [check("family_invite_role_check", sql`${t.role} in ('editor', 'viewer')`)],
 );
 
 export const child = pgTable(

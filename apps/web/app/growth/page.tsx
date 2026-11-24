@@ -96,7 +96,7 @@ export default async function GrowthPage({ searchParams }: Props) {
           {children.length > 1 && <ChildPicker items={children} current={child.id} t={t} />}
           <Link
             href={`/growth/new${children.length > 1 ? `?child=${child.id}` : ""}`}
-            className={BUTTON.filled}
+            className={`${BUTTON.filled} editor-only`}
           >
             <Icon name="add" size={18} />
             {t("growth.add")}
@@ -380,7 +380,7 @@ function MeasurementTable({
                 <td className="py-1 text-right">
                   <Link
                     href={`/growth/${m.id}/edit`}
-                    className={BUTTON.text}
+                    className={`${BUTTON.text} editor-only`}
                     aria-label={t("growth.editRow", { date: formatDate(m.measuredOn, locale) })}
                   >
                     <Icon name="edit" size={18} />

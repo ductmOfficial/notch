@@ -17,6 +17,7 @@ import { Icon, type IconName } from "../../components/icons";
 import { CoverArt } from "../../components/Motifs";
 import { Card, NoChild, NoDatabase } from "../../components/ui";
 import { getCurrentChild } from "../../lib/child";
+import { mayEdit, requireViewer } from "../../lib/session";
 import {
   buildTimeline,
   isTimelineFilter,
@@ -97,6 +98,8 @@ export default async function ChildPage({ searchParams }: Props) {
   const db = getDb();
   if (!db) return <NoDatabase />;
   const { child } = await getCurrentChild(db, params.child);
+  // Viewers see the page without the add and edit controls.
+  const editable = mayEdit(await requireViewer());
   if (!child) return <NoChild />;
 
   const tab: Tab = isTab(params.tab) ? params.tab : "timeline";
@@ -156,7 +159,7 @@ export default async function ChildPage({ searchParams }: Props) {
                 {formatAge(child.birthDate, today, locale)}
               </p>
             </div>
-            <div className="flex flex-wrap gap-2 pb-2">
+            <div className="editor-only flex flex-wrap gap-2 pb-2">
               <Link href={`/child/milestones/new?${q}`} className={BUTTON.filled}>
                 <Icon name="add" size={18} />
                 {t("milestone.add")}
@@ -190,7 +193,13 @@ export default async function ChildPage({ searchParams }: Props) {
           <div className="space-y-4 lg:sticky lg:top-4">
             <IntroCard child={child} q={q} t={t} locale={locale} />
             <NowCard growth={growth} next={next} t={t} locale={locale} />
-            <HighlightsCard milestones={milestones} q={q} t={t} locale={locale} />
+            <HighlightsCard
+              milestones={milestones}
+              q={q}
+              t={t}
+              locale={locale}
+              editable={editable}
+            />
             <FunCard birthDate={child.birthDate} q={q} t={t} locale={locale} />
           </div>
           <Feed
@@ -286,7 +295,7 @@ export default async function ChildPage({ searchParams }: Props) {
             {t("child.tabMilestones")}
           </h2>
           <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            <li>
+            <li className="editor-only">
               <Link
                 href={`/child/milestones/new?${q}`}
                 className="state-layer flex h-full min-h-36 flex-col items-center justify-center gap-2 rounded-m3-lg border-2 border-dashed border-outline-variant p-5 text-primary"
@@ -297,7 +306,7 @@ export default async function ChildPage({ searchParams }: Props) {
             </li>
             {milestones.map((m) => (
               <li key={m.id}>
-                <MilestoneTile milestone={m} q={q} locale={locale} />
+                <MilestoneTile milestone={m} q={q} locale={locale} editable={editable} />
               </li>
             ))}
           </ul>
@@ -337,7 +346,10 @@ function IntroCard({
           <IntroLine>{t("settings.childEnglishName", { name: child.englishName })}</IntroLine>
         )}
       </ul>
-      <Link href={`/child/edit?${q}`} className={`${BUTTON.tonal} w-full justify-center`}>
+      <Link
+        href={`/child/edit?${q}`}
+        className={`${BUTTON.tonal} editor-only w-full justify-center`}
+      >
         {t("settings.editChild")}
       </Link>
     </Card>
@@ -406,16 +418,21 @@ function NowCard({
   );
 }
 
+const HIGHLIGHT_TILE =
+  "flex aspect-square flex-col justify-between rounded-m3-md bg-tertiary-container p-2 text-on-tertiary-container";
+
 function HighlightsCard({
   milestones,
   q,
   t,
   locale,
+  editable,
 }: {
   milestones: readonly Milestone[];
   q: string;
   t: Translate;
   locale: Locale;
+  editable: boolean;
 }) {
   const shown = milestones.slice(0, 6);
   return (
@@ -434,13 +451,20 @@ function HighlightsCard({
         <ul className="grid grid-cols-3 gap-2">
           {shown.map((m) => (
             <li key={m.id}>
-              <Link
-                href={`/child/milestones/${m.id}/edit?${q}`}
-                className="state-layer flex aspect-square flex-col justify-between rounded-m3-md bg-tertiary-container p-2 text-on-tertiary-container"
-              >
-                <span className="label-medium">{formatDate(m.happenedOn, locale)}</span>
-                <span className="label-large line-clamp-3">{m.title}</span>
-              </Link>
+              {editable ? (
+                <Link
+                  href={`/child/milestones/${m.id}/edit?${q}`}
+                  className={`state-layer ${HIGHLIGHT_TILE}`}
+                >
+                  <span className="label-medium">{formatDate(m.happenedOn, locale)}</span>
+                  <span className="label-large line-clamp-3">{m.title}</span>
+                </Link>
+              ) : (
+                <div className={HIGHLIGHT_TILE}>
+                  <span className="label-medium">{formatDate(m.happenedOn, locale)}</span>
+                  <span className="label-large line-clamp-3">{m.title}</span>
+                </div>
+              )}
             </li>
           ))}
         </ul>
@@ -510,7 +534,7 @@ function Feed({
         {t("timeline.title")}
       </h2>
       {/* Like the box where a post is written: it opens the milestone form. */}
-      <Card tone="filled" className="flex items-center gap-3 p-4">
+      <Card tone="filled" className="editor-only flex items-center gap-3 p-4">
         <Avatar initial={initial} />
         <Link
           href={`/child/milestones/new?${q}`}
@@ -617,7 +641,7 @@ function Post({
           <Link
             href={event.href}
             aria-label={t(event.kind === "health" ? "health.editEntry" : "milestone.edit")}
-            className="state-layer inline-flex size-10 items-center justify-center rounded-full text-on-surface-variant"
+            className="editor-only state-layer inline-flex size-10 items-center justify-center rounded-full text-on-surface-variant"
           >
             <Icon name="edit" size={18} />
           </Link>
@@ -647,22 +671,34 @@ function MilestoneTile({
   milestone,
   q,
   locale,
+  editable,
 }: {
   milestone: Milestone;
   q: string;
   locale: Locale;
+  /** Opens the edit form; a plain tile for viewers. */
+  editable: boolean;
 }) {
-  return (
-    <Link
-      href={`/child/milestones/${milestone.id}/edit?${q}`}
-      className="state-layer flex h-full min-h-36 flex-col gap-2 rounded-m3-lg bg-tertiary-container p-5 text-on-tertiary-container"
-    >
+  const className =
+    "flex h-full min-h-36 flex-col gap-2 rounded-m3-lg bg-tertiary-container p-5 text-on-tertiary-container";
+  const content = (
+    <>
       <span className="label-medium">
         {formatDate(milestone.happenedOn, locale)} · {milestoneKindLabel(milestone.kind, locale)}
       </span>
       <span className="title-large">{milestone.title}</span>
       {milestone.note && <span className="body-medium">{milestone.note}</span>}
+    </>
+  );
+  return editable ? (
+    <Link
+      href={`/child/milestones/${milestone.id}/edit?${q}`}
+      className={`state-layer ${className}`}
+    >
+      {content}
     </Link>
+  ) : (
+    <div className={className}>{content}</div>
   );
 }
 

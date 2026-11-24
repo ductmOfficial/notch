@@ -43,6 +43,13 @@
       "when": 1795248003746,
       "tag": "0005_milestones",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1795509198524,
+      "tag": "0006_family_roles",
+      "breakpoints": true
     }
   ]
 }

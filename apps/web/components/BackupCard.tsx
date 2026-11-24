@@ -17,7 +17,8 @@ interface Summary extends Omit<BackupSummary, "exportedAt"> {
 }
 
 /** Download a JSON backup; restore one after a summary and a confirmation. */
-export function BackupCard() {
+/** `canRestore` for owners: a restore replaces the whole family's records. */
+export function BackupCard({ canRestore = true }: { canRestore?: boolean }) {
   const { t, locale } = useI18n();
   const router = useRouter();
   const inputId = useId();
@@ -64,22 +65,24 @@ export function BackupCard() {
           <Icon name="download" size={18} />
           {t("settings.backupDownload")}
         </a>
-        <label
-          htmlFor={inputId}
-          className={`${BUTTON.outlined} cursor-pointer has-focus-visible:outline-2`}
-        >
-          <Icon name="upload" size={18} />
-          {t("settings.restoreChoose")}
-          <input
-            ref={inputRef}
-            id={inputId}
-            type="file"
-            accept="application/json,.json"
-            className="sr-only"
-            disabled={!hydrated}
-            onChange={(e) => void choose(e.target.files?.[0])}
-          />
-        </label>
+        {canRestore && (
+          <label
+            htmlFor={inputId}
+            className={`${BUTTON.outlined} cursor-pointer has-focus-visible:outline-2`}
+          >
+            <Icon name="upload" size={18} />
+            {t("settings.restoreChoose")}
+            <input
+              ref={inputRef}
+              id={inputId}
+              type="file"
+              accept="application/json,.json"
+              className="sr-only"
+              disabled={!hydrated}
+              onChange={(e) => void choose(e.target.files?.[0])}
+            />
+          </label>
+        )}
       </div>
 
       {file && (

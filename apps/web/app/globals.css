@@ -241,3 +241,12 @@
     }
   }
 }
+
+/*
+ * Add and edit controls, hidden from viewers (<body data-role="viewer">). Outside the cascade
+ * layers, so it wins over the display of any utility. The server actions refuse a viewer's
+ * writes in any case.
+ */
+[data-role="viewer"] .editor-only {
+  display: none;
+}
