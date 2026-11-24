@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useId, useRef, useState, useTransition } from "react";
 
 import { restoreBackupAction, type RestoreState } from "../app/settings/actions";
+import { type BackupSummary, missingParts, summarizeBackup } from "../lib/backup-summary";
 import { formatDate, todayInVietnam } from "../lib/format";
 import { useI18n } from "../lib/i18n/client";
 import { useHydrated } from "../lib/use-hydrated";
@@ -11,30 +12,8 @@ import { BUTTON } from "./button-styles";
 import { ConfirmButton } from "./ConfirmButton";
 import { Icon } from "./icons";
 
-interface Summary {
+interface Summary extends Omit<BackupSummary, "exportedAt"> {
   readonly date: string;
-  readonly children: number;
-  readonly measurements: number;
-  readonly vaccinations: number;
-  readonly appointments: number;
-}
-
-type Child = Record<"measurements" | "vaccinations" | "appointments", unknown[]>;
-
-/** A first look at the chosen file, for the confirmation; the server validates it fully. */
-function summarize(json: unknown): Omit<Summary, "date"> & { exportedAt: string } {
-  const data = json as { format?: unknown; exportedAt?: unknown; children?: unknown };
-  if (data.format !== "notch-backup" || !Array.isArray(data.children)) throw new Error("format");
-  const children = data.children as Child[];
-  const count = (key: keyof Child) =>
-    children.reduce((sum, c) => sum + (Array.isArray(c[key]) ? c[key].length : 0), 0);
-  return {
-    exportedAt: typeof data.exportedAt === "string" ? data.exportedAt : "",
-    children: children.length,
-    measurements: count("measurements"),
-    vaccinations: count("vaccinations"),
-    appointments: count("appointments"),
-  };
 }
 
 /** Download a JSON backup; restore one after a summary and a confirmation. */
@@ -54,7 +33,7 @@ export function BackupCard() {
     setFile(null);
     if (!chosen) return;
     try {
-      const { exportedAt, ...counts } = summarize(JSON.parse(await chosen.text()));
+      const { exportedAt, ...counts } = summarizeBackup(JSON.parse(await chosen.text()));
       const date = Number.isNaN(Date.parse(exportedAt))
         ? "?"
         : formatDate(todayInVietnam(new Date(exportedAt)), locale);
@@ -106,6 +85,18 @@ export function BackupCard() {
       {file && (
         <div className="space-y-3 rounded-m3-md bg-secondary-container p-4 text-on-secondary-container">
           <p className="body-medium">{t("settings.restoreSummary", { ...file.summary })}</p>
+          {missingParts(file.summary.version).length > 0 && (
+            <p className="body-medium">
+              {t("settings.restoreOlder", {
+                version: file.summary.version,
+                parts: new Intl.ListFormat(locale, { type: "conjunction" }).format(
+                  missingParts(file.summary.version).map((part) =>
+                    t(`settings.restorePart.${part}`),
+                  ),
+                ),
+              })}
+            </p>
+          )}
           <ConfirmButton
             variant="danger"
             title={t("settings.restoreConfirmTitle")}

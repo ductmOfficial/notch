@@ -5,7 +5,7 @@ import Link from "next/link";
 
 import { BUTTON } from "../../components/button-styles";
 import { CardMotif, type CardMotifProps } from "../../components/Motifs";
-import { GrowthChart } from "../../components/GrowthChart";
+import { AXIS_WIDTH, GrowthAxis, GrowthChart } from "../../components/GrowthChart";
 import { GrowthReadingView } from "../../components/GrowthReading";
 import { Icon } from "../../components/icons";
 import { NoChild, NoDatabase } from "../../components/ui";
@@ -153,8 +153,17 @@ export default async function GrowthPage({ searchParams }: Props) {
                     aria-labelledby={titleId}
                     className="-mx-4 overflow-x-auto px-4 xl:hidden"
                   >
-                    <div dir="ltr" className="w-max min-w-full">
-                      <GrowthChart chart={chart} titleId={titleId} locale={locale} />
+                    <div dir="ltr" className="grid w-max min-w-full">
+                      <div className="[grid-area:1/1]">
+                        <GrowthChart chart={chart} titleId={titleId} locale={locale} />
+                      </div>
+                      {/* The y-axis again, kept at the left edge while the chart scrolls. */}
+                      <div
+                        className="sticky left-0 self-start [grid-area:1/1]"
+                        style={{ width: AXIS_WIDTH }}
+                      >
+                        <GrowthAxis chart={chart} locale={locale} />
+                      </div>
                     </div>
                   </div>
                   {/* From xl, three cards share the row: the compact frame, without scrolling. */}

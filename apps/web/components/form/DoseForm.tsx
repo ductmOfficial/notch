@@ -2,7 +2,7 @@
 
 import { CATALOG } from "@notch/vaccines";
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { useI18n } from "../../lib/i18n/client";
 
 import { recordDoseAction } from "../../app/actions";
@@ -34,6 +34,13 @@ export function DoseForm({
   const [state, action] = useActionState<FormState, FormData>(recordDoseAction, {});
   const { t } = useI18n();
   const v = (name: string, fallback = "") => fieldValue(state, name, fallback);
+  // The next appointment's dose follows the dose being recorded until it is edited by hand.
+  const [dose, setDose] = useState(() => v("doseNo", String(doseNo)));
+  const [nextByHand, setNextByHand] = useState<string | null>(null);
+  const doseNumber = Number(dose);
+  const nextDose =
+    nextByHand ??
+    (dose.trim() !== "" && Number.isInteger(doseNumber) ? String(doseNumber + 1) : "");
 
   return (
     <form action={action} className="space-y-6" noValidate>
@@ -55,7 +62,10 @@ export function DoseForm({
         <NumberField
           label={t("form.doseNo")}
           name="doseNo"
-          defaultValue={v("doseNo", String(doseNo))}
+          value={dose}
+          onChange={(e) => {
+            setDose(e.target.value);
+          }}
           error={state.errors?.doseNo}
           required
         />
@@ -82,7 +92,10 @@ export function DoseForm({
           <NumberField
             label={t("form.doseNo")}
             name="nextDoseNo"
-            defaultValue={v("nextDoseNo", String(doseNo + 1))}
+            value={nextDose}
+            onChange={(e) => {
+              setNextByHand(e.target.value);
+            }}
             error={state.errors?.nextDoseNo}
           />
           <DateField

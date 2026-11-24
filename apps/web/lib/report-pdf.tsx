@@ -45,6 +45,11 @@ const MUTED = "#524346";
 const LINE = "#d6c2c5";
 const PRIMARY = "#99405e";
 const CURVE = { median: "#3d692f", sd2: "#795900", sd3: "#9c8d90", grid: "#ece0e2" };
+/**
+ * Text inside an <Svg> does not inherit the page's font: without Roboto it falls back to
+ * Helvetica, which has no minus sign, so "−2" and "−3" printed without it.
+ */
+const CHART_TEXT = { fontFamily: "Roboto", fontSize: 7 } as const;
 /** Reading labels: green for normal, amber to watch, red to see a doctor. */
 const LEVEL_COLOR = { normal: "#3d692f", watch: "#795900", doctor: "#ba1a1a" } as const;
 
@@ -130,7 +135,7 @@ function Chart({ chart, locale }: { chart: ChartModel; locale: Locale }) {
             key={`yl${String(v)}`}
             x={PAD.left - 4}
             y={y(v) + 3}
-            style={{ fontSize: 7 }}
+            style={CHART_TEXT}
             fill={MUTED}
             textAnchor="end"
           >
@@ -142,7 +147,7 @@ function Chart({ chart, locale }: { chart: ChartModel; locale: Locale }) {
             key={`xl${String(tick.months)}`}
             x={x(tick.ageDays)}
             y={H - PAD.bottom + 11}
-            style={{ fontSize: 7 }}
+            style={CHART_TEXT}
             fill={MUTED}
             textAnchor="middle"
           >
@@ -166,7 +171,7 @@ function Chart({ chart, locale }: { chart: ChartModel; locale: Locale }) {
               key={`c${String(curve.z)}`}
               x={x(last[0]) + 3}
               y={y(last[1]) + 2.5}
-              style={{ fontSize: 6.5 }}
+              style={{ ...CHART_TEXT, fontSize: 6.5 }}
               fill={MUTED}
             >
               {curve.z === 0

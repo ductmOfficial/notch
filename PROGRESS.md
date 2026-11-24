@@ -58,6 +58,7 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 | 37  | Child's profile: birth-certificate and English names, birth time         | `feat/child-profile`        | ✅     |
 | 38  | Numerology in depth: more numbers, two birth charts, pinnacles, guidance | `feat/numerology-more`      | ✅     |
 | 39  | The child's page like a social profile: cover, tabs, feed, milestones    | `feat/child-page`           | ✅     |
+| 40  | Backlog: PDF minus signs, next dose number, phone chart axis, restore    | `fix/backlog`               | ✅     |
 
 Each step is a pull request with green checks (`Browser` from step 9), merged with rebase.
 
@@ -147,10 +148,10 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 
 ## Follow-ups
 
-- [ ] When recording a dose, update the suggested next dose number when the dose number changes
+- [x] When recording a dose, update the suggested next dose number when the dose number changes
 - [ ] Licence of the bundled WHO tables: `anthro` code is GPL-3; the tables are WHO reference data. Confirm the attribution before a wider release
-- [ ] Growth chart on phones opens at the latest measurements; the y-axis labels need a swipe back
-- [ ] Health log screens: the restore summary should count health entries and temperatures, and warn that a version 1 file brings back no health log
+- [x] Growth chart on phones opens at the latest measurements; the y-axis labels need a swipe back (a copy of the axis stays at the left edge)
+- [x] The restore summary counts health entries, temperatures and milestones, and names what an older backup lacks
 
 ## Issue log
 
@@ -167,3 +168,4 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 - **2026-11-19:** production had no vaccine catalog: deployments only migrate, and the catalog was loaded by the seed alone, so restoring a backup failed on the first product (`bcg`). `migrate` now loads the catalog too, and a test checks it.
 - **2026-11-20:** moving between pages took one to three seconds. The functions ran in the default US region while the database is in Singapore, and each page made several queries in a row. Fixed by running the functions in `sin1`, adding a loading state, caching the session in a signed cookie and reading the family with its children in one query.
 - **2026-11-20:** with the loading state, a backup picked right after the Settings page opened was ignored: the page streams, and the file input was there before its change handler. The input now stays disabled until the component has hydrated.
+- **2026-11-24:** the PDF growth charts printed the −2 and −3 curve labels without their minus sign. Text inside react-pdf's `<Svg>` does not inherit the page's font and fell back to Helvetica, which has no U+2212. The chart text now sets Roboto, and a test renders a report and checks that Helvetica is not used.
