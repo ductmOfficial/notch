@@ -62,6 +62,7 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 | 41  | Health screen: entries, temperatures, quick add, Today, PDF, timeline       | `feat/health-log`           | ✅     |
 | 42  | Follow-up after a vaccine: temperatures for two days, on Today and Vaccines | `feat/vaccine-follow-up`    | ✅     |
 | 43  | Family sharing: owners add relatives as editors or viewers                  | `feat/family-sharing`       | ✅     |
+| 44  | Installable app: manifest, icons, a service worker with an offline page     | `feat/pwa`                  | ✅     |
 
 Each step is a pull request with green checks (`Browser` from step 9), merged with rebase.
 
@@ -154,6 +155,7 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 | The follow-up runs on dates, from the day of the dose to two days later | Doses are stored by day, without a time; two days after the dose covers the first 48 hours whatever time it was given                                                                                |
 | Owners from the environment, relatives from Settings                    | NOTCH_ALLOWED_EMAILS stays the root of trust: a database change can never make someone an owner. Relatives are invited by address and join on their first sign-in, with no separate invitation email |
 | Roles checked in every server action, controls hidden by role           | The server refuses a viewer's write whatever the page shows; hiding the controls (and a note on form pages) keeps the screens honest about what a viewer can do                                      |
+| The service worker caches an offline page only                          | A child's health records stay off the device's caches; the offline page is fetched without a session, so even the cached copy names no one                                                           |
 
 ## Follow-ups
 

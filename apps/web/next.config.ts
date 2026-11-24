@@ -13,6 +13,12 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["@electric-sql/pglite", "pg", "@react-pdf/renderer"],
   // The PDF report reads its fonts from disk; ship them with that route.
   outputFileTracingIncludes: { "/report.pdf": ["./assets/fonts/*.ttf"] },
+  // The service worker is checked for updates on every visit, so a new one takes over soon.
+  headers() {
+    return Promise.resolve([
+      { source: "/sw.js", headers: [{ key: "Cache-Control", value: "no-cache" }] },
+    ]);
+  },
 };
 
 export default nextConfig;

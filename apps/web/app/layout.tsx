@@ -7,6 +7,7 @@ import type { ReactNode } from "react";
 import { MotifBackdrop, MotifMark } from "../components/Motifs";
 import { NavLinks } from "../components/NavLinks";
 import { QuickAdd } from "../components/QuickAdd";
+import { ServiceWorker } from "../components/ServiceWorker";
 import { I18nProvider } from "../lib/i18n/client";
 import { getI18n } from "../lib/i18n/server";
 import { getPalette, getTheme } from "../lib/preferences";
@@ -17,6 +18,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: { default: "Notch", template: "%s · Notch" },
     description: t("app.description"),
+    // Opened from the home screen, iOS shows it without the browser bar.
+    appleWebApp: { capable: true, title: "Notch", statusBarStyle: "default" },
   };
 }
 
@@ -106,6 +109,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             </div>
           )}
         </I18nProvider>
+        <ServiceWorker />
       </body>
     </html>
   );

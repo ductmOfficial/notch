@@ -12,6 +12,9 @@ export function proxy(request: NextRequest): NextResponse {
 
 export const config = {
   // Everything except the sign-in page, Better Auth's endpoints, the calendar subscription
-  // (its secret token is the credential), Next.js files and the icon.
-  matcher: ["/((?!sign-in|api/auth|calendar/|_next/|icon\\.svg|favicon\\.ico).*)"],
+  // (its secret token is the credential), Next.js files, the icons, and what installs the
+  // app: the manifest, the service worker and its offline page, none of which hold data.
+  matcher: [
+    "/((?!sign-in|api/auth|calendar/|_next/|icon\\.svg|apple-icon\\.png|icons/|favicon\\.ico|manifest\\.webmanifest|sw\\.js|offline).*)",
+  ],
 };
