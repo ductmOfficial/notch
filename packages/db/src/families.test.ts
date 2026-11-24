@@ -2,7 +2,7 @@ import { count } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { createDb } from "./client.js";
-import { familyForUser, familyIdForUser } from "./families.js";
+import { familyForUser, familyIdForUser, UnknownUserError } from "./families.js";
 import { addChild } from "./mutations.js";
 import { family, familyMember, user } from "./schema.js";
 
@@ -43,6 +43,20 @@ describe("familyIdForUser", () => {
       const [seeded] = await other.db.insert(family).values({ name: "Seeded" }).returning();
       await other.db.insert(user).values({ id: "u3", name: "", email: "three@example.com" });
       expect(await familyIdForUser(other.db, "u3")).toBe(seeded?.id);
+    } finally {
+      await other.close();
+    }
+  });
+});
+
+describe("a user the database does not have", () => {
+  it("is refused without creating a family", async () => {
+    const other = createDb("pglite:memory");
+    try {
+      await other.migrate();
+      await expect(familyForUser(other.db, "ghost")).rejects.toBeInstanceOf(UnknownUserError);
+      const [families] = await other.db.select({ n: count() }).from(family);
+      expect(families?.n).toBe(0);
     } finally {
       await other.close();
     }

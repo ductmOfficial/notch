@@ -11,7 +11,7 @@ export {
   revokeCalendarToken,
 } from "./calendar-tokens.js";
 export type { FamilyOfUser } from "./families.js";
-export { familyForUser, familyIdForUser } from "./families.js";
+export { familyForUser, familyIdForUser, UnknownUserError } from "./families.js";
 export type { Milestone, MilestoneInput, MilestoneKind } from "./milestones.js";
 export {
   addMilestone,

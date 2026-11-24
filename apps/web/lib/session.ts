@@ -1,6 +1,6 @@
 import "server-only";
 
-import { type Child, familyForUser } from "@notch/db";
+import { type Child, familyForUser, UnknownUserError } from "@notch/db";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
@@ -19,7 +19,8 @@ export interface Viewer {
 
 /**
  * The signed-in parent and their family, once per request. Someone removed from the
- * allowlist counts as signed out even while their session cookie is still valid.
+ * allowlist counts as signed out even while their session cookie is still valid, and so
+ * does a cookie naming a user this database does not have.
  */
 export const getViewer = cache(async (): Promise<Viewer | undefined> => {
   const auth = getAuth();
@@ -27,7 +28,15 @@ export const getViewer = cache(async (): Promise<Viewer | undefined> => {
   if (!auth || !db) return undefined;
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session || !isAllowed(session.user.email, allowedEmails())) return undefined;
-  const { familyId, children } = await familyForUser(db, session.user.id);
+  let family;
+  try {
+    family = await familyForUser(db, session.user.id);
+  } catch (error) {
+    // A cookie for a user this database lacks: sign in again rather than fail the page.
+    if (error instanceof UnknownUserError) return undefined;
+    throw error;
+  }
+  const { familyId, children } = family;
   return { userId: session.user.id, email: session.user.email, familyId, children };
 });
 
