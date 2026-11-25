@@ -367,3 +367,24 @@ export const milestone = pgTable(
     ),
   ],
 );
+
+// ── Sharing ──────────────────────────────────────────────────────────────
+
+/**
+ * A public, read-only link to a child's page for people without an account. It shows the
+ * child's name, age, milestones, latest measurement and doses, never health records. The
+ * token is stored as is so the family can copy the link again; anyone who can read this
+ * table can read the records themselves. One link per child; a new one replaces it.
+ */
+export const shareLink = pgTable("share_link", {
+  id: id(),
+  childId: uuid()
+    .notNull()
+    .unique()
+    .references(() => child.id, { onDelete: "cascade" }),
+  token: text().notNull().unique(),
+  /** Null: the link works until it is revoked. */
+  expiresAt: timestamp({ withTimezone: true }),
+  createdAt: createdAt(),
+  lastViewedAt: timestamp({ withTimezone: true }),
+});

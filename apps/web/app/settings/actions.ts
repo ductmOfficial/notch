@@ -4,6 +4,7 @@ import {
   AlreadyMemberError,
   BackupFormatError,
   createCalendarToken,
+  createShareLink,
   INVITE_ROLES,
   type InviteRole,
   inviteInputSchema,
@@ -12,7 +13,10 @@ import {
   removeMember,
   restoreBackup,
   revokeCalendarToken,
+  revokeShareLink,
   setMemberRole,
+  SHARE_LINK_DURATIONS,
+  type ShareLinkDuration,
 } from "@notch/db";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
@@ -68,6 +72,24 @@ export async function createCalendarLinkAction(): Promise<string> {
 export async function revokeCalendarLinkAction(): Promise<void> {
   const { familyId } = await requireEditor();
   await revokeCalendarToken(database(), familyId);
+  revalidatePath("/settings");
+}
+
+const isDuration = (value: string): value is ShareLinkDuration =>
+  (SHARE_LINK_DURATIONS as readonly string[]).includes(value);
+
+/** Creates (or replaces) the public link to a child's page; editors and owners only. */
+export async function createShareLinkAction(childId: string, duration: string): Promise<void> {
+  const { familyId } = await requireEditor();
+  if (!isDuration(duration)) throw new Error("Unknown duration");
+  const link = await createShareLink(database(), familyId, childId, duration);
+  if (!link) throw new Error("Unknown child");
+  revalidatePath("/settings");
+}
+
+export async function revokeShareLinkAction(childId: string): Promise<void> {
+  const { familyId } = await requireEditor();
+  await revokeShareLink(database(), familyId, childId);
   revalidatePath("/settings");
 }
 

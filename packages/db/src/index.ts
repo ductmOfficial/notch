@@ -63,6 +63,15 @@ export {
   updateHealthEntry,
   updateTemperature,
 } from "./health.js";
+export type { ShareLink, ShareLinkDuration } from "./share-links.js";
+export {
+  childForShareToken,
+  createShareLink,
+  isShareLinkActive,
+  listShareLinks,
+  revokeShareLink,
+  SHARE_LINK_DURATIONS,
+} from "./share-links.js";
 export type { AppointmentRow, Child, Measurement, Vaccination } from "./queries.js";
 export {
   getChild,

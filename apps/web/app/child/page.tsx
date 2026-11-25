@@ -14,6 +14,7 @@ import type { ReactNode } from "react";
 
 import { BUTTON } from "../../components/button-styles";
 import { Icon, type IconName } from "../../components/icons";
+import { MilestoneTile } from "../../components/MilestoneTile";
 import { CoverArt } from "../../components/Motifs";
 import { Card, NoChild, NoDatabase } from "../../components/ui";
 import { getCurrentChild } from "../../lib/child";
@@ -306,7 +307,11 @@ export default async function ChildPage({ searchParams }: Props) {
             </li>
             {milestones.map((m) => (
               <li key={m.id}>
-                <MilestoneTile milestone={m} q={q} locale={locale} editable={editable} />
+                <MilestoneTile
+                  milestone={m}
+                  locale={locale}
+                  href={editable ? `/child/milestones/${m.id}/edit?${q}` : undefined}
+                />
               </li>
             ))}
           </ul>
@@ -664,41 +669,6 @@ function Post({
         </div>
       </div>
     </Card>
-  );
-}
-
-function MilestoneTile({
-  milestone,
-  q,
-  locale,
-  editable,
-}: {
-  milestone: Milestone;
-  q: string;
-  locale: Locale;
-  /** Opens the edit form; a plain tile for viewers. */
-  editable: boolean;
-}) {
-  const className =
-    "flex h-full min-h-36 flex-col gap-2 rounded-m3-lg bg-tertiary-container p-5 text-on-tertiary-container";
-  const content = (
-    <>
-      <span className="label-medium">
-        {formatDate(milestone.happenedOn, locale)} · {milestoneKindLabel(milestone.kind, locale)}
-      </span>
-      <span className="title-large">{milestone.title}</span>
-      {milestone.note && <span className="body-medium">{milestone.note}</span>}
-    </>
-  );
-  return editable ? (
-    <Link
-      href={`/child/milestones/${milestone.id}/edit?${q}`}
-      className={`state-layer ${className}`}
-    >
-      {content}
-    </Link>
-  ) : (
-    <div className={className}>{content}</div>
   );
 }
 

@@ -14,6 +14,7 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 | P1    | Today, Growth and Vaccinations screens, forms, `.ics` calendar, design, E2E | ✅     |
 | P2    | Health log, post-vaccination follow-up, family sharing (PDF done in P1)     | ✅     |
 | P3    | PWA, demo mode, deployment                                                  | ✅     |
+| P4    | Sharing outside the family: a public read-only link to the child's page     | ✅     |
 
 ## Steps
 
@@ -65,6 +66,7 @@ Notch tracks a child's growth, vaccinations and health. This repo was created fr
 | 44  | Installable app: manifest, icons, a service worker with an offline page     | `feat/pwa`                    | ✅     |
 | 45  | About page and a read-only demo on an in-memory database                    | `feat/demo`                   | ✅     |
 | 46  | Architecture diagram; tests run with 90% coverage in CI                     | `chore/coverage-architecture` | ✅     |
+| 47  | Public share link to the child's page, for a week, a month or until revoked | `feat/share-link`             | ✅     |
 
 Each step is a pull request with green checks (`Browser` from step 9), merged with rebase.
 
@@ -158,6 +160,8 @@ Each step is a pull request with green checks (`Browser` from step 9), merged wi
 | Owners from the environment, relatives from Settings                    | NOTCH_ALLOWED_EMAILS stays the root of trust: a database change can never make someone an owner. Relatives are invited by address and join on their first sign-in, with no separate invitation email     |
 | Roles checked in every server action, controls hidden by role           | The server refuses a viewer's write whatever the page shows; hiding the controls (and a note on form pages) keeps the screens honest about what a viewer can do                                          |
 | The service worker caches an offline page only                          | A child's health records stay off the device's caches; the offline page is fetched without a session, so even the cached copy names no one                                                               |
+| A share link shows the child's page, never the health log               | People without an account see the name, age, milestones, latest measurement and doses; the health log, the birth date and time and the other names stay with the family, whatever the link's age         |
+| Share links are stored as is, one per child                             | The family can copy the link again to send it to someone else; the token only opens what the database already holds. A new link replaces the old one, and an expired one stays listed to renew           |
 | The demo runs on an in-memory database, not on production               | Production only migrates and never seeds; an in-memory PGlite per server instance shows the fictional child without an account, cannot touch a family's records and forgets everything with the instance |
 
 ## Follow-ups

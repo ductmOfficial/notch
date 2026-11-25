@@ -30,7 +30,7 @@
 ```
 .
 ├── apps/
-│   └── web/                    # Next.js app: / (Today), /growth, /vaccines, /health, /child, /settings, /about
+│   └── web/                    # Next.js app: / (Today), /growth, /vaccines, /health, /child, /settings, /about, /share
 ├── packages/
 │   ├── growth/                 # @notch/growth: WHO LMS z-scores and percentiles (pure TypeScript)
 │   ├── vaccines/               # @notch/vaccines: vaccine catalog, appointments, schedule engine (pure TypeScript)
@@ -245,7 +245,7 @@ pnpm --filter web e2e
 - **Family members and roles.** In Settings, an owner adds a relative by email as an **editor** (adds and changes records) or a **viewer** (reads everything, changes nothing), switches between the two, or removes them. The address may sign in at once; its first sign-in turns the invite into a membership. Viewers see no add or edit controls and get a short note on form pages; every server action checks the role as well, and only owners restore a backup or manage members. Owners stay owners: they come from the environment.
 - **First run.** A family without a child lands on `/welcome`, a short form for the first child (name, sex for the WHO charts, date of birth); every other page leads there until it is filled in. No seed file is needed.
 - **Child's profile.** Settings lists each child with an edit link (`/child/edit`): the family's name for the child, shown across the app, the birth-certificate and English names (optional), sex, date and time of birth. Only a child of the signed-in family can be changed.
-- **Checked on the server.** A proxy sends visitors without a session cookie to `/sign-in`; every page, server action and the calendar route then check the session and that the child belongs to the signed-in family.
+- **Checked on the server.** A proxy sends visitors without a session cookie to `/sign-in`; every page, server action and the calendar route then check the session and that the child belongs to the signed-in family. The calendar feed and shared pages (`/share/<token>`) skip the proxy: their secret token is the credential.
 - **Mail.** Through Resend when `RESEND_API_KEY` is set; otherwise written to `MAIL_OUTBOX` (the end-to-end tests read it) or printed to the console in development. The email holds only the link, nothing about the child. Sent from Resend's shared `onboarding@resend.dev` address (no domain of your own yet), it can land in Gmail's Spam: mark it as not spam once. A verified domain on Resend also lets addresses other than the Resend account's receive links.
 - **Limits.** Better Auth's rate limits (5 link requests a minute per client) are kept in the database, so they hold on serverless hosting.
 
@@ -329,7 +329,11 @@ Each child has a page (`/child`), reached from the name on Today and from the ch
 - **About**: basic info, health, vaccinations and the fun numbers, each with a link to its full page.
 - **Milestones**: every milestone as a tile, with a tile to add one. A milestone has a kind (movement, language, teeth, social, other), a title in the family's words with common ones offered for the kind, a date and a note. Milestones are recorded, never assessed: the app never says one came early or late.
 
-Like every page, it is for the signed-in family only.
+The page is for the signed-in family. To show it to someone without an account, Settings has **Share the child's page**:
+
+- An editor or owner creates a link for a child that works for **7 days, 30 days or until revoked**, copies it or opens it, and later sees when it expires and when it was last opened. A new link replaces the old one; revoking stops it at once.
+- The shared page (`/share/<token>`) shows the family's name for the child, the age, the latest weight and length with the day they were measured, the number of doses and the diseases covered, and the milestones. It never shows the health log, the birth date and time, or the birth-certificate and English names.
+- The token is 32 random bytes, stored as is so the link can be copied again (`packages/db/src/share-links.ts`). The page is served with `noindex`, `no-store` and `no-referrer`, and always reads the app's database, never the demo. An unknown, expired or revoked link shows a page that names no one, and a page left open checks its link again when it comes back into view and every minute, so it closes once the link is revoked or expires.
 
 ## Just for fun: numerology
 
