@@ -483,6 +483,7 @@ test("an owner adds a relative as a viewer, allows editing, then removes them", 
   await expect(other.getByRole("button", { name: "Lưu" })).toHaveCount(0);
   await other.goto("/settings");
   await expect(other.getByText("Quyền: Người xem")).toBeVisible();
+  await expect(other.getByRole("list", { name: "Chia sẻ trang của bé" })).toHaveCount(0);
   await expect(other.getByRole("list", { name: "Thành viên gia đình" })).toHaveCount(0);
 
   // The owner allows editing: the form appears for the relative.

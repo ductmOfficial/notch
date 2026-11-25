@@ -24,6 +24,16 @@ const nextConfig: NextConfig = {
   headers() {
     return Promise.resolve([
       { source: "/sw.js", headers: [{ key: "Cache-Control", value: "no-cache" }] },
+      // A shared child's page: kept out of search engines and shared caches, and its secret
+      // address is not sent to other sites.
+      {
+        source: "/share/:token",
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
+          { key: "Cache-Control", value: "private, no-store" },
+          { key: "Referrer-Policy", value: "no-referrer" },
+        ],
+      },
     ]);
   },
 };

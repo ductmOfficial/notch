@@ -39,6 +39,8 @@ const ICONS = {
   sick: "sick",
   medication: "medication",
   stethoscope: "stethoscope",
+  share: "share",
+  openInNew: "open_in_new",
 };
 
 const root = dirname(

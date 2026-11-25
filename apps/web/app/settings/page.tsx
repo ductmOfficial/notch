@@ -1,5 +1,12 @@
-import { calendarLinkInfo, listInvites, listMembers } from "@notch/db";
+import {
+  calendarLinkInfo,
+  isShareLinkActive,
+  listInvites,
+  listMembers,
+  listShareLinks,
+} from "@notch/db";
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import Link from "next/link";
 
 import { BackupCard } from "../../components/BackupCard";
@@ -8,6 +15,7 @@ import { BUTTON } from "../../components/button-styles";
 import { CalendarLink, type CalendarLinkSummary } from "../../components/CalendarLink";
 import { LanguagePicker } from "../../components/LanguagePicker";
 import { PalettePicker } from "../../components/PalettePicker";
+import { type ShareLinkItem, ShareLinks } from "../../components/ShareLinks";
 import { SignOutButton } from "../../components/SignOutButton";
 import { ThemePicker } from "../../components/ThemePicker";
 import { Icon } from "../../components/icons";
@@ -30,15 +38,36 @@ export default async function SettingsPage() {
   const db = await getDb();
   const owner = isOwner(viewer);
   const demo = await isDemo();
-  const [info, members, invites] = await Promise.all([
+  const editor = mayEdit(viewer);
+  const [info, members, invites, links] = await Promise.all([
     db ? calendarLinkInfo(db, viewer.familyId) : undefined,
     db && owner ? listMembers(db, viewer.familyId) : [],
     db && owner ? listInvites(db, viewer.familyId) : [],
+    db && editor ? listShareLinks(db, viewer.familyId) : [],
   ]);
   const day = (date: Date) => formatDate(todayInVietnam(date), locale);
   const calendar: CalendarLinkSummary | null = info
     ? { created: day(info.createdAt), lastUsed: info.lastUsedAt ? day(info.lastUsedAt) : null }
     : null;
+  // Share links are absolute, on the address this page was opened at.
+  const request = await headers();
+  const origin = `${request.get("x-forwarded-proto") ?? "http"}://${request.get("host") ?? "localhost"}`;
+  const now = new Date();
+  const shareItems: ShareLinkItem[] = viewer.children.map((c) => {
+    const link = links.find((l) => l.childId === c.id);
+    return {
+      childId: c.id,
+      name: c.name,
+      link: link
+        ? {
+            url: `${origin}/share/${link.token}`,
+            expires: link.expiresAt ? day(link.expiresAt) : null,
+            expired: !isShareLinkActive(link, now),
+            lastViewed: link.lastViewedAt ? day(link.lastViewedAt) : null,
+          }
+        : null,
+    };
+  });
   return (
     <div className="space-y-6 pt-2">
       <header>
@@ -85,7 +114,7 @@ export default async function SettingsPage() {
                   <Link href={`/child?child=${c.id}`} className={BUTTON.text}>
                     {t("child.viewPage")}
                   </Link>
-                  {mayEdit(viewer) && (
+                  {editor && (
                     <Link href={`/child/edit?child=${c.id}`} className={BUTTON.outlined}>
                       <Icon name="edit" size={18} />
                       {t("settings.editChild")}
@@ -109,8 +138,14 @@ export default async function SettingsPage() {
           />
         </Card>
       )}
-      {/* The calendar link is the family's: editors and owners create or revoke it. */}
-      {mayEdit(viewer) && (
+      {/* Share links and the calendar link are the family's: editors and owners manage them. */}
+      {editor && shareItems.length > 0 && (
+        <Card className="space-y-4 p-5">
+          <h2 className="title-small">{t("settings.share")}</h2>
+          <ShareLinks items={shareItems} />
+        </Card>
+      )}
+      {editor && (
         <Card className="space-y-4 p-5">
           <h2 className="title-small">{t("settings.calendar")}</h2>
           <CalendarLink summary={calendar} />
