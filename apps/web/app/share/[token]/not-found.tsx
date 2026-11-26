@@ -1,8 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { BUTTON } from "../../../components/button-styles";
 import { MotifMark } from "../../../components/Motifs";
 import { getI18n } from "../../../lib/i18n/server";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return { title: t("share.goneTitle"), robots: { index: false, follow: false } };
+}
 
 /** An unknown, revoked or expired share link: no hint of whose page it was. */
 export default async function ShareLinkGone() {

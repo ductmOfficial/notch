@@ -6,7 +6,7 @@ import { formatDate } from "../lib/format";
 import type { Locale } from "../lib/i18n/messages";
 
 const TILE =
-  "flex h-full min-h-36 flex-col gap-2 rounded-m3-lg bg-tertiary-container p-5 text-on-tertiary-container";
+  "flex h-full min-h-24 flex-col gap-2 rounded-m3-lg bg-tertiary-container p-5 text-on-tertiary-container sm:min-h-36";
 
 /** A milestone as a tile: when, what kind, what happened. With `href`, it opens the edit form. */
 export function MilestoneTile({
