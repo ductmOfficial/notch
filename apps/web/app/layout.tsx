@@ -1,6 +1,7 @@
 import "./globals.css";
 
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -13,6 +14,7 @@ import { I18nProvider } from "../lib/i18n/client";
 import { getI18n } from "../lib/i18n/server";
 import { getPalette, getTheme } from "../lib/preferences";
 import { isDemo } from "../lib/demo";
+import { SHARED_PAGE_HEADER } from "../lib/shared-page";
 import { getViewer, mayEdit } from "../lib/session";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -38,12 +40,18 @@ export const viewport: Viewport = {
  */
 export default async function RootLayout({ children }: { children: ReactNode }) {
   // Theme and palette chosen in Settings are rendered on the server, so the page never flashes.
-  const [theme, palette, viewer, demo] = await Promise.all([
+  const [theme, palette, signedIn, demoBrowser, request] = await Promise.all([
     getTheme(),
     getPalette(),
     getViewer(),
     isDemo(),
+    headers(),
   ]);
+  // A shared child's page looks the same to everyone: the public frame, without the family's
+  // navigation or the demo banner, even for a family member or a demo browser.
+  const shared = request.get(SHARED_PAGE_HEADER) === "1";
+  const viewer = shared ? undefined : signedIn;
+  const demo = demoBrowser && !shared;
   const { t, locale } = await getI18n();
   return (
     <html

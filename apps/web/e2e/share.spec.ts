@@ -54,6 +54,23 @@ test("a share link opens the child's page without an account, until it is replac
   );
   expect(overflow).toBe(0);
 
+  // A family member who opens the link sees what others see: no app navigation.
+  const preview = await page.context().newPage();
+  await preview.goto(url);
+  await expect(preview.locator("main h1")).toHaveText("Mây");
+  await expect(preview.getByRole("navigation", { name: "Chính" })).toHaveCount(0);
+  await preview.close();
+
+  // Nor does a browser in the demo get the demo's banner over a real child's page.
+  const demo = await browser.newContext({ storageState: { cookies: [], origins: [] } });
+  const demoPage = await demo.newPage();
+  await demoPage.goto("/demo");
+  await expect(demoPage.getByRole("note")).toBeVisible();
+  await demoPage.goto(url);
+  await expect(demoPage.locator("main h1")).toHaveText("Mây");
+  await expect(demoPage.getByRole("note")).toHaveCount(0);
+  await demo.close();
+
   // The family sees that it was opened.
   await page.reload();
   await expect(links).toContainText("Mở lần cuối ngày");
@@ -81,4 +98,11 @@ test("a share link opens the child's page without an account, until it is replac
   await guest.goto(replaced);
   await expect(guest.getByRole("heading", { name: "Link không còn dùng được" })).toBeVisible();
   await context.close();
+});
+
+test("an unknown address shows a page in the app's language", async ({ page }) => {
+  await page.goto("/growth/00000000-0000-4000-8000-000000000000/edit");
+  await expect(page.getByRole("heading", { name: "Không tìm thấy trang" })).toBeVisible();
+  await page.getByRole("link", { name: "Về Hôm nay" }).click();
+  await expect(page).toHaveURL(/\/$/);
 });

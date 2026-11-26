@@ -299,7 +299,7 @@ export default async function ChildPage({ searchParams }: Props) {
             <li className="editor-only">
               <Link
                 href={`/child/milestones/new?${q}`}
-                className="state-layer flex h-full min-h-36 flex-col items-center justify-center gap-2 rounded-m3-lg border-2 border-dashed border-outline-variant p-5 text-primary"
+                className="state-layer flex h-full min-h-24 flex-col items-center justify-center gap-2 rounded-m3-lg border-2 sm:min-h-36 border-dashed border-outline-variant p-5 text-primary"
               >
                 <Icon name="add" size={28} />
                 <span className="label-large">{t("milestone.add")}</span>
